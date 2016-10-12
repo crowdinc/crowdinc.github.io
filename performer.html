@@ -5,13 +5,6 @@
 		Crowd in C[loud] Performer Interface
 		</title>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" type="text/css" href="./css/main.css">
     <link rel="stylesheet" href="./codemirror/lib/codemirror.css">
@@ -38,7 +31,7 @@
 
   <body onload="load()">
     <div class="section group">
-      <div class="col span_3_of_5">
+      <div class="col col-lg-8 col-md-8">
         <h1> Crowd <!--(<span id="usersonline">0</span>)--> in C[loud] : https://bit.ly/crowdinc</h1>
 
         <form>
@@ -68,136 +61,140 @@
           </div>
         </form>
       </div>
-      <div class="col span_1_of_5  center">
-         <img src="./images/mostliked_simple.png" height="100px">
+      <div class="col col-lg-2 col-md-2  center">
+         <img src="./images/mostliked_simple.png" height="80px">
         <h2 id="most-liked" style="margin:0px;">None</h2>
       </div>
-      <div class="col span_1_of_5  center">
-          <img src="./images/mostcrowd_simple2.png" height="100px">
+      <div class="col col-lg-2 col-md-2  center">
+          <img src="./images/mostcrowd_simple2.png" height="80px">
        <h2 id="most-followed" style="margin:0px;">None</h2>
       </div>
     </div>
     <div >
     <div class = "row">
 
-    <div id="availables" class = "col-sm-9 col-md-9 col-lg-9">
+      <div id="availables" class = col-sm-10 col-md-10 col-lg-10>
+
+      </div>
+
+
+      <div id="unavailables" class="col-sm-2 col-md-2 col-lg-2">
+      </div>
 
     </div>
+    <div class = "editor">
+      <div id ="codemirror_div" class = "col-sm-12 col-md-12 col-lg-12">
+        <textarea id="code" name="code">
+  // dice button will give you random tunes but you can drag and drop circles.
+  // Top part is high notes, The bottom is low notes
+  // Left side give you pure tones, right side is more metallic
+  // This is in C major chord if that means anything to you.
+  // Find your name in the projection screen!
+  // Do not miss what others did by pressing checkbox.
+  // If you get stuck for some reason, simply refresh the page and start over!
+  // I am going to play some tunes, don't be surprised
+  // One more time for tunes.
+  // Gotta end the piece soon. Georg is staring at me from the back stage.
+  // alert
+  publishMessage("audience", {type:"script",script:'setTimeout(function(){alert("you guys are not listening to me.");}, 3000 * Math.random());'});
+
+  // dice button will give you random tunes but you can drag and drop circles.
+  // Top part is high notes, The bottom is low notes
+  // Left side give you pure tones, right side is more metallic
+  // This is in C major chord if that means anything to you.
+  // Find your name in the projection screen!
+  // Do not miss what others did by pressing checkbox.
+  // If you get stuck for some reason, simply refresh the page and start over!
+  // I am going to play some tunes, don't be surprised
+  // One more time for tunes.
+  // Gotta end the piece soon. Georg is staring at me from the back stage.
+  //Cmajor 100%
+  publishMessage("audience", {type:"scale", baseNote:60, scale:[0,2,4,5,7,9,11,12], probability:1});
+  //Cminor 100%
+  publishMessage("audience", {type:"scale", baseNote:60, scale:[0,2,3,5,7,8,10,12], probability:1});
+  // A minor 100%
+  publishMessage("audience", {type:"scale", baseNote:57, scale:[0,2,3,5,7,8,10,12], probability:1});
+  //Eminor
+  publishMessage("audience", {type:"scale", baseNote:64, scale:[0,2,3,5,7,8,10,12], probability:1}) ;
+  //st C Major7
+  publishMessage("audience", {type:"scale", baseNote:60, scale:[0,4,7,11,12], probability:1}) ;
+  //st Aminor
+  publishMessage("audience", {type:"scale", baseNote:57, scale:[0,3,7,10,12], probability:1});
+  //st Eminor
+  publishMessage("audience", {type:"scale", baseNote:64, scale:[0,3,7,10,12], probability:1}) ;
+  //st Eminor
+  publishMessage("audience", {type:"scale", baseNote:65, scale:[0,3,7,10,12], probability:1}) ;
+  //pu C
+  publishMessage("audience", {type:"scale", baseNote:60, scale:[0], probability:1});
+  //pu B
+  publishMessage("audience", {type:"scale", baseNote:71, scale:[0], probability:1});
+  //pu high C
+  publishMessage("audience", {type:"scale", baseNote:72, scale:[0], probability:1});
+  //pu G
+  publishMessage("audience", {type:"scale", baseNote:67, scale:[0], probability:1});
+  //pu B
+  publishMessage("audience", {type:"scale", baseNote:70, scale:[0], probability:1});
+
+  var majorScale = [0,2,4,5,7,9,11,12];
+  var minorScale = [0,2,3,5,7,8,10,12];
+  minor7 :[0,3,7,10,12]
+  major7 : [0,4,7,11,12]
 
 
-    <div id="unavailables" class = "col-sm-1 col-md-1 col-lg-1">
+
+  leftside will give you pure tone
+  right side will give you metallic tone
+  find your name on the screen!!!'
+  let me change the chord to c Mnior', true, 2000)"}
+
+  {"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  Mihai is the most liked tunes!', true, 2000)"}
+  So I am going to play a tunes, do not be surprised.
+  {"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  nice texture out there!
+  {"baseNote":57,"probability":1,"scale":[0,3,7,10,12],"type":"scale"}
+  {"baseNote":60,"probability":0.5,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":60,"probability":0.5,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  {"baseNote":57,"probability":0.5,"scale":[0,3,7,10,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
+  {"baseNote":57,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
+  {"baseNote":71,"probability":0.5,"scale":[0],"type":"scale"}
+  Georg is staring at me. Gotta end the piece soon.', true, 2000)"}
+  {"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
+  {"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
+  {"baseNote":48,"probability":0.5,"scale":[0],"type":"scale"}
+  {"baseNote":36,"probability":0.5,"scale":[0],"type":"scale"}
+  {"sound":false,"state":"END","type":"state-response"}
+
+  nice!
+  left-side will give you pure tone
+  right side will give you metallic tone
+  find you name on the screen!!!
+  let me change the chord to c Mnior
+  Mihai is the most liked tunes!
+  So I am going to play a tunes, do not be surprised.
+  nice texture out there!
+  Georg is staring at me. Gotta end the piece soon.
+
+      </textarea>
+      </div>
     </div>
-    <div id ="codemirror_div" class = "col-sm-2 col-md-2 col-lg-2">
-      <textarea id="code" name="code">
-// dice button will give you random tunes but you can drag and drop circles.
-// Top part is high notes, The bottom is low notes
-// Left side give you pure tones, right side is more metallic
-// This is in C major chord if that means anything to you.
-// Find your name in the projection screen!
-// Do not miss what others did by pressing checkbox.
-// If you get stuck for some reason, simply refresh the page and start over!
-// I am going to play some tunes, don't be surprised
-// One more time for tunes.
-// Gotta end the piece soon. Georg is staring at me from the back stage.
-// alert
-publishMessage("audience", {type:"script",script:'setTimeout(function(){alert("you guys are not listening to me.");}, 3000 * Math.random());'});
 
-// dice button will give you random tunes but you can drag and drop circles.
-// Top part is high notes, The bottom is low notes
-// Left side give you pure tones, right side is more metallic
-// This is in C major chord if that means anything to you.
-// Find your name in the projection screen!
-// Do not miss what others did by pressing checkbox.
-// If you get stuck for some reason, simply refresh the page and start over!
-// I am going to play some tunes, don't be surprised
-// One more time for tunes.
-// Gotta end the piece soon. Georg is staring at me from the back stage.
-//Cmajor 100%
-publishMessage("audience", {type:"scale", baseNote:60, scale:[0,2,4,5,7,9,11,12], probability:1});
-//Cminor 100%
-publishMessage("audience", {type:"scale", baseNote:60, scale:[0,2,3,5,7,8,10,12], probability:1});
-// A minor 100%
-publishMessage("audience", {type:"scale", baseNote:57, scale:[0,2,3,5,7,8,10,12], probability:1});
-//Eminor
-publishMessage("audience", {type:"scale", baseNote:64, scale:[0,2,3,5,7,8,10,12], probability:1}) ;
-//st C Major7
-publishMessage("audience", {type:"scale", baseNote:60, scale:[0,4,7,11,12], probability:1}) ;
-//st Aminor
-publishMessage("audience", {type:"scale", baseNote:57, scale:[0,3,7,10,12], probability:1});
-//st Eminor
-publishMessage("audience", {type:"scale", baseNote:64, scale:[0,3,7,10,12], probability:1}) ;
-//st Eminor
-publishMessage("audience", {type:"scale", baseNote:65, scale:[0,3,7,10,12], probability:1}) ;
-//pu C
-publishMessage("audience", {type:"scale", baseNote:60, scale:[0], probability:1});
-//pu B
-publishMessage("audience", {type:"scale", baseNote:71, scale:[0], probability:1});
-//pu high C
-publishMessage("audience", {type:"scale", baseNote:72, scale:[0], probability:1});
-//pu G
-publishMessage("audience", {type:"scale", baseNote:67, scale:[0], probability:1});
-//pu B
-publishMessage("audience", {type:"scale", baseNote:70, scale:[0], probability:1});
-
-var majorScale = [0,2,4,5,7,9,11,12];
-var minorScale = [0,2,3,5,7,8,10,12];
-minor7 :[0,3,7,10,12]
-major7 : [0,4,7,11,12]
-
-
-
-leftside will give you pure tone
-right side will give you metallic tone
-find your name on the screen!!!'
-let me change the chord to c Mnior', true, 2000)"}
-
-{"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-Mihai is the most liked tunes!', true, 2000)"}
-So I am going to play a tunes, do not be surprised.
-{"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-nice texture out there!
-{"baseNote":57,"probability":1,"scale":[0,3,7,10,12],"type":"scale"}
-{"baseNote":60,"probability":0.5,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":60,"probability":0.5,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-{"baseNote":57,"probability":0.5,"scale":[0,3,7,10,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
-{"baseNote":57,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":71,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":72,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":67,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0,2,3,5,7,8,10,12],"type":"scale"}
-{"baseNote":71,"probability":0.5,"scale":[0],"type":"scale"}
-Georg is staring at me. Gotta end the piece soon.', true, 2000)"}
-{"baseNote":60,"probability":1,"scale":[0,2,4,5,7,9,11,12],"type":"scale"}
-{"baseNote":60,"probability":1,"scale":[0],"type":"scale"}
-{"baseNote":48,"probability":0.5,"scale":[0],"type":"scale"}
-{"baseNote":36,"probability":0.5,"scale":[0],"type":"scale"}
-{"sound":false,"state":"END","type":"state-response"}
-
-nice!
-left-side will give you pure tone
-right side will give you metallic tone
-find you name on the screen!!!
-let me change the chord to c Mnior
-Mihai is the most liked tunes!
-So I am going to play a tunes, do not be surprised.
-nice texture out there!
-Georg is staring at me. Gotta end the piece soon.
-
-    </textarea>
-    </div>
-  </div>
 
     </div>
   </body>
