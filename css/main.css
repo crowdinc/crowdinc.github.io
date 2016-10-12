@@ -178,6 +178,7 @@ h1,h2,h3,h4 {
 	clear: both;
 	padding: 0px;
 	margin: 0px;
+	min-width: 90px;
 }
 
 /*  COLUMN SETUP  */
@@ -192,11 +193,6 @@ h1,h2,h3,h4 {
 /*	margin: 1% 0 1% 1.6%;*/
 }
 .col:first-child { margin-left: 0; }
-.section {
-	clear: both;
-	padding: 0px;
-	margin: 0px;
-}
 
 /*  COLUMN SETUP  */
 .col {
