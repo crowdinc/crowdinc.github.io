@@ -693,5 +693,21 @@ var DEBUG = false;
         matchBrackets: true
     });
 
+    var livecode = function(cm){
+      var selectedText = cm.getDoc().getSelection();
+      if(selectedText.length > 0){
+        console.log(selectedText);
+        publishMessage("audience", {type:"script",script:selectedText});
+      }else{
+        selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
+        console.log(selectedText);
+        publishMessage("audience", {type:"script",script:selectedText});
+      }
+    };
+
+    var map = {"Shift-Enter": livecode};
+    editor.addKeyMap(map);
+
+
 
   });
