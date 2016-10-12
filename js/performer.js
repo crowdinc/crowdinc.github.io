@@ -98,6 +98,8 @@ var DEBUG = false;
       publish_key: publishKey,
       subscribe_key: subscribeKey,
       uuid: my_id,
+      ssl : (('https:' == document.location.protocol) ? true : false)
+
   });
 
   var divTemplate = '<div id="[index]" class="modalDialog">\n         <div class = "center">\n          [nickname]<br>\n        </div>\n        <div class = "section group stats"> \n          <div class="col span_2_of_4_ center">\n            <img src="./images/heart_small.png" height="15px" style="float: left;">\n            <span style="float: left;" id=[index]_liked> 0</span>\n          </div>\n          <div class="col span_2_of_4_ center">\n            <img src="./images/crowd_small.png" height="15px"  style="float: left;">\n            <span id=[index]_crowd> 0</span>\n          </div>\n        </div>\n      </div>';
