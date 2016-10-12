@@ -661,8 +661,9 @@ var DEBUG = false;
 */
 
     arrayAvailables.push(index);
-    for (var i=0; i< 30; i++)
-      divAvailables.append(obj);
+
+    divAvailables.append(obj);
+    for (var i=0; i<200; i++)divAvailables.append('<div id="0" class="modalDialog">' + obj.html() + '</div>');
 
     if ( arrayWaitingPeople.length > 0){
       for(var i=0; i< arrayWaitingPeople.length; i++){

@@ -73,6 +73,7 @@ size_10{
 /*  min-width:100px;*/
 /*  max-width:100px;*/
   height: 100%;
+	width:100%;
   border: 2px grey solid;
 }
 
@@ -434,6 +435,7 @@ h1,h2,h3,h4 {
 .editor{
 	position:fixed;
 	bottom:0px;
+	right:0px;
 	height:100px;
 }
 /*  GO FULL WIDTH BELOW 480 PIXELS
