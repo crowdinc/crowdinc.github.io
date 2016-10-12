@@ -1,1 +1,168 @@
-<div> Hello crowd inc  </div> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>
+		Crownd in C - audience interface.
+		</title>
+
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
+		<link rel="stylesheet" type="text/css" href="./css/main.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="./js/jquery.bpopup.min.js"></script>
+		<script src="https://cdn.pubnub.com/pubnub-3.7.1.min.js"></script>
+     <!--   <script src="./js/waax.min.js"></script>-->
+		<script src="./js/pubnub-keys.js"></script>
+		<script src="./js/audience.js"></script>
+
+	</head>
+
+	<body><!-- onload="getNextDivName()">-->
+		<div id = "top_banner" class = "top_banner">
+			<div class="section group height_100">
+				<div class="col-left span_2_of_4 center border height_100">
+                    <div class = "banner">
+                        <span class = "banner_text responsive_font_size_4"><h1 id="screenname_display">snaglee</h1></span>
+                    </div>
+                </div>
+                <div class="col-right span_2_of_4 center border height_100">
+                    <div class = "banner">
+                        <span class = "banner_text"><img src="./images/modify_w.png" class = "tenpercent" onclick="modifyPattern()"></span>
+                    </div>
+                </div>
+			</div>
+		</div>
+        <canvas id="patternCanvas" class = "">
+        Sorry, canvas not supported
+        </canvas>
+        <div id= "submit_pane" class = "bottom_banner2">
+            <div class="section group height_100">
+                <div class="col-left span_2_of_4 center border height_100 ">
+                    <div class = "banner">
+                        <span class = "banner_text responsive_font_size_4"><img src="./images/randomize.png" class = "tenpercent" onclick="randomizeNote()"></span>
+                    </div>
+                </div>
+                <div class="col-right span_2_of_4 center border height_100 ">
+                    <div class = "banner">
+                        <span class = "banner_text responsive_font_size_4"><img src="./images/play.png" class = "tenpercent" onclick="update()"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id= "mingle_pane" class = "bottom_banner2">
+            <div class="section group height_100">
+                <div  class="col-left span_2_of_4 center border height_100 ">
+                    <div  class = "banner">
+                        <span id = "like_button_area" class = "banner_text responsive_font_size_4"><img src="./images/heart.png" class = "tenpercent" onclick="like()">
+                        </span>
+                        <span id = "liked_button_area" class = "banner_text responsive_font_size_4"><img src="./images/heart_liked.png" class = "tenpercent">
+                        </span>
+                    </div>
+                </div>
+                <div class="col-right span_2_of_4 center border height_100 ">
+                    <div class = "banner">
+                        <span class = "banner_text responsive_font_size_4"><img src="./images/exit.png" class = "tenpercent" onclick="exit()"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+     <!--   <div id = "submit" class = "bottom_pane">
+            <div class = "buttons center responsive_font_size_4">
+                <button id = "random">Randomize!</button>
+                <button id = "update">Submit your pattern!</button>
+            </div>
+        </div> -->
+       <!-- <div class = "height_100">
+
+            <div class="section group border height_100">
+                <div class="col span_4_of_4 center border height_100">
+                 <div class="banner">
+                        <span class="banner_text"><h1 id="tindered">NoNaMe</h1></span>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+		<div id = "bottom_banner" class = "bottom_banner2">
+			<div class="section group height_100">
+				<div class="col-left span_2_of_4 center border height_100 ">
+					<div class = "banner">
+						<span class = "banner_text"><img  src="./images/mingle.png" class = "tenpercent"onclick="mingle()"></span>
+					</div>
+				</div>
+				<div class="col-right span_2_of_4 center border height_100 ">
+					<div class = "banner">
+						<span class = "banner_text"><img onclick="getNextPattern()" src="./images/close.png" class = "tenpercent"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <div id="initial-message" class="dialog-message" >
+            <div>
+                <h1>Crowd in C[loud]</h1>
+                <div class="responsive_font_size_4">Please type your nickname for participation. </div>
+                <div id  = "name_error_msg" class = "red responsive_font_size_4"></div>
+                <div class = "buttons center">
+                    <input type="text" name="screenname" id="screenname" value="" class="ui-widget-content ui-corner-all responsive_font_size_4" />
+                    <br/><br/>
+                    <button id = "start" class ="responsive_font_size_5">Start</button>
+                </div>
+            </div>
+        </div>
+
+				<div id="waiting-message" class="dialog-message" >
+            <div>
+                <h1>Crowd in C[loud]</h1>
+                <div class="responsive_font_size_4">Waiting for the next tune.....</div>
+                <div class="responsive_font_size_4">If it hangs more than 10 seconds, simply refresh the page. Green dots are yours, red dots are not.</div>
+            </div>
+        </div>
+
+				<div id="question-message" class="dialog-message" >
+						<div>
+								<h1>Crowd in C[loud]</h1>
+								<div class="responsive_font_size_4">I have a question.</div>
+								<div class="responsive_font_size_4" id="question_content"></div>
+								<div style="text-align:right;font-size:10em;">
+									<button id = "answer_yes" ><h1 style="font-size: xx-large;">Yes</h1></button>
+									<button id = "answer_no" ><h1 style="font-size: xx-large;">No</h1></button>
+								</div>
+						</div>
+				</div>
+
+
+        <div id="STANDBY" class="fullscreenblock" >
+        </div>
+
+        <div class="info message">
+            <h1 class = "msg_header">FYI, something just happened!</h1>
+        </div>
+
+        <div class="error message">
+            <h1 class = "msg_header">Ups, an error ocurred</h1>
+        </div>
+
+        <div class="like message">
+            <h1 class = "msg_header">Ups, an error ocurred</h1>
+        </div>
+
+
+        <div class="warning message">
+            <h1 class = "msg_header">Wait, I must warn you!</h1>
+        </div>
+
+        <div class="success message">
+            <h1 class = "msg_header">Congrats, you did it!</h1>
+        </div>
+
+	</body>
+
+</html>
