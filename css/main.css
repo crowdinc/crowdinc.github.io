@@ -371,6 +371,12 @@ h1,h2,h3,h4 {
     background: -o-linear-gradient(#fff, #999);
 }
 
+.editor{
+	position:fixed;
+	bottom:0px;
+	right:0px;
+	height:100px;
+}
 
 .message{
     background-size: 40px 40px;
@@ -432,12 +438,6 @@ h1,h2,h3,h4 {
     }
 }
 
-.editor{
-	position:fixed;
-	bottom:0px;
-	right:0px;
-	height:100px;
-}
 /*  GO FULL WIDTH BELOW 480 PIXELS
 @media only screen and (max-width: 480px) {
 	.col {  margin: 1% 0 1% 0%; }
