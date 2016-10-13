@@ -373,9 +373,11 @@ h1,h2,h3,h4 {
 
 .editor{
 	position:fixed!important;
-	bottom:0px;
-	right:0px;
-	height:100px;
+	bottom:10px;
+	right:10px;
+	height:200px;
+	width:50%;
+	resize: both;
 }
 
 .message{

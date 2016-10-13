@@ -692,6 +692,9 @@ var DEBUG = false;
         matchBrackets: true
     });
 
+    $( "#resizable" ).resizable();
+    $( "#resizable" ).draggable();
+
     var livecode = function(cm){
       var selectedText = cm.getDoc().getSelection();
       if(selectedText.length > 0){
