@@ -752,7 +752,7 @@ $(document).ready(function () {
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
   $("#start").button().css({ margin:'5px'}).click(function(){
-
+    context.resume();
     $("#name_error_msg").text("");
 
     strScreenName = $("#screenname").val();
