@@ -85,10 +85,116 @@
     <!--<div class="col-sm-8 col-md-8 col-lg-8 editor">-->
       <div id ="codemirror_div">
         <textarea id="code" name="code">
-In case you do not have online access.
-Network : LiveGuest
-passcode : livelab123
-      </textarea>
+- it is often told that you should turn off the mobile phones but this is not the case for this particular performance. 
+- First thing I have to ask you is the mobile phone and maximize your volume
+- For this particular performance, you are the musician
+* turn on your phone 
+* get online access
+* online dating app. 
+* login - you will be given an instrument 
+* profile - composition 
+* green dots are yours / red dots are others 
+* three rules 
+
+
+// cmajor
+baseNote = 60;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+//cminor
+selectedScale = [0,2,3,5,7,9,11,12];
+
+//cMajor
+selectedScale = [0,2,4,5,7,9,11,12];
+
+// Dmajor
+baseNote = 62;
+
+// Cmajor
+baseNote = 60;
+
+// Emajor
+baseNote = 64;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+// cmajor
+baseNote = 60;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+
+// Eminor
+selectedScale = [0,2,3,5,7,9,11,12];
+
+baseNote = 60;
+selectedScale = [0];
+
+baseNote = 71;
+
+baseNote = 72;
+
+baseNote = 67;
+
+baseNote = 60;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+
+baseNote = 60;
+selectedScale = [0];
+
+baseNote = 71;
+
+baseNote = 72;
+
+baseNote = 70;
+
+baseNote = 64;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+baseNote = 60 + Math.Random() * 17;
+selectedScale = [0,2,4,5,7,9,11,12];
+
+selectedScale = [0,2,4,5,7,9,11,12];
+soundEnabled = false; 
+
+var span = 20;
+handle = setInterval(function(){
+	baseNote = 60 + Math.Random() * span;
+	span *= 0.9 
+}, 2000);
+
+
+setTimeout(function(){alert(“this is fade out. wait a bit”); soundEnabled = false;}, Math.random()*10000);
+
+
+baseNote = 60;selectedScale = [0];
+setTimeout(function(){baseNote = 72;}, 1000);
+setTimeout(function(){baseNote = 71;}, 2000);
+setTimeout(function(){baseNote = 67;}, 3000);
+
+// dice button will give you random tunes but you can drag and drop circles.
+  // Top part is high notes, The bottom is low notes
+  // Left side give you pure tones, right side is more metallic
+  // This is in C major chord if that means anything to you.
+  // Find your name in the projection screen!
+  // Do not miss what others did by pressing checkbox.
+  // If you get stuck for some reason, simply refresh the page and start over!
+  // I am going to play some tunes, don't be surprised
+  // One more time for tunes.
+  // Gotta end the piece soon. Georg is staring at me from the back stage.
+  // alert
+  publishMessage("audience", {type:"script",script:'setTimeout(function(){alert("you guys are not listening to me.");}, 3000 * Math.random());'});
+
+  // dice button will give you random tunes but you can drag and drop circles.
+  // Top part is high notes, The bottom is low notes
+  // Left side give you pure tones, right side is more metallic
+  // This is in C major chord if that means anything to you.
+  // Find your name in the projection screen!
+  // Do not miss what others did by pressing checkbox.
+  // If you get stuck for some reason, simply refresh the page and start over!
+  // I am going to play some tunes, don't be surprised
+  // One more time for tunes.
+  // Gotta end the piece soon. Georg is staring at me from the back stage.
+  </textarea>
       </div>
     </div>
 
