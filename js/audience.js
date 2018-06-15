@@ -49,19 +49,16 @@ function hideAllMessages() {
   var messagesHeights = new Array(); // this array will store height for each
 
   for (i=0; i<myMessages.length; i++) {
-  messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); // fill array
-  //$('.' + myMessages[i]).css('top', -messagesHeights[i]); //move element outside viewport
+  messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); // fill array 
+      //move element outside viewport
     $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
   }
 }
 
 function showMessage(type, message, autoHide, hideTime) {
-  //  $('.'+ type +'-trigger').click(function(){
   hideAllMessages();
   $("."+type+" .msg_header").text(message);
-  //$("."+type+" .msg_body").text(message2);
   $('.'+type).animate({top:"0"}, 500);
-   // });
   if (autoHide){
     hideTime = hideTime | 3000;
     setTimeout(hideAllMessages, hideTime);
@@ -263,7 +260,6 @@ ScissorVoice.prototype.stop = function(time){
 
 ScissorVoice.prototype.detune = function(detune){
     for (var i=0; i<this.oscs.length; i++){
-        //this.oscs[i].frequency.value = noteNum2Freq(noteNum);
         this.oscs[i].detune.value -= detune;
     }
 }
@@ -293,7 +289,7 @@ var selectedScale = majorScale;
 var selectedScaleWeight = scaleWeight;
 var baseNote = 60;
 
-function getPicthIndex(num){
+function getPitchIndex(num){
 
     var weightSum = 0;
     for (var i=0; i< selectedScale.length; i++){
@@ -356,8 +352,6 @@ function textAlphanumeric(inputtext){
     return false;
   }
 }
-
-// var my_id = PUBNUB.uuid(); // old method
 
 // get/create/store UUID
 var my_id = PUBNUB.db.get('session') || (function(){
@@ -457,7 +451,6 @@ function parseMessage( message ) {
         if ( message.probability > Math.random()){
           baseNote = message.baseNote;
           selectedScale = message.scale;
-          //showMessage("info", "The performer changed the scale.", true);
         }
       }
       else{
@@ -560,15 +553,16 @@ function getNextPattern(){
   $("#waiting-message").css("visibility", "visible");
 }
 
+// not required? aaron 6/15/18
 // Request the next div
-function getNextDivName() {
+/*function getNextDivName() {
   var actualTindered =  document.getElementById('tindered');
   var actualDivName = actualTindered.textContent;
- /* pubnub.publish({
+  pubnub.publish({
     channel: "performer",
     message: {"nextToDivName": actualDivName, "user": my_id}
-  });*/
-}
+  });
+}*/
 
 
 // Set the name of the next div
@@ -606,7 +600,6 @@ function refresh(){
 }
 
 function update(){
- // alert("update!")
   state = "WAIT";
   publishMessage("performer", {type :"update", index: myIndex, tm : pattern});
   $("#waiting-message").css("visibility", "visible");
@@ -690,17 +683,9 @@ function stateTransition(_state){
 }
 
 $(document).ready(function () {
-
-
-// Initially, hide them all
+    
+  // Initially, hide them all
   hideAllMessages();
-
-  // Show message
- /* for(var i=0;i<myMessages.length;i++)
-  {
-    showMessage(myMessages[i]);
-  }
-  */
 
   // When message is clicked, hide it
   $('.message').click(function(){
@@ -738,17 +723,6 @@ $(document).ready(function () {
     }, 3000);
   })();
 
-  // Parse messages received from PubNub platform
-
-/* $('#initial-message').bPopup({
-    modalClose: false,
-    opacity: 0.7,
-    positionStyle: 'absolute',
-  //  position: [50%, 20],
-    escClose :false
-  });
-*/
-
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
   $("#start").button().css({ margin:'5px'}).click(function(){
@@ -762,7 +736,7 @@ $(document).ready(function () {
     }
 
     if ( textAlphanumeric(strScreenName) == false ) {
-      $("#name_error_msg").text("Please, use combination of alphabets and numbers for the screen name. ");
+      $("#name_error_msg").text("Please, use only letters and numbers for the screen name. ");
       return;
     }
     NORESPONSE1 = true;
@@ -777,17 +751,6 @@ $(document).ready(function () {
       }, 3000);
     })();
     $("#name_error_msg").text("Waiting for response...");
-
-    //$('#initial-message').bPopup().close();
-
-    /*var delay = WX.StereoDelay({
-    mix: 1.0,
-    delayTimeLeft: 0.5,
-    delayTimeRight: 0.75,
-    feedbackLeft: 0.2,
-    feedbackRight: 0.4,
-    crosstalk: 0.25
-    }),*/
 
     if (soundEnabled){
       var masterGain = context.createGain();
@@ -819,8 +782,6 @@ $(document).ready(function () {
 
 
   function init() {
-    // Initialise our object
-   // obj = {x:50, y:50, w:70, h:70};
     canvas = $("#patternCanvas")[0];
 
     canvas.width = window.innerWidth;
@@ -852,39 +813,39 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if ( state == "EDIT" || state == "MINGLE" || state == "CHECK"){
+    if (state == "EDIT" || state == "MINGLE" || state == "CHECK"){
        for (var i=0; i< selectedScale.length; i++){
         ctx.beginPath();
         var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
 
         ctx.rect(0, accHeight, w, height);
         accHeight += height;
-        if ( i % 2 == 0)
+        if (i % 2 == 0)
           ctx.fillStyle = '#f8f8f5';
         else
           ctx.fillStyle = '#e9e3e0';
         ctx.fill();
-     /*   ctx.lineWidth = 3;
-        ctx.strokeStyle = '#661A4C';
-        ctx.stroke();
-      */}
-
+        }
     }
 
     if ( state == "EDIT" || state == "MINGLE"){
 
 
       for (var i=0; i< patternSize; i++){
-      //  ctx.fillRect(pattern[i].x, pattern[i].y, pattern[i].size, pattern[i].size);
         drawCircle(ctx,pattern[i].x * w, pattern[i].y* h, noteSize, '#83eb9f' );
-        if ( i < patternSize-1)
-          drawLine(ctx,pattern[i].x* w, pattern[i].y* h, pattern[i+1].x* w, pattern[i+1].y* h, '#57bd72');
+        if ( i < patternSize-1) {
+          drawLine(ctx,pattern[i].x* w, pattern[i].y* h, 
+                   pattern[i+1].x* w, pattern[i+1].y* h, '#57bd72');
+        }
         drawCircle(ctx,pattern[i].x* w, pattern[i].y* h, noteSize/3, '#57bd72' );
       }
 
       if (playBarNote >= 0){
-        var playBarCircleX = pattern[playBarNote].x * (1-progress) + pattern[playBarNote+1].x * (progress);
-        var playBarCircleY = pattern[playBarNote].y * (1-progress) + pattern[playBarNote+1].y * (progress);
+        var playBarCircleX = pattern[playBarNote].x * (1-progress) + 
+            pattern[playBarNote+1].x * (progress);
+        var playBarCircleY = pattern[playBarNote].y * (1-progress) + 
+            pattern[playBarNote+1].y * (progress);
+          
         drawCircle(ctx,playBarCircleX* w, playBarCircleY* h, noteSize/2 , '#fdff85' );
      }
    }
@@ -892,15 +853,19 @@ $(document).ready(function () {
    if ( state == "CHECK" || state == "MINGLE"){
 
       for (var i=0; i< patternElse.length; i++){
-      //  ctx.fillRect(pattern[i].x, pattern[i].y, pattern[i].size, pattern[i].size);
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y* h, noteSize-2, '#ff969d' );
-        if ( i < patternElse.length-1)
-          drawLine(ctx,patternElse[i].x* w, patternElse[i].y* h, patternElse[i+1].x* w, patternElse[i+1].y* h, '#d16970');
+        if ( i < patternElse.length-1) {
+          drawLine(ctx,patternElse[i].x* w, patternElse[i].y* h, 
+                   patternElse[i+1].x* w, patternElse[i+1].y* h, '#d16970');
+        }
         drawCircle(ctx,patternElse[i].x* w, patternElse[i].y* h, noteSize/3, '#d16970' );
       }
       if (playBarNoteElse >= 0){
-        var playBarCircleX = patternElse[playBarNoteElse].x * (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
-        var playBarCircleY = patternElse[playBarNoteElse].y * (1-progressElse) + patternElse[playBarNoteElse+1].y * (progressElse);
+        var playBarCircleX = patternElse[playBarNoteElse].x * 
+            (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
+        var playBarCircleY = patternElse[playBarNoteElse].y * 
+            (1-progressElse) + patternElse[playBarNoteElse+1].y * (progressElse);
+          
         drawCircle(ctx,playBarCircleX* w, playBarCircleY* h, noteSize/2 , '#fdff85' );
      }
    }
@@ -915,7 +880,6 @@ $(document).ready(function () {
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
     var oscType = ["sine","sine","triangle","triangle","sawtooth","square","triangle","sawtooth","square" ];
-    //var oscType = ["triangle"];
     var detune = 20;
     var maxNumOsc = oscType.length;
 
@@ -928,28 +892,18 @@ $(document).ready(function () {
         intervalInSec = interval/1000;
         progress = 0;
 
-      //  synth.noteon(60, 127, context.currentTime);
-      //  synth.noteoff(60,0,context.currentTime + 1);
         if (soundEnabled){
 
           var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc )  + 1;
           var numDetune = Math.floor(pattern[playBarNote].x * detune );
-       //   var pitchIndex = Math.floor((1 - pattern[playBarNote].y) * selectedScale.length);
-          var pitchIndex =getPicthIndex(1 - pattern[playBarNote].y);
+          var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,numOsc,oscType, detune);
-             //drone = new ScissorVoice(pitchListforDrone[pitchIndex],getRandomInt(3,10),"triangle", [3,5,7,12][getRandomInt(0,3)]);
+          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 
+                                         12,numOsc,oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          //function(delay, A,D, peakLevel, sustainlevel)
-          //function(time, A,D,S,R, peakLevel, sustainlevel){
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
-
-          //voice.output.noteOn(0,intervalInSec*0.1,intervalInSec*0.5,voice.maxGain*2.0,voice.maxGain);
-          // ADSR.prototype.noteOff= function(delay, R, sustainlevel){
-          // voice.output.noteOff(intervalInSec*0.5, intervalInSec*0.5,voice.maxGain);
-
-      //    console.log("begin! (" + pattern[playBarNote].distance + "," + interval);
+          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
+                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
       else if (playBarNote >= 0 && lastPingTime + interval < currentTime){
@@ -957,29 +911,26 @@ $(document).ready(function () {
         progress = 0;
         var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc )  + 1;
         var numDetune = Math.floor(pattern[playBarNote].x * detune );
-        //var pitchIndex = Math.floor((1 - pattern[playBarNote].y) * selectedScale.length);
-        var pitchIndex =getPicthIndex(1 - pattern[playBarNote].y);
+        var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
         var octave = Math.floor(pitchIndex / selectedScale.length);
 
         lastPingTime = currentTime;
-        //      synth.noteon(60 + pentatonicScale[playBarNote], 127, context.currentTime);
-    //    synth.noteoff(60 + pentatonicScale[playBarNote],0,context.currentTime + 1);
 
         if (playBarNote == patternSize-1)
         {
           interval = intervalBetweenPattern;
           playBarNote = -1;
-      //    console.log("end! (" + playBarNote + "," + interval);
         }else{
           interval = pattern[playBarNote].distance / speed;
-    //      console.log("next! (" + pattern[playBarNote].distance + "," + interval);
         }
         intervalInSec = interval/1000;
         if ( soundEnabled){
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,numOsc,oscType, detune);
+          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+                                         octave * 12,numOsc,oscType, detune);
           voice.stop( context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
+          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
+                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
     } // end of if (state == "EDIT" || state == "MINGLE"){
@@ -993,28 +944,20 @@ $(document).ready(function () {
         lastPingTimeElse = currentTime;
         intervalElse = patternElse[playBarNoteElse].distance / speedElse;
         intervalInSec = interval/1000;
-      //  synth.noteon(60, 127, context.currentTime);
-      //  synth.noteoff(60,0,context.currentTime + 1);
         if (soundEnabled){
 
           var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc )  + 1;
           var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune );
-          //var pitchIndex = Math.floor((1 - patternElse[playBarNoteElse].y) * selectedScale.length);
-          var pitchIndex =getPicthIndex(1 - patternElse[playBarNoteElse].y);
+          var pitchIndex =getPitchIndex(1 - patternElse[playBarNoteElse].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,numOsc,oscType, detune);
-             //drone = new ScissorVoice(pitchListforDrone[pitchIndex],getRandomInt(3,10),"triangle", [3,5,7,12][getRandomInt(0,3)]);
+          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+                                         octave * 12,numOsc,oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          //function(delay, A,D, peakLevel, sustainlevel)
-          //function(time, A,D,S,R, peakLevel, sustainlevel){
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
+          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
+                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
 
-          //voice.output.noteOn(0,intervalInSec*0.1,intervalInSec*0.5,voice.maxGain*2.0,voice.maxGain);
-          // ADSR.prototype.noteOff= function(delay, R, sustainlevel){
-          // voice.output.noteOff(intervalInSec*0.5, intervalInSec*0.5,voice.maxGain);
 
-      //    console.log("begin! (" + pattern[playBarNote].distance + "," + interval);
         }
       }
       else if (playBarNoteElse >= 0 && lastPingTimeElse + intervalElse < currentTime){
@@ -1022,41 +965,29 @@ $(document).ready(function () {
         progressElse = 0;
         var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc )  + 1;
         var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune );
-//        var pitchIndex = Math.floor((1 - patternElse[playBarNoteElse].y) * selectedScale.length);
-        var pitchIndex =getPicthIndex(1 - patternElse[playBarNoteElse].y);
+        var pitchIndex =getPitchIndex(1 - patternElse[playBarNoteElse].y);
 
         var octave = Math.floor(pitchIndex / selectedScale.length);
 
         lastPingTimeElse = currentTime;
-        //      synth.noteon(60 + pentatonicScale[playBarNote], 127, context.currentTime);
-    //    synth.noteoff(60 + pentatonicScale[playBarNote],0,context.currentTime + 1);
 
         if (playBarNoteElse == patternElse.length-1)
         {
           intervalElse = intervalBetweenPattern;
           playBarNoteElse = -1;
-      //    console.log("end! (" + playBarNote + "," + interval);
         }else{
           intervalElse = patternElse[playBarNoteElse].distance / speedElse;
-    //      console.log("next! (" + pattern[playBarNote].distance + "," + interval);
         }
         intervalInSec = interval/1000;
         if ( soundEnabled){
-          //synth.onData('noteon', {"pitch":60+ pentatonicScale[playBarNote], "time":context.currentTime});
-          //synth.onData('noteoff', {"pitch":60+ pentatonicScale[playBarNote], "time":context.currentTime+1});
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,numOsc,oscType, detune);
-                    //drone = new ScissorVoice(pitchListforDrone[pitchIndex],getRandomInt(3,10),"triangle", [3,5,7,12][getRandomInt(0,3)]);
-          //console.log("currentTime:" + context.currentTime);
-          //voice.stopAt = context.currentTime + intervalInSec * 0.4;
+          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+                                         octave * 12,numOsc,oscType, detune);
 
           voice.stop( context.currentTime + intervalInSec * 0.7);
 
           voice.connect(reverb);
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
-          //function(delay, A,D, peakLevel, sustainlevel)
-         // voice.output.noteOn(0,intervalInSec*0.1,intervalInSec*0.5,voice.maxGain*2.0,voice.maxGain);
-          // ADSR.prototype.noteOff= function(delay, R, sustainlevel){
-         // voice.output.noteOff(intervalInSec*0.5, intervalInSec*0.5,voice.maxGain);
+          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
+                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
 
         }
       }
@@ -1066,8 +997,6 @@ $(document).ready(function () {
 
     //}
     draw();
-
-//    requestAnimationFrame(animate, renderer.domElement);
   };
 
   animate();
@@ -1082,13 +1011,12 @@ $(document).ready(function () {
     // Is touch close enough to our object?
 
     // Assign new coordinates to our object
-    pattern[selectedNote].setPosition((e.pageX -  noteSize/2)/w
-        ,(e.pageY -  noteSize/2)/h);
+    pattern[selectedNote].setPosition((e.pageX -  noteSize / 2) / w, (e.pageY -  noteSize / 2) / h);
     pattern[selectedNote].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
       pattern[(1+selectedNote)%patternSize].x * w, pattern[(1+selectedNote)%patternSize].y * h);
-    if ( selectedNote > 0)
-      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x* w, pattern[selectedNote].y* h,
-      pattern[selectedNote-1].x* w, pattern[selectedNote-1].y* h);
+    if (selectedNote > 0)
+      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
+      pattern[selectedNote-1].x * w, pattern[selectedNote-1].y * h);
 
     // Redraw the canvas
     draw();
@@ -1097,23 +1025,17 @@ $(document).ready(function () {
 
   function mouseHandler(e){
     //Assume only one touch/only process one touch even if there's more
-    //var touch = event
-    if ( selectedNote <0 )
+    if (selectedNote < 0)
       return;
     // Is touch close enough to our object?
 
     // Assign new coordinates to our object
-
-    // Is touch close enough to our object?
-
-    // Assign new coordinates to our object
-    pattern[selectedNote].setPosition((e.pageX -  noteSize/2)/w
-        ,(e.pageY -  noteSize/2)/h);
+    pattern[selectedNote].setPosition((e.pageX - noteSize / 2) / w, (e.pageY - noteSize / 2) / h);
     pattern[selectedNote].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
       pattern[(1+selectedNote)%patternSize].x * w, pattern[(1+selectedNote)%patternSize].y * h);
-    if ( selectedNote > 0)
-      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x* w, pattern[selectedNote].y* h,
-      pattern[selectedNote-1].x* w, pattern[selectedNote-1].y* h);
+    if (selectedNote > 0)
+      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
+      pattern[selectedNote-1].x * w, pattern[selectedNote-1].y * h);
 
     // Redraw the canvas
     draw();
@@ -1131,13 +1053,13 @@ $(document).ready(function () {
 
     for (var i=0; i< patternSize; i++){
       var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
-      if ( minDistance >= distance){
+      if (minDistance >= distance){
         minDistance = distance;
         tempNoteID = i;
       }
     }
 
-    if(tempNoteID > -1 && minDistance < noteSize) {
+    if (tempNoteID > -1 && minDistance < noteSize) {
       selectedNote = tempNoteID;
     }
   });
@@ -1148,15 +1070,15 @@ $(document).ready(function () {
     var tempNoteID = -1;
     var e = event.originalEvent.changedTouches[0];
 
-    for (var i=0; i< patternSize; i++){
+    for (var i = 0; i < patternSize; i++){
       var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
-      if ( minDistance >= distance){
+      if (minDistance >= distance){
         minDistance = distance;
         tempNoteID = i;
       }
     }
 
-    if(tempNoteID > -1 && minDistance < noteSize) {
+    if (tempNoteID > -1 && minDistance < noteSize) {
       selectedNote = tempNoteID;
     }
 

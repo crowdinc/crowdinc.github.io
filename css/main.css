@@ -48,16 +48,12 @@ size_10{
 #availables {
   background-color: white;
   color: black;
-/*  float: left;
-  width: auto;*/
   height: auto;
 }
 
 #unavailables {
   background-color: white;
   height: auto;
-/*  min-width:75px;
-  max-width:100px;*/
   height: 100%;
   border: 2px grey dashed;
 }
@@ -68,10 +64,7 @@ size_10{
 
 #codemirror_div{
   background-color: white;
-/*  float:right;*/
   height: auto;
-/*  min-width:100px;*/
-/*  max-width:100px;*/
   height: 100%;
 	width:100%;
   border: 2px grey solid;
@@ -110,7 +103,6 @@ size_10{
 }
 
 .modalDialog {
-   /* font-family: Arial, Helvetica, sans-serif;*/
     background:white;
     float:left;
    	display: block;
@@ -128,17 +120,6 @@ size_10{
     pointer-events: auto;
 }
 
-/*
-.modalDialog > div {
-    width: auto;
-
-    position: relative;
-    margin: 10% auto;
-    padding: 5px 20px 13px 20px;
-    border-radius: 10px;
-    background: #ff969d;
-}
-*/
 .close {
     background: #606061;
     color: #FFFFFF;
@@ -186,12 +167,10 @@ h1,h2,h3,h4 {
 .col-left {
 	display: block;
 	float:left;
-/*	margin: 1% 0 1% 1.6%;*/
 }
 .col-right {
 	display: block;
 	float:right;
-/*	margin: 1% 0 1% 1.6%;*/
 }
 .col:first-child { margin-left: 0; }
 
@@ -199,7 +178,6 @@ h1,h2,h3,h4 {
 .col {
 	display: block;
 	float:left;
-/*	margin: 1% 0 1% 1.6%;*/
 }
 /*  GRID OF FIVE  */
 .span_5_of_5 {
@@ -240,11 +218,6 @@ h1,h2,h3,h4 {
 }
 
 .bottom_pane{
-	/*
-	position: fixed;
-	bottom:0px;
-	right:0px;
-	*/
 	width:100%;
 	height:10%;
 	opacity:0.7;
@@ -252,7 +225,6 @@ h1,h2,h3,h4 {
 	color:black;
 	background-color:white;
 	text-align: center;
-	/*visibility: hidden;*/
 }
 
 .bottom_banner{
