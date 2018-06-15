@@ -12,8 +12,8 @@ State Diagram
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : update msg sent
 WAIT -> CHECK : next-response msg received in "WAIT" state
-CHECK -> DATE : user press HEART button
-DATE -> CHECK : user press exit button
+CHECK -> MINGLE : user press HEART button
+MINGLE -> CHECK : user press exit button
 CHECK -> EDIT : user press "update" button
 
 */
@@ -982,7 +982,7 @@ $(document).ready(function () {
           voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
-    } // end of if (state == "EDIT" || state == "DATE"){
+    } // end of if (state == "EDIT" || state == "MINGLE"){
 
 
     if (state == "CHECK" || state == "MINGLE"){
@@ -1060,9 +1060,9 @@ $(document).ready(function () {
 
         }
       }
-    } // end of if (state == "EDIT" || state == "DATE"){
+    } // end of if (state == "EDIT" || state == "MINGLE"){
 
-   // if (state == "CHECK" || state == "DATE"){
+   // if (state == "CHECK" || state == "MINGLE"){
 
     //}
     draw();
