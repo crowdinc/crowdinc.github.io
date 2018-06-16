@@ -1,4 +1,3 @@
-// main code
 window.onbeforeunload = function(){
   return "";
 };
@@ -7,80 +6,80 @@ function getRandomInt (min, max) {
 }
 
 var DEBUG = false;
-  var performanceStarted = false;
+var performanceStarted = false;
 
-  var indexMostLiked = -1;
-  var likesMostLiked = 0;
-  var indexMostFollowed = -1;
-  var followersMostFollowed = 0;
-  var borderMostLiked = 50;
-  var borderMostFollowed = 40;
+var indexMostLiked = -1;
+var likesMostLiked = 0;
+var indexMostFollowed = -1;
+var followersMostFollowed = 0;
+var borderMostLiked = 50;
+var borderMostFollowed = 40;
 
-  var soundEnabled = false;
-  var state = "STANDBY"; // STANDBY, GOLIVE, END
-  var arrayUUIDs = new Array();
+var soundEnabled = false;
+var state = "STANDBY"; // STANDBY, GOLIVE, END
+var arrayUUIDs = new Array();
 
-  var arrayUniqueNicknames = new Array();
-  var arrayTinderMusics = new Array();
-  var arrayAvailables = new Array();
-  var arrayUnavailables = new Array();
-  var arrayWaitingPeople = new Array();;
-  var divUnavailables = null;
-  var divAvailables = null;
-  var randomNumber ;
-  var STOPWORKING = false;
+var arrayUniqueNicknames = new Array();
+var arrayTinderMusics = new Array();
+var arrayAvailables = new Array();
+var arrayUnavailables = new Array();
+var arrayWaitingPeople = new Array();;
+var divUnavailables = null;
+var divAvailables = null;
+var randomNumber ;
+var STOPWORKING = false;
   // load some variables after loading the page
-  function load() {
-    divAvailables = $("#availables");
-    divUnavailables = $("#unavailables");
+function load() {
+  divAvailables = $("#availables");
+  divUnavailables = $("#unavailables");
 
-    // my_id is defined by pubnub
-  //  var divUsername = document.getElementById('username');
+  // my_id is defined by pubnub
+//  var divUsername = document.getElementById('username');
 //    divUsername.appendChild(document.createTextNode("username: "+my_id));
+  soundEnabled = false;
+  $( "#radio" ).buttonset();
+  $( "#chat" ).selectmenu({width: "auto"});
+
+  $('#chat_message').button().addClass('my-textfield');
+  $( "#broadcast" )
+        .button()
+        .click(function( event ) {
+    //alert("broadcast:" + $('#chat_message').val() + ":" + $("#chat").val());
+          if($("#chat").val() == "question"){
+            publishMessage("audience", {type:"question", text:$('#chat_message').val()});
+            event.preventDefault();
+          }
+          else{
+            publishMessage("audience", {type:"script", script:"showMessage('"+$("#chat").val()+"','"+$('#chat_message').val()+"', true, 2000)"});
+            event.preventDefault();
+          }
+
+        });
+  $("#radio1").click(function(){
+    state = "STANDBY";
     soundEnabled = false;
-    $( "#radio" ).buttonset();
-    $( "#chat" ).selectmenu({width: "auto"});
+    respondState();
+  });
+  $("#radio2").click(function(){
+    state = "GOLIVE";
+    soundEnabled = true;
+    respondState();
+  });
+  $("#radio3").click(function(){
+    publishMessage("audience", {type:"script", script:"refresh()"});
+    window.location.reload();
 
-    $('#chat_message').button().addClass('my-textfield');
-    $( "#broadcast" )
-          .button()
-          .click(function( event ) {
-      //alert("broadcast:" + $('#chat_message').val() + ":" + $("#chat").val());
-            if($("#chat").val() == "question"){
-              publishMessage("audience", {type:"question", text:$('#chat_message').val()});
-              event.preventDefault();
-            }
-            else{
-              publishMessage("audience", {type:"script", script:"showMessage('"+$("#chat").val()+"','"+$('#chat_message').val()+"', true, 2000)"});
-              event.preventDefault();
-            }
+  });
+  $("#radio4").click(function(){
+    state = "END";
+    soundEnabled = false;
+    respondState();
+  });
+  randomNumber = getRandomInt(0,1000);
+  publishMessage("performer", {type:"amialone", random:randomNumber});
 
-          });
-    $("#radio1").click(function(){
-      state = "STANDBY";
-      soundEnabled = false;
-      respondState();
-    });
-    $("#radio2").click(function(){
-      state = "GOLIVE";
-      soundEnabled = true;
-      respondState();
-    });
-    $("#radio3").click(function(){
-      publishMessage("audience", {type:"script", script:"refresh()"});
-      window.location.reload();
-
-    });
-    $("#radio4").click(function(){
-      state = "END";
-      soundEnabled = false;
-      respondState();
-    });
-    randomNumber = getRandomInt(0,1000);
-    publishMessage("performer", {type:"amialone", random:randomNumber});
-
-   // divUsersOnline = document.getElementById('usersonline');
-  }
+ // divUsersOnline = document.getElementById('usersonline');
+}
 // PubNub code
 
   // get an unique pubnub id
@@ -660,56 +659,41 @@ var DEBUG = false;
       obj.className = 'available-editing';
     }
     obj.find('.stats').css("display", "");
-    //newDiv.appendChild(document.createTextNode(user.nickname + "," + user.followers.length + "," +user.likedby.length));
-    // onclick, set as Unavailable
-   /* obj.click(function() {
-      var actualIndex = arrayAvailables.indexOf(index);
-      if (actualIndex != -1) {
-        arrayAvailables.splice(actualIndex,1);
-      }
-      this.remove();
-      setAsUnavailable(index);
-    });
-*/
 
     arrayAvailables.push(index);
 
     divAvailables.append(obj);
 
-    if ( arrayWaitingPeople.length > 0){
-      for(var i=0; i< arrayWaitingPeople.length; i++){
+    if (arrayWaitingPeople.length > 0){
+      for(var i = 0; i < arrayWaitingPeople.length; i++){
         next(arrayWaitingPeople[i]);
       }
       arrayWaitingPeople = new Array();
     }
   }
 
- $(document).ready(function () {
-    var myTextArea = $("#code");
-    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: false,
-        styleActiveLine: true,
-        matchBrackets: true
-    });
-
-    $( "#resizable" ).resizable();
-    $( "#resizable" ).draggable();
-
-    var livecode = function(cm){
-      var selectedText = cm.getDoc().getSelection();
-      if(selectedText.length > 0){
-        console.log(selectedText);
-        publishMessage("audience", {type:"script",script:selectedText});
-      }else{
-        selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
-        console.log(selectedText);
-        publishMessage("audience", {type:"script",script:selectedText});
-      }
-    };
-
-    var map = {"Shift-Enter": livecode};
-    editor.addKeyMap(map);
-
-
-
+$(document).ready(function () {
+  var myTextArea = $("#code");
+  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: false,
+      styleActiveLine: true,
+      matchBrackets: true
   });
+
+  $( "#resizable" ).resizable();
+  $( "#resizable" ).draggable();
+
+  var livecode = function(cm){
+    var selectedText = cm.getDoc().getSelection();
+    if (selectedText.length > 0){
+      console.log(selectedText);
+      publishMessage("audience", {type:"script",script:selectedText});
+    } else{
+      selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
+      console.log(selectedText);
+      publishMessage("audience", {type:"script",script:selectedText});
+    }
+  };
+  var map = {"Shift-Enter": livecode};
+  editor.addKeyMap(map);
+});
