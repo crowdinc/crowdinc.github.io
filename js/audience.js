@@ -1,7 +1,3 @@
-//alert("test");
-
-// PubNub code
-// Get an unique pubnub id
 var state = "NAME"; // it is either NAME, EDIT, WAIT, CHECK, MINGLE
 var DEBUG = false;
 var performerState = "STANDBY";
@@ -21,8 +17,6 @@ CHECK -> EDIT : user press "update" button
 var NORESPONSE1 = true;
 var NORESPONSE2 = true;
 var NORESPONSE3 = 0;
-
-
 
 var soundEnabled = true;
 var context;
@@ -48,8 +42,8 @@ var myMessages = ['info','warning','error','success', 'like'];
 function hideAllMessages() {
   var messagesHeights = new Array(); // this array will store height for each
 
-  for (i=0; i<myMessages.length; i++) {
-  messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); // fill array 
+  for (i = 0; i < myMessages.length; i++) {
+    messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); // fill array 
       //move element outside viewport
     $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
   }
@@ -57,13 +51,12 @@ function hideAllMessages() {
 
 function showMessage(type, message, autoHide, hideTime) {
   hideAllMessages();
-  $("."+type+" .msg_header").text(message);
-  $('.'+type).animate({top:"0"}, 500);
+  $("." + type + " .msg_header").text(message);
+  $('.' + type).animate({top: "0"}, 500);
   if (autoHide){
     hideTime = hideTime | 3000;
     setTimeout(hideAllMessages, hideTime);
   }
-
 }
 
 function BufferLoader(context, urlList, callback) {
@@ -73,6 +66,7 @@ function BufferLoader(context, urlList, callback) {
   this.bufferList = new Array();
   this.loadCount = 0;
 }
+
 BufferLoader.prototype.loadBuffer = function(url, index) {
   // Load buffer asynchronously
   var request = new XMLHttpRequest();
@@ -104,16 +98,14 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
     console.log('BufferLoader: XHR error', error);
     debugger;
   }
-
   request.send();
 };
 
 BufferLoader.prototype.load = function() {
-  for (var i = 0; i < this.urlList.length; ++i)
-  this.loadBuffer(this.urlList[i], i);
+  for (var i = 0; i < this.urlList.length; ++i) {
+    this.loadBuffer(this.urlList[i], i);
+  }
 };
-
-
 
 function loadSounds(obj, soundMap, callback) {
   // Array-ify
@@ -148,16 +140,15 @@ var soundmap = {
 };
 //, 'piano1': 'piano_note1_f_sharp.wav', 'indo1' : 'indonesian_gong.wav', 'june_o' : 'june_o.wav', 'reversegate' :'H3000-ReverseGate.mp3'};
 
-
-function getRandomInt (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function noteNum2Freq(num){
-    return Math.pow(2,(num-57)/12) * 440
+  return Math.pow(2, (num-57) / 12) * 440;
 }
 
-if(soundEnabled){
+if (soundEnabled){
   try {
     // still needed for Safari
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -171,21 +162,20 @@ if(soundEnabled){
     // API not supported
     alert('Web Audio API not supported, please use most recent Chrome (41+), FireFox(31+) or Safari (iOS 7.1+).');
   }
-
 }
 
 loadSounds(buffers, soundmap, function(){
   reverb.buffer = buffers['ir1'];
-
 });
 
 
 var playSample = function(sampleName, randomSpeed){
-  if(buffers[sampleName]){
+  if (buffers[sampleName]){
     var source = context.createBufferSource();
     source.buffer = buffers[sampleName];
-    if(randomSpeed)
-      source.playbackRate.value = (Math.random() - 0.5) * 0.2 + 1
+    if (randomSpeed) {
+      source.playbackRate.value = (Math.random() - 0.5) * 0.2 + 1;
+    }
     source.connect(compressor);
     source.start(0);
   }
@@ -196,29 +186,28 @@ function ADSR(){
     this.node.gain.value = 0.0;
 }
 
-ADSR.prototype.noteOn= function(delay, A,D, peakLevel, sustainlevel){
+ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel){
     peakLevel = peakLevel || 1;
     sustainlevel = sustainlevel || 0.3;
 
-    this.node.gain.linearRampToValueAtTime(0.0,delay + context.currentTime);
-    this.node.gain.linearRampToValueAtTime(peakLevel,delay + context.currentTime + A); // Attack
-    this.node.gain.linearRampToValueAtTime(sustainlevel,delay + context.currentTime + A + D);// Decay
+    this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
+    this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
+    this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
 }
 
-ADSR.prototype.noteOff= function(delay, R, sustainlevel){
+ADSR.prototype.noteOff = function(delay, R, sustainlevel){
     sustainlevel = sustainlevel || 0.1;
 
-    this.node.gain.linearRampToValueAtTime(sustainlevel,delay + context.currentTime );// Release
-    this.node.gain.linearRampToValueAtTime(0.0,delay + context.currentTime + R);// Release
-
+    this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime );// Release
+    this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + R);// Release
 }
 
-ADSR.prototype.play= function(delay, A,D,S,R, peakLevel, sustainlevel){
-  this.node.gain.linearRampToValueAtTime(0.0,delay + context.currentTime);
-  this.node.gain.linearRampToValueAtTime(peakLevel,delay + context.currentTime + A); // Attack
-  this.node.gain.linearRampToValueAtTime(sustainlevel,delay + context.currentTime + A + D);// Decay
-  this.node.gain.linearRampToValueAtTime(sustainlevel,delay + context.currentTime + A + D + S);// sustain.
-  this.node.gain.linearRampToValueAtTime(0.0,delay + context.currentTime + A + D + S + R);// Release
+ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel){
+  this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
+  this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
+  this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
+  this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D + S);// sustain.
+  this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + A + D + S + R);// Release
 }
 var index = 0;
 
@@ -230,55 +219,48 @@ function ScissorVoice(noteNum, numOsc, oscType, detune){
   this.oscs = [];
   this.index = index++;
   this.time = context.currentTime;
-  for (var i=0; i< numOsc; i++){
+  for (var i = 0; i < numOsc; i++){
     var osc = context.createOscillator();
-    if ( oscType.length === "undefined")
+    if (oscType.length === "undefined")
       osc.type = oscType;
     else
-      osc.type = oscType[i%oscType.length];
+      osc.type = oscType[i % oscType.length];
     osc.frequency.value = this.frequency;
     osc.detune.value = -detune + i * 2 * detune / numOsc ;
     osc.start(context.currentTime);
     osc.connect(this.output.node);
     this.oscs.push(osc);
   }
-  //console.log("played(" + index +") " + noteNum + " at " + context.currentTime);
-   //   console.log("started : " +this.noteNum);
-
 }
 
 ScissorVoice.prototype.stop = function(time){
-  //time =  time | context.currentTime;
   var it = this;
   setTimeout(function(){
- //   console.log("stopped(" + index +") " +it.noteNum + " at " +context.currentTime);
-    for (var i=0; i<it.oscs.length; i++){
-        it.oscs[i].disconnect();
+    for (var i = 0; i < it.oscs.length; i++){
+      it.oscs[i].disconnect();
     }
   }, Math.floor((time-context.currentTime)*1000));
 }
 
 ScissorVoice.prototype.detune = function(detune){
-    for (var i=0; i<this.oscs.length; i++){
-        this.oscs[i].detune.value -= detune;
-    }
+  for (var i = 0; i < this.oscs.length; i++){
+    this.oscs[i].detune.value -= detune;
+  }
 }
 
 ScissorVoice.prototype.connect = function(target){
   this.output.node.connect(target);
 }
 
-
-
 window.requestAnimFrame = (function(){
-return  window.requestAnimationFrame       ||
-  window.webkitRequestAnimationFrame ||
-  window.mozRequestAnimationFrame    ||
-  window.oRequestAnimationFrame      ||
-  window.msRequestAnimationFrame     ||
-  function( callback ){
-  window.setTimeout(callback, 1000 / 60);
-};
+  return  window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame    ||
+    window.oRequestAnimationFrame      ||
+    window.msRequestAnimationFrame     ||
+    function(callback){
+      window.setTimeout(callback, 1000 / 60);
+    };
 })();
 
 var pentatonicScale = [0,2,4,7,9];
@@ -290,19 +272,18 @@ var selectedScaleWeight = scaleWeight;
 var baseNote = 60;
 
 function getPitchIndex(num){
-
     var weightSum = 0;
-    for (var i=0; i< selectedScale.length; i++){
+    for (var i = 0; i < selectedScale.length; i++){
       weightSum += selectedScaleWeight[i];
     }
     var count;
     var accWeight=0;
-    for (count=0; count< selectedScale.length; count++){
+    for (count = 0; count < selectedScale.length; count++){
       if (num <= accWeight / weightSum)
         break;
       accWeight += selectedScaleWeight[count];
     }
-    return count-1;
+    return count - 1;
 }
 function Note(){
   this.x = 0;
@@ -335,20 +316,12 @@ function drawLine(ctx, x1,y1,x2,y2, color) {
     ctx.stroke();
 }
 
-function detectHit(x1,y1,x2,y2,w,h) {
-  //Very simple detection here
-  if(x2-x1>w) return false;
-  if(y2-y1>h) return false;
-  return true;
-}
-
-
 //This segment displays the validation rule for address field.
-function textAlphanumeric(inputtext){
+function textAlphanumeric(inputText){
   var alphaExp = /^[0-9a-zA-Z._]+$/;
-  if(inputtext.match(alphaExp)){
+  if (inputText.match(alphaExp)) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
@@ -366,7 +339,6 @@ var pubnub = PUBNUB.init({
     subscribe_key: subscribeKey,
     uuid: my_id,
     ssl : (('https:' == document.location.protocol) ? true : false)
-
 });
 
 // Subscribe to a channel
@@ -374,20 +346,22 @@ pubnub.subscribe({
     channel: my_id + ",audience",
     message: parseMessage,
     error: function (error) {
-     // Handle error here
-     console.log(JSON.stringify(error));
-     refresh();
+      // Handle error here
+      console.log(JSON.stringify(error));
+      refresh();
     },
     heartbeat: 15
 });
 
-function parseMessage( message ) {
-  if(DEBUG)console.log("message - received:" + JSON.stringify(message));
+function parseMessage(message) {
+  if (DEBUG) {
+    console.log("message - received:" + JSON.stringify(message));
+  }
   if (typeof message.nextDivName !== 'undefined') {
     setNextDivName(message.nextDivName);
   }
   else if (typeof message.type !== 'undefined'){
-    if ( message.type == "create-response"){
+    if (message.type == "create-response"){
       NORESPONSE1 = false;
       if (message.res == "s"){
         state = "EDIT";
@@ -398,23 +372,21 @@ function parseMessage( message ) {
         lastPingTime = Date.now();
         $("#submit_pane").css("visibility", "visible");
       }
-      else
-      {
+      else {
         $('#name_error_msg').text($('#screenname').val() + " is already taken.");
       }
     }
-    else if ( message.type == "next-response")
-    {
+    else if ( message.type == "next-response") {
       NORESPONSE3--;
       patternElse = message.suggested_tm.tm;
       currentNickname = message.suggested_tm.nickname;
       currentIndex = message.suggested_tm.index;
       $('#screenname_display').text(currentNickname);
 
-      for (var i=0; i< patternElse.length-1; i++){
-        patternElse[i].distance = dist(patternElse[i].x * w,patternElse[i].y* h,patternElse[i+1].x* w,patternElse[i+1].y* h);
+      for (var i = 0; i < patternElse.length - 1; i++){
+        patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                       patternElse[i+1].x * w, patternElse[i+1].y * h);
       }
-
       if ( state == "WAIT"){
         $("#bottom_banner").css("visibility", "visible");
         $("#top_banner").css("visibility", "visible");
@@ -423,58 +395,52 @@ function parseMessage( message ) {
         $("#waiting-message").css("visibility", "hidden");
       }
     }
-    else if ( message.type == "liked-response")
-    {
-      if ( message.index == myIndex)
-      {
+    else if (message.type == "liked-response") {
+      if (message.index == myIndex) {
         showMessage('error',  "I know! You like your tune.", true, 1000);
       }
-      else if ( liked.indexOf(message.index) == -1 ){
+      else if (liked.indexOf(message.index) == -1){
         showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
         playSample("liked", true);
       }
-      else{
+      else {
         showMessage('error', "It's a match! " + message.nickname + ' likes your tune, too!', true, 1000);
         playSample("matched", true);
       }
     }
-    else if ( message.type == "question")
-    {
-      if(message.text.length>0){
+    else if (message.type == "question") {
+      if (message.text.length > 0){
         $("#question_content").text(message.text);
         $("#question-message").css("visibility", "visible");
       }
     }
-    else if ( message.type == "scale"){
-      if ( message.probability >=0 )
-      {
-        if ( message.probability > Math.random()){
+    else if (message.type == "scale"){
+      if (message.probability >= 0) {
+        if (message.probability > Math.random()){
           baseNote = message.baseNote;
           selectedScale = message.scale;
         }
       }
-      else{
+      else {
         baseNote = message.baseNote;
         selectedScale = message.scale;
         showMessage("info", "The performer changed the scale.", true);
       }
     }
-    else if ( message.type == "sound-toggle"){
-      if ( message.probability >=0 )
-      {
-        if ( message.probability > Math.random()){
+    else if (message.type == "sound-toggle"){
+      if (message.probability >= 0) {
+        if (message.probability > Math.random()){
           soundEnabled = message.on;
         }
       }
-      else{
+      else {
         soundEnabled = message.on;
       }
     }
-    else if ( message.type == "script"){
-      if (message.script){
-        if ( message.probability >=0 )
-        {
-          if ( message.probability > Math.random()){
+    else if (message.type == "script"){
+      if (message.script) {
+        if (message.probability >= 0) {
+          if (message.probability > Math.random()){
             try {
               eval(message.script);
             } catch (e) {
@@ -482,7 +448,7 @@ function parseMessage( message ) {
             }
           }
         }
-        else{
+        else {
           try {
             eval(message.script);
           } catch (e) {
@@ -490,15 +456,13 @@ function parseMessage( message ) {
           }
         }
       }
-
-
     }
     else if (message.type == "state-response"){
       NORESPONSE2 = false;
       soundEnabled = message.sound;
       performerState = message.state;
-      if ( performerState == "STANDBY"){
-  showMessage("warning", "STANDBY, Crowd in C is about to start.");
+      if (performerState == "STANDBY"){
+        showMessage("warning", "STANDBY, Crowd in C is about to start.");
         $("#STANDBY").css("visibility", "visible");
       }
       else if (performerState == "GOLIVE"){
@@ -506,13 +470,13 @@ function parseMessage( message ) {
         showMessage("success", "Let's go live!", true);
         $("#STANDBY").css("visibility", "hidden");
       }
-       else if (performerState == "END"){
+      else if (performerState == "END"){
         hideAllMessages();
         showMessage("success", "This is the end. (Applause)", true);
         $("#STANDBY").css("visibility", "hidden");
       }
     }
-    else{
+    else {
       console.log("unhandled type:" + message.type);
     }
   }
@@ -522,23 +486,22 @@ function parseMessage( message ) {
 }
 
 function publishMessage(channel, options){
-  if(channel=="audience")
-  {
-    console.error("please not hack this application. :) ")
+  if (channel == "audience") {
+    console.error("please not hack this application. :) ");
     return;
   }
   pubnub.publish({
     channel: channel,
     message: options,
-    error : function(m) {
+    error: function(m) {
       console.log("Message send failed - ["
           + JSON.stringify(m) + "] - Retrying in 3 seconds!");
       setTimeout(publishMessage(channel, options), 2000);
     }
   });
-
-  if(DEBUG)console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
-
+  if (DEBUG) {
+    console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
+  }
 }
 
 
@@ -564,7 +527,6 @@ function getNextPattern(){
   });
 }*/
 
-
 // Set the name of the next div
 function setNextDivName(divName) {
   var actualTindered =  document.getElementById('tindered');
@@ -572,22 +534,20 @@ function setNextDivName(divName) {
   actualTindered.appendChild(document.createTextNode(divName));
 }
 
-
 window.onbeforeunload = function(){
   return "";
 };
 
-
 function randomizeNote(){
-
-  for (var i=0; i< patternSize; i++){
+  for (var i = 0; i < patternSize; i++){
     var note = new Note();
-    note.setPosition(Math.random(), Math.random())
+    note.setPosition(Math.random(), Math.random());
     pattern[i] = note;
   }
 
-  for (var i=0; i< patternSize-1; i++){
-    pattern[i].distance = dist(pattern[i].x * w,pattern[i].y* h,pattern[i+1].x* w,pattern[i+1].y* h);
+  for (var i = 0; i < patternSize - 1; i++){
+    pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
+                               pattern[i+1].x * w, pattern[i+1].y * h);
   }
 }
 
@@ -601,13 +561,13 @@ function refresh(){
 
 function update(){
   state = "WAIT";
-  publishMessage("performer", {type :"update", index: myIndex, tm : pattern});
+  publishMessage("performer", {type: "update", index: myIndex, tm: pattern});
   $("#waiting-message").css("visibility", "visible");
   $("#submit_pane").css("visibility", "hidden");
 }
 
 function like(){
-  publishMessage("performer", {type :"liked", index:myIndex, likedindex: currentIndex});
+  publishMessage("performer", {type: "liked", index: myIndex, likedindex: currentIndex});
   liked.push(currentIndex);
   $("#like_button_area").css("display", "none");
   $("#liked_button_area").css("display", "block");
@@ -615,7 +575,7 @@ function like(){
 
 function modifyPattern(){
   state = "EDIT";
-  publishMessage("performer", {type :"editing", index:myIndex});
+  publishMessage("performer", {type: "editing", index: myIndex});
 
   $("#submit_pane").css("visibility", "visible");
   $("#bottom_banner").css("visibility", "hidden");
@@ -628,23 +588,22 @@ function mingle(){
   $("#like_button_area").css("visibility", "visible");
   $("#liked_button_area").css("visibility", "visible");
 
-  if ( liked.indexOf(currentIndex) == -1){
+  if (liked.indexOf(currentIndex) == -1){
     $("#like_button_area").css("display", "block");
     $("#liked_button_area").css("display", "none");
   }
-  else{
+  else {
     $("#like_button_area").css("display", "none");
     $("#liked_button_area").css("display", "block");
   }
   $("#bottom_banner").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
-  for (var i=0; i < pattern.length; i++){
+  for (var i = 0; i < pattern.length; i++){
     var note = new Note();
     note.setPosition(pattern[i].x, pattern[i].y);
     note.distance = pattern[i].distance;
     originalPattern[i] = note;
   }
-
 }
 
 function exit(){
@@ -655,13 +614,13 @@ function exit(){
   $("#like_button_area").css("visibility", "hidden");
   $("#liked_button_area").css("visibility", "hidden");
 
-  for (var i=0; i < pattern.length; i++){
+  for (var i = 0; i < pattern.length; i++){
     pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
     pattern[i].distance = originalPattern[i].distance;
   }
 }
-//it is either NAME, EDIT, WAIT, CHECK, MINGLE
 
+//it is either NAME, EDIT, WAIT, CHECK, MINGLE
 function stateTransition(_state){
   state = _state;
   switch(state){
@@ -676,14 +635,13 @@ function stateTransition(_state){
     case "MINGLE":
     break;
     default:
-    if(DEBUG) alert("unknown state:" + _state);
+    if (DEBUG) alert("unknown state:" + _state);
     break;
   }
   return;
 }
 
 $(document).ready(function () {
-    
   // Initially, hide them all
   hideAllMessages();
 
@@ -719,35 +677,33 @@ $(document).ready(function () {
         publishMessage("performer", {type:"state", my_id:my_id});
         loopPublish2();
       }
-
     }, 3000);
   })();
 
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
-  $("#start").button().css({ margin:'5px'}).click(function(){
+  $("#start").button().css({margin:'5px'}).click(function(){
     context.resume();
     $("#name_error_msg").text("");
 
     strScreenName = $("#screenname").val();
-    if ( strScreenName.length > 12) {
+    if (strScreenName.length > 12) {
       $("#name_error_msg").text("screen name is too long");
       return;
     }
 
-    if ( textAlphanumeric(strScreenName) == false ) {
+    if (textAlphanumeric(strScreenName) == false) {
       $("#name_error_msg").text("Please, use only letters and numbers for the screen name. ");
       return;
     }
     NORESPONSE1 = true;
-    publishMessage("performer", {"type":"create", "my_id":my_id, "nickname": strScreenName});
+    publishMessage("performer", {"type":"create", "my_id": my_id, "nickname": strScreenName});
     (function loopPublish1(){
       setTimeout(function(){
         if (NORESPONSE1){
           publishMessage("performer", {"type":"create", "my_id":my_id, "nickname": strScreenName});
           loopPublish1();
         }
-
       }, 3000);
     })();
     $("#name_error_msg").text("Waiting for response...");
@@ -764,8 +720,7 @@ $(document).ready(function () {
     testOsc.connect(compressor);
     testOsc.start(0);
     testOsc.stop(context.currentTime + 0.3);
-
-
+    
   });
 
   var playBarNote = -1;
@@ -800,8 +755,7 @@ $(document).ready(function () {
   }
 
   init();
-
-
+  
   function draw() {
     canvas = $("#patternCanvas")[0];
     var ctx = canvas.getContext('2d');
@@ -809,35 +763,33 @@ $(document).ready(function () {
     // Clear the canvas
     ctx.clearRect(0, 0, w, h);
     var weightSum = 0;
-    for (var i=0; i< selectedScale.length; i++){
+    for (var i = 0; i < selectedScale.length; i++){
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
     if (state == "EDIT" || state == "MINGLE" || state == "CHECK"){
-       for (var i=0; i< selectedScale.length; i++){
-        ctx.beginPath();
-        var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
-
-        ctx.rect(0, accHeight, w, height);
-        accHeight += height;
-        if (i % 2 == 0)
-          ctx.fillStyle = '#f8f8f5';
-        else
-          ctx.fillStyle = '#e9e3e0';
-        ctx.fill();
-        }
+       for (var i = 0; i < selectedScale.length; i++){
+         ctx.beginPath();
+         var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
+         ctx.rect(0, accHeight, w, height);
+         accHeight += height;
+         if (i % 2 == 0)
+           ctx.fillStyle = '#f8f8f5';
+         else
+           ctx.fillStyle = '#e9e3e0';
+         ctx.fill();
+       }
     }
 
-    if ( state == "EDIT" || state == "MINGLE"){
-
-
-      for (var i=0; i< patternSize; i++){
-        drawCircle(ctx,pattern[i].x * w, pattern[i].y* h, noteSize, '#83eb9f' );
-        if ( i < patternSize-1) {
-          drawLine(ctx,pattern[i].x* w, pattern[i].y* h, 
-                   pattern[i+1].x* w, pattern[i+1].y* h, '#57bd72');
+    if (state == "EDIT" || state == "MINGLE"){
+      
+      for (var i = 0; i < patternSize; i++){
+        drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
+        if (i < patternSize-1) {
+          drawLine(ctx,pattern[i].x * w, pattern[i].y * h, 
+                   pattern[i+1].x * w, pattern[i+1].y * h, '#57bd72');
         }
-        drawCircle(ctx,pattern[i].x* w, pattern[i].y* h, noteSize/3, '#57bd72' );
+        drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize/3, '#57bd72');
       }
 
       if (playBarNote >= 0){
@@ -846,36 +798,36 @@ $(document).ready(function () {
         var playBarCircleY = pattern[playBarNote].y * (1-progress) + 
             pattern[playBarNote+1].y * (progress);
           
-        drawCircle(ctx,playBarCircleX* w, playBarCircleY* h, noteSize/2 , '#fdff85' );
-     }
-   }
-
-   if ( state == "CHECK" || state == "MINGLE"){
-
-      for (var i=0; i< patternElse.length; i++){
-        drawCircle(ctx,patternElse[i].x * w, patternElse[i].y* h, noteSize-2, '#ff969d' );
-        if ( i < patternElse.length-1) {
-          drawLine(ctx,patternElse[i].x* w, patternElse[i].y* h, 
-                   patternElse[i+1].x* w, patternElse[i+1].y* h, '#d16970');
-        }
-        drawCircle(ctx,patternElse[i].x* w, patternElse[i].y* h, noteSize/3, '#d16970' );
+        drawCircle(ctx, playBarCircleX * w, playBarCircleY * h, noteSize/2 , '#fdff85');
       }
+    }
+
+    if (state == "CHECK" || state == "MINGLE"){
+
+      for (var i = 0; i < patternElse.length; i++){
+        drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
+        if (i < patternElse.length-1) {
+          drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h, 
+                   patternElse[i+1].x * w, patternElse[i+1].y * h, '#d16970');
+        }
+        drawCircle(ctx, patternElse[i].x * w, patternElse[i].y * h, noteSize/3, '#d16970');
+      }
+      
       if (playBarNoteElse >= 0){
         var playBarCircleX = patternElse[playBarNoteElse].x * 
             (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
         var playBarCircleY = patternElse[playBarNoteElse].y * 
             (1-progressElse) + patternElse[playBarNoteElse+1].y * (progressElse);
-          
-        drawCircle(ctx,playBarCircleX* w, playBarCircleY* h, noteSize/2 , '#fdff85' );
-     }
-   }
-    // Draw our object in its new position
+
+        drawCircle(ctx,playBarCircleX * w, playBarCircleY * h, noteSize/2, '#fdff85');
+      }
+    }
   }
 
   var animate = function() {
 
     window.requestAnimFrame(animate);
-    if (state == "NAME" )
+    if (state == "NAME")
       return;
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
@@ -893,122 +845,128 @@ $(document).ready(function () {
         progress = 0;
 
         if (soundEnabled){
-
           var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc )  + 1;
           var numDetune = Math.floor(pattern[playBarNote].x * detune );
           var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 
-                                         12,numOsc,oscType, detune);
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+                                       numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
-                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
+          voice.output.play(0, intervalInSec*0.1,intervalInSec*0.1, intervalInSec*0.4, 
+                            intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
       else if (playBarNote >= 0 && lastPingTime + interval < currentTime){
         playBarNote++;
         progress = 0;
-        var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc )  + 1;
+        var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc) + 1;
         var numDetune = Math.floor(pattern[playBarNote].x * detune );
         var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
         var octave = Math.floor(pitchIndex / selectedScale.length);
 
         lastPingTime = currentTime;
 
-        if (playBarNote == patternSize-1)
-        {
+        if (playBarNote == patternSize-1) {
           interval = intervalBetweenPattern;
           playBarNote = -1;
-        }else{
+        } else {
           interval = pattern[playBarNote].distance / speed;
         }
         intervalInSec = interval/1000;
-        if ( soundEnabled){
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
-                                         octave * 12,numOsc,oscType, detune);
-          voice.stop( context.currentTime + intervalInSec * 0.7);
+        if (soundEnabled){
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+                                       numOsc, oscType, detune);
+          voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
-                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+                            intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
     } // end of if (state == "EDIT" || state == "MINGLE"){
 
 
     if (state == "CHECK" || state == "MINGLE"){
+      
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime){
         playBarNoteElse++;
-        progressElse=0;
+        progressElse = 0;
         lastPingTimeElse = currentTime;
         intervalElse = patternElse[playBarNoteElse].distance / speedElse;
         intervalInSec = interval/1000;
         if (soundEnabled){
-
-          var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc )  + 1;
-          var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune );
-          var pitchIndex =getPitchIndex(1 - patternElse[playBarNoteElse].y);
+          var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc) + 1;
+          var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune);
+          var pitchIndex = getPitchIndex(1 - patternElse[playBarNoteElse].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
                                          octave * 12,numOsc,oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
-                            intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
-
-
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+                            intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
       else if (playBarNoteElse >= 0 && lastPingTimeElse + intervalElse < currentTime){
         playBarNoteElse++;
         progressElse = 0;
-        var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc )  + 1;
-        var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune );
+        var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc) + 1;
+        var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune);
         var pitchIndex =getPitchIndex(1 - patternElse[playBarNoteElse].y);
 
         var octave = Math.floor(pitchIndex / selectedScale.length);
 
         lastPingTimeElse = currentTime;
 
-        if (playBarNoteElse == patternElse.length-1)
-        {
+        if (playBarNoteElse == patternElse.length-1) {
           intervalElse = intervalBetweenPattern;
           playBarNoteElse = -1;
-        }else{
+        } else {
           intervalElse = patternElse[playBarNoteElse].distance / speedElse;
         }
         intervalInSec = interval/1000;
-        if ( soundEnabled){
-          var voice  =  new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
-                                         octave * 12,numOsc,oscType, detune);
-
-          voice.stop( context.currentTime + intervalInSec * 0.7);
-
+        if (soundEnabled){
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+                                       numOsc, oscType, detune);
+          voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
           voice.output.play(0,intervalInSec*0.1,intervalInSec*0.1,intervalInSec*0.4,
                             intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
-
         }
       }
     } // end of if (state == "EDIT" || state == "MINGLE"){
-
-   // if (state == "CHECK" || state == "MINGLE"){
-
-    //}
     draw();
   };
 
   animate();
+  
+  var selectedNote = -1;
+  
+  $(document).bind('touchstart', function(event){
+    // Left mouse button was pressed, set flag
+    var minDistance = 100000;
+    var tempNoteID = -1;
+    var e = event.originalEvent.changedTouches[0];
 
+    for (var i = 0; i < patternSize; i++){
+      var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
+      if (minDistance >= distance){
+        minDistance = distance;
+        tempNoteID = i;
+      }
+    }
+
+    if (tempNoteID > -1 && minDistance < noteSize) {
+      selectedNote = tempNoteID;
+    }
+  });
+  
   function touchHandler(){
     //Assume only one touch/only process one touch even if there's more
     var e = event.targetTouches[0];
-    //var touch = event
-    if ( selectedNote <0 )
+    if (selectedNote < 0)
       return;
-
-    // Is touch close enough to our object?
 
     // Assign new coordinates to our object
     pattern[selectedNote].setPosition((e.pageX -  noteSize / 2) / w, (e.pageY -  noteSize / 2) / h);
@@ -1023,29 +981,10 @@ $(document).ready(function () {
     event.preventDefault();
   }
 
-  function mouseHandler(e){
-    //Assume only one touch/only process one touch even if there's more
-    if (selectedNote < 0)
-      return;
-    // Is touch close enough to our object?
-
-    // Assign new coordinates to our object
-    pattern[selectedNote].setPosition((e.pageX - noteSize / 2) / w, (e.pageY - noteSize / 2) / h);
-    pattern[selectedNote].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
-      pattern[(1+selectedNote)%patternSize].x * w, pattern[(1+selectedNote)%patternSize].y * h);
-    if (selectedNote > 0)
-      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
-      pattern[selectedNote-1].x * w, pattern[selectedNote-1].y * h);
-
-    // Redraw the canvas
-    draw();
-
-    event.preventDefault();
-  }
-
-  var leftButtonDown = false;
-  var selectedNote = -1;
-
+  $(document).bind('touchend',function(event){
+      selectedNote = -1;
+  });
+  
   $(document).mousedown(function(e){
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
@@ -1063,34 +1002,27 @@ $(document).ready(function () {
       selectedNote = tempNoteID;
     }
   });
+  
+  function mouseHandler(e){
+    if (selectedNote < 0)
+      return;
 
-  $(document).bind('touchstart',function(event){
-    // Left mouse button was pressed, set flag
-    var minDistance = 100000;
-    var tempNoteID = -1;
-    var e = event.originalEvent.changedTouches[0];
+    // Assign new coordinates to our object
+    pattern[selectedNote].setPosition((e.pageX - noteSize / 2) / w, (e.pageY - noteSize / 2) / h);
+    pattern[selectedNote].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
+      pattern[(1+selectedNote)%patternSize].x * w, pattern[(1+selectedNote)%patternSize].y * h);
+    if (selectedNote > 0)
+      pattern[selectedNote-1].distance = dist(pattern[selectedNote].x * w, pattern[selectedNote].y * h,
+      pattern[selectedNote-1].x * w, pattern[selectedNote-1].y * h);
 
-    for (var i = 0; i < patternSize; i++){
-      var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
-      if (minDistance >= distance){
-        minDistance = distance;
-        tempNoteID = i;
-      }
-    }
+    // Redraw the canvas
+    draw();
 
-    if (tempNoteID > -1 && minDistance < noteSize) {
-      selectedNote = tempNoteID;
-    }
-
-  });
-
-  $(document).bind('touchend',function(event){
-      selectedNote = -1;
-  });
+    event.preventDefault();
+  }
 
   $(document).mouseup(function(e){
     // Left mouse button was released, clear flag
     selectedNote = -1;
   });
-
 });
