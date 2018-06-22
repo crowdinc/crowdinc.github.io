@@ -43,8 +43,9 @@ function hideAllMessages() {
   var messagesHeights = new Array(); // this array will store height for each
 
   for (i = 0; i < myMessages.length; i++) {
-    messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); // fill array 
-      //move element outside viewport
+    // fill array 
+    messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); 
+    // move element outside viewport
     $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
   }
 }
@@ -153,9 +154,9 @@ if (soundEnabled){
     // still needed for Safari
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     // create an AudioContext
-    //context = WX._ctx
+    // context = WX._ctx
     context = new window.AudioContext();
-   // alert('Web Audio API supported.');
+    // alert('Web Audio API supported.');
     compressor = context.createDynamicsCompressor()
     reverb = context.createConvolver();
   } catch(e) {
@@ -316,7 +317,7 @@ function drawLine(ctx, x1,y1,x2,y2, color) {
     ctx.stroke();
 }
 
-//This segment displays the validation rule for address field.
+// This segment displays the validation rule for address field.
 function textAlphanumeric(inputText){
   var alphaExp = /^[0-9a-zA-Z._]+$/;
   if (inputText.match(alphaExp)) {
@@ -620,7 +621,7 @@ function exit(){
   }
 }
 
-//it is either NAME, EDIT, WAIT, CHECK, MINGLE
+// it is either NAME, EDIT, WAIT, CHECK, MINGLE
 function stateTransition(_state){
   state = _state;
   switch(state){
