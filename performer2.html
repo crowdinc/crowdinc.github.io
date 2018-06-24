@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.20.3.min.js"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.2.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
@@ -19,7 +19,7 @@
     <script src="./js/pubnub-keys.js"></script>
     <script src="./js/performer2.js"></script>
   </head>
-  <body onload="load()">
+  <body>
     <div class="section group">
       <div class="col col-lg-8 col-md-8">
         <h1> Crowd in C[loud] : crowdinc.github.io</h1>
@@ -40,24 +40,18 @@
             <span class = "chat_row">
               <button type="submit" id="broadcast">Broadcast</button>
             </span>
-            <!--<span id="radio" class = "chat_row">
-              <input type="radio" id="radio1" name="radio" checked="checked"><label for="radio1">STANDBY</label>
-              <input type="radio" id="radio2" name="radio"><label for="radio2">Go Live</label>
-              <input type="radio" id="radio3" name="radio"><label for="radio3">Refresh</label>
-              <input type="radio" id="radio4" name="radio"><label for="radio4">End</label>
-            </span>-->
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-warning active">
-                <input type="radio" id="standby" checked> STANDBY
+              <label class="btn btn-warning active" id="standby">
+                <input type="radio" checked> STANDBY
               </label>
-              <label class="btn btn-success">
-                <input type="radio" id="golive"> GO LIVE
+              <label class="btn btn-success" id="golive">
+                <input type="radio"> GO LIVE
               </label>
-              <label class="btn btn-primary">
-                <input type="radio" id="refresh"> REFRESH
+              <label class="btn btn-primary" id="refresh">
+                <input type="radio"> REFRESH
               </label>
-              <label class="btn btn-danger">
-                <input type="radio" id="end"> END
+              <label class="btn btn-danger" id="end">
+                <input type="radio"> END
               </label>
             </div>
           </div>
