@@ -23,7 +23,7 @@ var arrayUniqueNicknames = new Array();
 var arrayTinderMusics = new Array();
 var arrayAvailables = new Array();
 var arrayUnavailables = new Array();
-var arrayWaitingPeople = new Array();;
+var arrayWaitingPeople = new Array();
 var divUnavailables = null;
 var divAvailables = null;
 var randomNumber ;
@@ -249,7 +249,6 @@ function create(user_id, user_nickname) {
 
             setAsUnavailable(foundIndex);
             console.log("user exists and returned");
-        //    publishMessage(user_id, {type:"script", script:"showMessage('success','Welcome Back! '" +user_nickname + ", true, 2000)"});
 
             break;
           }
@@ -270,7 +269,6 @@ function updateDiv(index){
   user = arrayTinderMusics[index];
   user.obj.find('#'+index+'_liked').text(user.likedby.length);
   user.obj.find('#'+index+'_crowd').text(user.followers.length);
-  //$('#'+index +"_liked").text(user.nickname + "," + user.followers.length + "," + user.likedby.length);
 }
 
 function respondState(user_id){
@@ -317,344 +315,276 @@ function liked(user_index, liked_index){
 
 }
 
-  // update the tinder music and get the next user to follow (get the next?! always?!)
-  function inform(user_index){
-    var user = arrayTinderMusics[user_index];
-    if(!user)return;
+// update the tinder music and get the next user to follow (get the next?! always?!)
+function inform(user_index){
+  var user = arrayTinderMusics[user_index];
+  if(!user)return;
 
-    if ( typeof(user.follow) == 'number' ) { // I was in a pattern
-      var followed = user.follow;
+  if ( typeof(user.follow) == 'number' ) { // I was in a pattern
+    var followed = user.follow;
 
-      if (arrayAvailables.indexOf(followed) == -1) {
-          next(user.index)
-          console.log("arrayAvailables -1 : I was folloing someone disappeared");
-      }
-      else {
-        var suggested = arrayTinderMusics[followed];
-        publishMessage(user.id,
-          {"type": "next-response",
-            "suggested_tm": {
-                        "nickname" : suggested.nickname,
-                        "index" : suggested.index,
-                        "tm" : suggested.tm
-                      }
-                    });
-        console.log("followed -1 : I was folloing someone disappeared");
-      }
-      // TODO: update the number of followers on the screen
+    if (arrayAvailables.indexOf(followed) == -1) {
+        next(user.index)
+        console.log("arrayAvailables -1 : I was following someone disappeared");
     }
-    else{
-      next(user.index);
+    else {
+      var suggested = arrayTinderMusics[followed];
+      publishMessage(user.id,
+        {"type": "next-response",
+          "suggested_tm": {
+                      "nickname" : suggested.nickname,
+                      "index" : suggested.index,
+                      "tm" : suggested.tm
+                    }
+                  });
+      console.log("followed -1 : I was folloing someone disappeared");
     }
+    // TODO: update the number of followers on the screen
+  }
+  else{
+    next(user.index);
+  }
+}
+
+function update(user_index, user_tm) {
+  var user = arrayTinderMusics[user_index];
+  if(!user)return;
+  user.obj.css("background", "");
+
+  // update the tinder music
+  user.tm = user_tm;
+
+  // set the user mode
+  user.mode = "following";
+
+  if (user.status == 'unavailable') {
+    //document.getElementById(user.index).className = 'unavailable';
+    var actualIndex = arrayUnavailables.indexOf(user_index);
+      if (actualIndex != -1) {
+        arrayUnavailables.splice(actualIndex,1);
+      }
+      setAsAvailable(user_index);
+    //  div.remove();
+      updateDiv(user_index)
   }
 
-  function update(user_index, user_tm) {
-    var user = arrayTinderMusics[user_index];
-    if(!user)return;
-    user.obj.css("background", "");
+  if ( typeof(user.follow) == 'number' ) { // I was in a pattern
+    var followed = user.follow;
 
-    // update the tinder music
-    user.tm = user_tm;
-
-    // set the user mode
-    user.mode = "following";
-
-    if (user.status == 'unavailable') {
-      //document.getElementById(user.index).className = 'unavailable';
-      var actualIndex = arrayUnavailables.indexOf(user_index);
-        if (actualIndex != -1) {
-          arrayUnavailables.splice(actualIndex,1);
-        }
-        setAsAvailable(user_index);
-      //  div.remove();
-        updateDiv(user_index)
-      }
-
-    if ( typeof(user.follow) == 'number' ) { // I was in a pattern
-      var followed = user.follow;
-
-      if (arrayAvailables.indexOf(followed) == -1) {
-          next(user.index)
-      }
-      else {
-        var suggested = arrayTinderMusics[followed];
-        publishMessage(user.id,
-          {"type": "next-response",
-            "suggested_tm": {
-                        "nickname" : suggested.nickname,
-                         "index" : suggested.index,
-
-                        "tm" : suggested.tm
-                      }
-                    });
-      }
-      // TODO: update the number of followers on the screen
+    if (arrayAvailables.indexOf(followed) == -1) {
+        next(user.index)
     }
-    else{
-      next(user.index);
+    else {
+      var suggested = arrayTinderMusics[followed];
+      publishMessage(user.id,
+        {"type": "next-response",
+          "suggested_tm": {
+                      "nickname" : suggested.nickname,
+                       "index" : suggested.index,
+
+                      "tm" : suggested.tm
+                    }
+                  });
     }
   }
+  else{
+    next(user.index);
+  }
+}
 
-  // update the next user to follow
-  function next(user_index) {
-    var user = arrayTinderMusics[user_index];
-    user.obj.css("background", "");
+// update the next user to follow
+function next(user_index) {
+  var user = arrayTinderMusics[user_index];
+  user.obj.css("background", "");
 
-    suggested_index = get_next_user_to_follow(user_index);
+  suggested_index = get_next_user_to_follow(user_index);
+
+  if ( typeof(user.follow) == 'number' ) {
+    var ex_followed = arrayTinderMusics[user.follow];
+    // unfollow the older
+    var follower_index = ex_followed.followers.indexOf[user.index];
+    if (follower_index != -1) {
+      ex_followed.followers.splice(follower_index,1);
+    }
+
+    // TODO: update the number of followers on the screen
+
+    if (ex_followed.index == indexMostFollowed) {
+      followersMostFollowed = followersMostFollowed - 1;
+    } 
+    updateDiv(user.follow);
+  }
+
+  if ( suggested_index != -1 ) {
+    var suggested = arrayTinderMusics[suggested_index];
+
+    // follow
+    user.follow = suggested_index;
+    suggested.followers.push(user.index);
+
+    updateDiv(suggested_index);
+
+    // TODO: update the number of followers on the screen
+    // if it is the most followed now
+    if (suggested.followers.length > followersMostFollowed) {
+      indexMostFollowed = suggested.index;
+      followersMostFollowed = suggested.followers.length;
+      $("#most-followed").text(suggested.nickname);
+    } 
+    // response
+    publishMessage(user.id, {"type": "next-response",
+                    "suggested_tm": {
+                      "nickname" : suggested.nickname,
+                      "index" : suggested.index,
+                      "tm" : suggested.tm
+                    }
+                  });
+
+  } else {
+    // there is no user to follow
+    // keep track of waiting people
+    arrayWaitingPeople.push(user.index);
+  }
+}
+
+
+// return the index of the next user to follow
+// based on the index of the follower (not the index of the followed)
+function get_next_user_to_follow(user_index) {
+  var user = arrayTinderMusics[user_index];
+
+  var suggested_index = -1;
+
+  if ( arrayAvailables.length > 0 ) {
+    suggested_index = arrayTinderMusics[ arrayAvailables[0] ].index;
 
     if ( typeof(user.follow) == 'number' ) {
-      var ex_followed = arrayTinderMusics[user.follow];
-      // unfollow the older
-      var follower_index = ex_followed.followers.indexOf[user.index];
-      if (follower_index != -1) {
-        ex_followed.followers.splice(follower_index,1);
-      }
-
-      // TODO: update the number of followers on the screen
-
-      if (ex_followed.index == indexMostFollowed) {
-        followersMostFollowed = followersMostFollowed - 1;
-      } /*else if (ex_followed.index != indexMostLiked) {
-      // we cant change the most liked style here
-        var divExFollowed = document.getElementById(ex_followed.index);
-        divExFollowed.style.border = ex_followed.followers.length+"px grey solid";
-      }*/
-      updateDiv(user.follow);
-
-
-    }
-
-    if ( suggested_index != -1 ) {
-      var suggested = arrayTinderMusics[suggested_index];
-
-      // follow
-      user.follow = suggested_index;
-      suggested.followers.push(user.index);
-
-      updateDiv(suggested_index);
-
-      // TODO: update the number of followers on the screen
-      // if it is the most followed now
-      if (suggested.followers.length > followersMostFollowed) {
-        // updating the old most followed
-       /* if (indexMostFollowed != indexMostLiked && indexMostFollowed >=0) {
-        // we cant change the style of the most liked here
-          var divOldMostFollowed = document.getElementById(indexMostFollowed);
-          divOldMostFollowed.style.border = suggested.followers.length+"px grey solid";
+      var ex_followed = user.follow;
+      // search the next one
+      if ( arrayTinderMusics[ex_followed].status == 'available') {
+        var possible = arrayAvailables.indexOf(ex_followed) + 1;
+        if (possible < arrayAvailables.length) {
+          suggested_index = arrayTinderMusics[ arrayAvailables[possible] ].index;
         }
-        */
+      } // else there is no one available, follow the first
+    } // else the user is not following anybody, follow the first
+  } // else there is no one to follow, return -1
 
-        indexMostFollowed = suggested.index;
-        followersMostFollowed = suggested.followers.length;
-        $("#most-followed").text(suggested.nickname);
-        //console.log("Most Followed one : " + suggested.nickname);
-        // updating the new one
-       /* if (indexMostFollowed != indexMostLiked && indexMostFollowed >=0) {
-        // we cant change the style of the most liked here
-          var divMostFollowed = document.getElementById(indexMostFollowed);
-          divMostFollowed.style.border = borderMostFollowed+"px pink double";
-        }*/
-      } /*else if (suggested.index != indexMostLiked) {
-          var divFollowed = document.getElementById(suggested.index);
-          divFollowed.style.border = suggested.followers.length+"px grey solid";
-      }*/
-
-      // response
-      publishMessage(user.id, {"type": "next-response",
-                      "suggested_tm": {
-                        "nickname" : suggested.nickname,
-                        "index" : suggested.index,
-                        "tm" : suggested.tm
-                      }
-                    });
-
-    } else {
-      // there is no user to follow
-   /*   user.follow = "";
-      publishMessage(user.id, {"type": "next-response",
-                      "suggested_tm": ""
-            });
-     */
-      // keep track of waiting people
-      arrayWaitingPeople.push(user.index);
+  return suggested_index;
+}
 
 
+// when the user goes to edit mode
+// the performer change the mode and color
+// and inform to everybody
+function editing(user_index) {
+  var user = arrayTinderMusics[user_index];
+  if(!user)return;
+  var actualIndex = arrayAvailables.indexOf(user_index);
+    if (actualIndex != -1) {
+      arrayAvailables.splice(actualIndex,1);
     }
-  }
-
-
-  // return the index of the next user to follow
-  // based on the index of the follower (not the index of the followed)
-  function get_next_user_to_follow(user_index) {
-    var user = arrayTinderMusics[user_index];
-
-    var suggested_index = -1;
-
-    if ( arrayAvailables.length > 0 ) {
-      suggested_index = arrayTinderMusics[ arrayAvailables[0] ].index;
-
-      if ( typeof(user.follow) == 'number' ) {
-        var ex_followed = user.follow;
-        // search the next one
-        if ( arrayTinderMusics[ex_followed].status == 'available') {
-          var possible = arrayAvailables.indexOf(ex_followed) + 1;
-          if (possible < arrayAvailables.length) {
-            suggested_index = arrayTinderMusics[ arrayAvailables[possible] ].index;
-          }
-        } // else there is no one available, follow the first
-      } // else the user is not following anybody, follow the first
-    } // else there is no one to follow, return -1
-
-    return suggested_index;
-  }
-
-
-  // when the user goes to edit mode
-  // the performer change the mode and color
-  // and inform to everybody
-  function editing(user_index) {
-    var user = arrayTinderMusics[user_index];
-    if(!user)return;
-    var actualIndex = arrayAvailables.indexOf(user_index);
-      if (actualIndex != -1) {
-        arrayAvailables.splice(actualIndex,1);
-      }
-      else{
-        if(DEBUG) console.log("something is wrong");
-      }
-      user.obj.remove();
-      setAsUnavailable(user_index);
-    // change mode
-   /* user.mode = 'editing'
-
-    // chande the color
-    if (user.status == 'unavailable') {
-      document.getElementById(user.index).className = 'unavailable-editing';
-    } else {
-      document.getElementById(user.index).className = 'available-editing';
+    else{
+      if(DEBUG) console.log("something is wrong");
     }
-
-    // reponse with the latest tinder music
-    publishMessage(user.id, {"type": "editing-response",
-                    "tm" : user.tm
-          });
+    user.obj.remove();
+    setAsUnavailable(user_index);
+}
 
 
-    // inform the followers
+// View
+
+// set the tinder music as unavailable
+function setAsUnavailable(index) {
+  var user = arrayTinderMusics[index];
+
+  if ( user.status == 'available' ) {
+    user.status = 'unavailable';
     for ( i = 0; i < user.followers.length; i++) {
-      publishMessage(arrayTinderMusics[ user.followers[i] ].id,
-        {"type": "user-editing"});
-
-    }*/
+    }
+  } else if ( user.status == 'unavailable') {
+    // run something if the user is new?!
   }
-
-
-  // View
-
-  // set the tinder music as unavailable
-  function setAsUnavailable(index) {
-    var user = arrayTinderMusics[index];
-
-    if ( user.status == 'available' ) {
-      user.status = 'unavailable';
-      for ( i = 0; i < user.followers.length; i++) {
-      /*  publishMessage(arrayTinderMusics[ user.followers[i] ].id,
-        {"type": "user-unavailable"});*/
-      }
-    } else if ( user.status == 'unavailable') {
-      // run something if the user is new?!
-    }
-    var divStr = divTemplate.replace(/\[index\]/g,user.index).replace(/\[nickname\]/g,user.nickname)
-    var newDiv = $('<div/>').html(divStr).contents();//document.createElement('div');
-    newDiv.find('.stats').css("display", "none");
-    //newDiv.id = index;
-    if ( user.mode != 'editing') {
-      newDiv.className = 'unavailable';
-    } else {
-      newDiv.className = 'unavailable-editing';
-    }
-    //newDiv.appendChild(document.createTextNode(user.nickname  ));
-    // onclick set as available
-  /*  newDiv.onclick = function() {
-      // the user can go to available mode only when it is playing, yeah?!
-      if (arrayTinderMusics[index].mode != 'editing') {
-        var actualIndex = arrayUnavailables.indexOf(index);
-        if (actualIndex != -1) {
-          arrayUnavailables.splice(actualIndex,1);
-        }
-      //  this.remove();
-        setAsAvailable(index);
-      }
-    }
-    */
-
-    arrayUnavailables.push(index);
-    divUnavailables.append(newDiv);
-    user.obj = newDiv;
+  var divStr = divTemplate.replace(/\[index\]/g,user.index).replace(/\[nickname\]/g,user.nickname)
+  var newDiv = $('<div/>').html(divStr).contents();//document.createElement('div');
+  newDiv.find('.stats').css("display", "none");
+  //newDiv.id = index;
+  if ( user.mode != 'editing') {
+    newDiv.className = 'unavailable';
+  } else {
+    newDiv.className = 'unavailable-editing';
   }
+  //newDiv.appendChild(document.createTextNode(user.nickname  ));
+  // onclick set as available
+/*  newDiv.onclick = function() {
+    // the user can go to available mode only when it is playing, yeah?!
+    if (arrayTinderMusics[index].mode != 'editing') {
+      var actualIndex = arrayUnavailables.indexOf(index);
+      if (actualIndex != -1) {
+        arrayUnavailables.splice(actualIndex,1);
+      }
+    //  this.remove();
+      setAsAvailable(index);
+    }
+  }
+  */
+
+  arrayUnavailables.push(index);
+  divUnavailables.append(newDiv);
+  user.obj = newDiv;
+}
 
   // set the tinder music as available
-  function setAsAvailable(index) {
-    var user = arrayTinderMusics[index];
-    var obj = user.obj;
-    user.status = 'available';
+function setAsAvailable(index) {
+  var user = arrayTinderMusics[index];
+  var obj = user.obj;
+  user.status = 'available';
 
-    if (user.mode != 'editing') {
-      obj.className = 'available';
-    } else {
-      obj.className = 'available-editing';
-    }
-    obj.find('.stats').css("display", "");
-    //newDiv.appendChild(document.createTextNode(user.nickname + "," + user.followers.length + "," +user.likedby.length));
-    // onclick, set as Unavailable
-   /* obj.click(function() {
-      var actualIndex = arrayAvailables.indexOf(index);
-      if (actualIndex != -1) {
-        arrayAvailables.splice(actualIndex,1);
-      }
-      this.remove();
-      setAsUnavailable(index);
-    });
-*/
-
-    arrayAvailables.push(index);
-
-    divAvailables.append(obj);
-
-    if ( arrayWaitingPeople.length > 0){
-      for(var i=0; i< arrayWaitingPeople.length; i++){
-        next(arrayWaitingPeople[i]);
-      }
-      arrayWaitingPeople = new Array();
-    }
+  if (user.mode != 'editing') {
+    obj.className = 'available';
+  } else {
+    obj.className = 'available-editing';
   }
+  obj.find('.stats').css("display", "");
 
- $(document).ready(function () {
-    var myTextArea = $("#code");
-    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: false,
-        styleActiveLine: true,
-        matchBrackets: true
-    });
+  arrayAvailables.push(index);
 
-    $( "#resizable" ).resizable();
-    $( "#resizable" ).draggable();
+  divAvailables.append(obj);
 
-    var livecode = function(cm){
-      var selectedText = cm.getDoc().getSelection();
-      if(selectedText.length > 0){
-        console.log(selectedText);
-        publishMessage("audience", {type:"script",script:selectedText});
-      }else{
-        selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
-        console.log(selectedText);
-        publishMessage("audience", {type:"script",script:selectedText});
-      }
-    };
+  if ( arrayWaitingPeople.length > 0){
+    for(var i=0; i< arrayWaitingPeople.length; i++){
+      next(arrayWaitingPeople[i]);
+    }
+    arrayWaitingPeople = new Array();
+  }
+}
 
-    var map = {"Shift-Enter": livecode};
-    editor.addKeyMap(map);
-
-
-
+$(document).ready(function () {
+  var myTextArea = $("#code");
+  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: false,
+      styleActiveLine: true,
+      matchBrackets: true
   });
+
+  $( "#resizable" ).resizable();
+  $( "#resizable" ).draggable();
+
+  var livecode = function(cm){
+    var selectedText = cm.getDoc().getSelection();
+    if(selectedText.length > 0){
+      console.log(selectedText);
+      publishMessage("audience", {type:"script",script:selectedText});
+    }else{
+      selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
+      console.log(selectedText);
+      publishMessage("audience", {type:"script",script:selectedText});
+    }
+  };
+
+  var map = {"Shift-Enter": livecode};
+  editor.addKeyMap(map);
+
+
+
+});

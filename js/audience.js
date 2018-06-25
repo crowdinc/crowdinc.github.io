@@ -517,17 +517,6 @@ function getNextPattern(){
   $("#waiting-message").css("visibility", "visible");
 }
 
-// not required? aaron 6/15/18
-// Request the next div
-/*function getNextDivName() {
-  var actualTindered =  document.getElementById('tindered');
-  var actualDivName = actualTindered.textContent;
-  pubnub.publish({
-    channel: "performer",
-    message: {"nextToDivName": actualDivName, "user": my_id}
-  });
-}*/
-
 // Set the name of the next div
 function setNextDivName(divName) {
   var actualTindered =  document.getElementById('tindered');

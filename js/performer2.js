@@ -2,13 +2,23 @@
   return "";
 };*/
 
-var DEBUG = false;
+var DEBUG = true;
 var soundEnabled = false;
 var state = "STANDBY"; // STANDBY, GOLIVE, END
 var STOPWORKING = false;
 var arrayUUIDs = [];
 var arrayUniqueNicknames = [];
 var arrayUsers = [];
+var arrayWaitingPeople = [];
+var indexMostLiked = -1;
+var likesMostLiked = 0;
+var indexMostFollowed = -1;
+var followersMostFollowed = 0;
+var borderMostLiked = 50;
+var borderMostFollowed = 40;
+var divUsers = null;
+
+var divTemplate = '<div id="[index]" class="modalDialog">\n         <div class = "center">\n          [nickname]<br>\n        </div>\n        <div class = "section group stats"> \n          <div class="col span_2_of_4_ center">\n            <img src="./images/heart_small.png" height="15px" style="float: left;">\n            <span style="float: left;" id=[index]_liked> 0</span>\n          </div>\n          <div class="col span_2_of_4_ center">\n            <img src="./images/crowd_small.png" height="15px"  style="float: left;">\n            <span id=[index]_crowd> 0</span>\n          </div>\n        </div>\n      </div>';
 
 var pubnub = new PubNub({
   subscribeKey: subscribeKey,
@@ -25,11 +35,15 @@ pubnub.subscribe({
 
 pubnub.addListener({
   message: function(m) {
-    parseMessage(m);
+    parseMessage(m.message);
+  },
+  presence: function(p) {
+    performanceStatus(p);
   }
 });
 
 $(document).ready(function() {
+  divUsers = $('#availables');
   $('#standby').click(function() {
     console.log('standby');
     state = "STANDBY";
@@ -53,11 +67,91 @@ $(document).ready(function() {
     soundEnabled = false;
     respondState();
   });
+  var myTextArea = $('#code');
+  var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    lineNumbers: false,
+    styleActiveLine: true,
+    matchBrackets: true
+  });
+  $('#resizable').resizable();
+  $('#resizable').draggable();
+  var livecode = function(cm) {
+    var selectedText = cm.getDoc().getSelection();
+    if (selectedText.length > 0) {
+      console.log(selectedText);
+      publishMessage('audience', {
+        type: 'script',
+        script: selectedText
+      });
+    }
+    else {
+      selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
+      console.log(selectedText);
+      publishMessage('audience', {
+        type: 'script',
+        script: selectedText
+      });
+    }
+  };
+  var map = {"Shift-Enter": livecode};
+  editor.addKeyMap(map);
 });
 
+// handler for message events
 function parseMessage(m) {
   if (STOPWORKING) return;
-  console.log(m.message);
+  try {
+    //if (DEBUG) console.log("message received: " + JSON.stringify(m));
+    if (typeof m.type !== 'undefined') {
+      if (typeof m.index !== 'undefined') {
+        if (arrayUsers[m.index] == 'undefined') {
+          return; // there's nothing we can do. (?)
+        }
+      }
+      switch(m.type) {
+        case 'create':
+          create(m.my_id, m.nickname);
+          break;
+        case 'update':
+          update(m.index, m.tm);
+          break;
+        case 'next':
+          next(m.index);
+          break;
+        case 'editing':
+          console.log('user ', m.nickname, ' is editing');
+          break;
+        case 'whereami':
+          console.log('user ', m.nickname, ' sent a whereami message');
+          break;
+        case 'state':
+          respondState(m.my_id);
+          break;
+        case 'liked':
+          break;
+        default:
+          console.log('unhandled message type: ', m.type);
+      }
+    }
+  }
+  catch(err) {
+    console.log(err.message);
+  }
+}
+
+// handler for presence events
+function performanceStatus(event) {
+  if (DEBUG) console.log("status: " + JSON.stringify(event));
+  // change backgroud of a disconnected user
+  if (typeof message.action !== 'undefined') {
+    if (message.action == 'timeout') {
+      var user_disconected = arrayUUIDs.indexOf(message.uuid);
+      if (user_disconected != -1) {
+        var divDisconnected = document.getElementById(user_disconected);
+        divDisconnected.style.background = "grey";
+      }
+    }
+  }
 }
 
 function respondState(user_id){
@@ -67,6 +161,7 @@ function respondState(user_id){
     publishMessage("audience", {type:"state-response", sound:soundEnabled, state:state});
 }
 
+// central message sending function
 function publishMessage(channel, options){
   if (STOPWORKING) {
     alert("you can't publish a message");
@@ -88,8 +183,8 @@ function create(userID, userNickname) {
   // if the nickname doesn't exist yet
   if (arrayUniqueNicknames.indexOf(userNickname) == -1) {
     // push returns the length
-    var index = arrayUniqueNicknames.push(user_nickname) - 1;
-    arrayUUIDs.push(user_id);
+    var index = arrayUniqueNicknames.push(userNickname) - 1;
+    arrayUUIDs.push(userID);
     var user = {
       'id': userID,
       'nickname': userNickname,
@@ -118,10 +213,12 @@ function create(userID, userNickname) {
     // disconnected user returning with same name
     else {
       var foundIndex = -1;
-      for (var i = 0; i < arrayTinderMusics.length; i++){
+      for (var i = 0; i < arrayTinderMusics.length; i++) {
+        // find user's index in array
         if (user_id.trim() === arrayTinderMusics[i].id && 
             user_nickname === arrayTinderMusics[i].nickname) {
           foundIndex = i;
+          // initiate user's interface
           publishMessage(user_id, {
             "type": "create-response",
             "res": "s",
@@ -139,4 +236,140 @@ function create(userID, userNickname) {
       }
     }
   }
+  displayUser(arrayUsers.indexOf(user));
 }
+
+function displayUser(index) {
+  var user = arrayUsers[index];
+  var divStr = divTemplate.replace(/\[index\]/g,user.index).replace(/\[nickname\]/g,user.nickname);
+  var newDiv = $('<div/>').html(divStr).contents();
+  newDiv.find('.stats').css("display", "none");
+  user.obj = newDiv;
+  divUsers.append(newDiv);
+}
+
+function update(userIndex, userPattern) {
+  var user = arrayUsers[userIndex];
+  if (!user) return;
+  user.obj.css("background", "");
+  
+  user.pattern = userPattern;
+  
+  user.mode = "following";
+  
+  if (typeof(user.follow) == 'number') { // I was in a pattern (?)
+    var followed = user.follow;
+    if (arrayUsers.indexOf(followed) == -1) {
+      next(user.index);
+    }
+    else {
+      var suggested = arrayUsers[followed];
+      publishMessage(user.id, {
+        "type": 'next-response',
+        "suggested_tm": {
+          "nickname": suggested.nickname,
+          "index": suggested.index,
+          "tm": suggested.pattern
+        }
+      });
+    }
+  }
+  else {
+    next(user.index);
+  }
+}
+
+function next(userIndex) {
+  var user = arrayUsers[userIndex];
+  user.obj.css("background", "");
+  var suggestedIndex = get_next_user_to_follow(userIndex);
+  if (typeof(user.follow) == 'number') {
+    var exFollowed = arrayUsers[user.follow];
+    
+    // unfollow the older
+    var followerIndex = exFollowed.followers.indexOf[user.index];
+    if (followerIndex != -1) {
+      exFollowed.followers.splice(followerIndex, 1);
+    }
+    
+    if (exFollowed.index == indexMostFollowed) {
+      followersMostFollowed = followersMostFollowed - 1;
+    }
+    updateDiv(user.follow);
+  }
+  if (suggestedIndex != -1) {
+    var suggested = arrayUsers[suggestedIndex];
+    
+    // follow
+    user.follow = suggestedIndex;
+    suggested.followers.push(user.index);
+    
+    updateDiv(suggestedIndex);
+    
+    if (suggested.followers.length > followersMostFollowed) {
+      indexMostFollowed = suggested.index;
+      followersMostFollowed = suggested.followers.length;
+      $('#most-followed').text(suggested.nickname);
+    }
+    
+    // response
+    publishMessage(user.id, {
+      "type": 'next-response',
+      "suggested_tm": {
+        "nickname": suggested.nickname,
+        "index": suggested.index,
+        "tm": suggested.pattern
+      }
+    });
+  }
+  // no user to follow
+  else {
+    arrayWaitingPeople.push(user.index);
+  }
+}
+
+function get_next_user_to_follow(userIndex) {
+  var user = arrayUsers[userIndex];
+  var suggestedIndex = -1;
+  if (arrayUsers.length > 0) {
+    suggestedIndex = 0;
+    if (typeof(user.follow) == 'number') {
+      var exFollowed = user.follow;
+      if (arrayUsers[exFollowed].mode = "following") {
+        var possible = arrayUsers.indexOf(exFollowed) + 1;
+        if (possible < arrayUsers.length) {
+          suggestedIndex = possible;
+        }
+      }
+    }
+  }
+  return suggestedIndex;
+}
+
+function updateDiv(index) {
+  user = arrayUsers[index];
+  user.obj.find('#'+index+'_liked').text(user.likedby.length);
+  user.obj.find('#'+index+'_crowd').text(user.followers.length);
+}
+
+function liked(user_index, liked_index) {
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
