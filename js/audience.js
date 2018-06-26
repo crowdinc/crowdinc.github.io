@@ -54,7 +54,7 @@ function showMessage(type, message, autoHide, hideTime) {
   hideAllMessages();
   $("." + type + " .msg_header").text(message);
   $('.' + type).animate({top: "0"}, 500);
-  if (autoHide){
+  if (autoHide) {
     hideTime = hideTime | 3000;
     setTimeout(hideAllMessages, hideTime);
   }
@@ -145,11 +145,11 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function noteNum2Freq(num){
+function noteNum2Freq(num) {
   return Math.pow(2, (num-57) / 12) * 440;
 }
 
-if (soundEnabled){
+if (soundEnabled) {
   try {
     // still needed for Safari
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -165,13 +165,13 @@ if (soundEnabled){
   }
 }
 
-loadSounds(buffers, soundmap, function(){
+loadSounds(buffers, soundmap, function() {
   reverb.buffer = buffers['ir1'];
 });
 
 
-var playSample = function(sampleName, randomSpeed){
-  if (buffers[sampleName]){
+var playSample = function(sampleName, randomSpeed) {
+  if (buffers[sampleName]) {
     var source = context.createBufferSource();
     source.buffer = buffers[sampleName];
     if (randomSpeed) {
@@ -182,12 +182,12 @@ var playSample = function(sampleName, randomSpeed){
   }
 }
 
-function ADSR(){
+function ADSR() {
     this.node = context.createGain();
     this.node.gain.value = 0.0;
 }
 
-ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel){
+ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel) {
     peakLevel = peakLevel || 1;
     sustainlevel = sustainlevel || 0.3;
 
@@ -196,14 +196,14 @@ ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel){
     this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
 }
 
-ADSR.prototype.noteOff = function(delay, R, sustainlevel){
+ADSR.prototype.noteOff = function(delay, R, sustainlevel) {
     sustainlevel = sustainlevel || 0.1;
 
     this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime );// Release
     this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + R);// Release
 }
 
-ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel){
+ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel) {
   this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
   this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
   this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
@@ -212,7 +212,7 @@ ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel){
 }
 var index = 0;
 
-function ScissorVoice(noteNum, numOsc, oscType, detune){
+function ScissorVoice(noteNum, numOsc, oscType, detune) {
   this.output  = new ADSR();
   this.maxGain = 1 / numOsc;
   this.noteNum = noteNum;
@@ -220,7 +220,7 @@ function ScissorVoice(noteNum, numOsc, oscType, detune){
   this.oscs = [];
   this.index = index++;
   this.time = context.currentTime;
-  for (var i = 0; i < numOsc; i++){
+  for (var i = 0; i < numOsc; i++) {
     var osc = context.createOscillator();
     if (oscType.length === "undefined")
       osc.type = oscType;
@@ -234,32 +234,32 @@ function ScissorVoice(noteNum, numOsc, oscType, detune){
   }
 }
 
-ScissorVoice.prototype.stop = function(time){
+ScissorVoice.prototype.stop = function(time) {
   var it = this;
-  setTimeout(function(){
-    for (var i = 0; i < it.oscs.length; i++){
+  setTimeout(function() {
+    for (var i = 0; i < it.oscs.length; i++) {
       it.oscs[i].disconnect();
     }
   }, Math.floor((time-context.currentTime)*1000));
 }
 
-ScissorVoice.prototype.detune = function(detune){
-  for (var i = 0; i < this.oscs.length; i++){
+ScissorVoice.prototype.detune = function(detune) {
+  for (var i = 0; i < this.oscs.length; i++) {
     this.oscs[i].detune.value -= detune;
   }
 }
 
-ScissorVoice.prototype.connect = function(target){
+ScissorVoice.prototype.connect = function(target) {
   this.output.node.connect(target);
 }
 
-window.requestAnimFrame = (function(){
+window.requestAnimFrame = (function() {
   return  window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame    ||
     window.oRequestAnimationFrame      ||
     window.msRequestAnimationFrame     ||
-    function(callback){
+    function(callback) {
       window.setTimeout(callback, 1000 / 60);
     };
 })();
@@ -272,32 +272,32 @@ var selectedScale = majorScale;
 var selectedScaleWeight = scaleWeight;
 var baseNote = 60;
 
-function getPitchIndex(num){
+function getPitchIndex(num) {
     var weightSum = 0;
-    for (var i = 0; i < selectedScale.length; i++){
+    for (var i = 0; i < selectedScale.length; i++) {
       weightSum += selectedScaleWeight[i];
     }
     var count;
     var accWeight=0;
-    for (count = 0; count < selectedScale.length; count++){
+    for (count = 0; count < selectedScale.length; count++) {
       if (num <= accWeight / weightSum)
         break;
       accWeight += selectedScaleWeight[count];
     }
     return count - 1;
 }
-function Note(){
+function Note() {
   this.x = 0;
   this.y = 0;
   this.distance = 0;
 }
 
-Note.prototype.setPosition = function(x,y){
+Note.prototype.setPosition = function(x,y) {
   this.x = x;
   this.y = y;
 }
 
-function dist(x1,y1,x2,y2){
+function dist(x1,y1,x2,y2) {
   return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
 }
 
@@ -318,7 +318,7 @@ function drawLine(ctx, x1,y1,x2,y2, color) {
 }
 
 // This segment displays the validation rule for address field.
-function textAlphanumeric(inputText){
+function textAlphanumeric(inputText) {
   var alphaExp = /^[0-9a-zA-Z._]+$/;
   if (inputText.match(alphaExp)) {
     return true;
@@ -328,7 +328,7 @@ function textAlphanumeric(inputText){
 }
 
 // get/create/store UUID
-var my_id = PUBNUB.db.get('session') || (function(){
+var my_id = PUBNUB.db.get('session') || (function() {
     var uuid = PUBNUB.uuid();
     PUBNUB.db.set('session', uuid);
     return uuid;
@@ -361,10 +361,10 @@ function parseMessage(message) {
   if (typeof message.nextDivName !== 'undefined') {
     setNextDivName(message.nextDivName);
   }
-  else if (typeof message.type !== 'undefined'){
-    if (message.type == "create-response"){
+  else if (typeof message.type !== 'undefined') {
+    if (message.type == "create-response") {
       NORESPONSE1 = false;
-      if (message.res == "s"){
+      if (message.res == "s") {
         state = "EDIT";
         $('#initial-message').bPopup().close();
         strScreenName = $("#screenname").val();
@@ -372,6 +372,11 @@ function parseMessage(message) {
         myIndex = message.index;
         lastPingTime = Date.now();
         $("#submit_pane").css("visibility", "visible");
+        publishMessage('performer', {
+          type: 'update',
+          index: myIndex,
+          tm: pattern
+        });
       }
       else {
         $('#name_error_msg').text($('#screenname').val() + " is already taken.");
@@ -384,11 +389,11 @@ function parseMessage(message) {
       currentIndex = message.suggested_tm.index;
       $('#screenname_display').text(currentNickname);
 
-      for (var i = 0; i < patternElse.length - 1; i++){
+      for (var i = 0; i < patternElse.length - 1; i++) {
         patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
                                        patternElse[i+1].x * w, patternElse[i+1].y * h);
       }
-      if ( state == "WAIT"){
+      if ( state == "WAIT") {
         $("#bottom_banner").css("visibility", "visible");
         $("#top_banner").css("visibility", "visible");
         lastPingTimeElse = Date.now();
@@ -400,7 +405,7 @@ function parseMessage(message) {
       if (message.index == myIndex) {
         showMessage('error',  "I know! You like your tune.", true, 1000);
       }
-      else if (liked.indexOf(message.index) == -1){
+      else if (liked.indexOf(message.index) == -1) {
         showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
         playSample("liked", true);
       }
@@ -410,14 +415,14 @@ function parseMessage(message) {
       }
     }
     else if (message.type == "question") {
-      if (message.text.length > 0){
+      if (message.text.length > 0) {
         $("#question_content").text(message.text);
         $("#question-message").css("visibility", "visible");
       }
     }
-    else if (message.type == "scale"){
+    else if (message.type == "scale") {
       if (message.probability >= 0) {
-        if (message.probability > Math.random()){
+        if (message.probability > Math.random()) {
           baseNote = message.baseNote;
           selectedScale = message.scale;
         }
@@ -428,9 +433,9 @@ function parseMessage(message) {
         showMessage("info", "The performer changed the scale.", true);
       }
     }
-    else if (message.type == "sound-toggle"){
+    else if (message.type == "sound-toggle") {
       if (message.probability >= 0) {
-        if (message.probability > Math.random()){
+        if (message.probability > Math.random()) {
           soundEnabled = message.on;
         }
       }
@@ -438,10 +443,10 @@ function parseMessage(message) {
         soundEnabled = message.on;
       }
     }
-    else if (message.type == "script"){
+    else if (message.type == "script") {
       if (message.script) {
         if (message.probability >= 0) {
-          if (message.probability > Math.random()){
+          if (message.probability > Math.random()) {
             try {
               eval(message.script);
             } catch (e) {
@@ -458,20 +463,20 @@ function parseMessage(message) {
         }
       }
     }
-    else if (message.type == "state-response"){
+    else if (message.type == "state-response") {
       NORESPONSE2 = false;
       soundEnabled = message.sound;
       performerState = message.state;
-      if (performerState == "STANDBY"){
+      if (performerState == "STANDBY") {
         showMessage("warning", "STANDBY, Crowd in C is about to start.");
         $("#STANDBY").css("visibility", "visible");
       }
-      else if (performerState == "GOLIVE"){
+      else if (performerState == "GOLIVE") {
         hideAllMessages();
         showMessage("success", "Let's go live!", true);
         $("#STANDBY").css("visibility", "hidden");
       }
-      else if (performerState == "END"){
+      else if (performerState == "END") {
         hideAllMessages();
         showMessage("success", "This is the end. (Applause)", true);
         $("#STANDBY").css("visibility", "hidden");
@@ -486,7 +491,7 @@ function parseMessage(message) {
   }
 }
 
-function publishMessage(channel, options){
+function publishMessage(channel, options) {
   if (channel == "audience") {
     console.error("please not hack this application. :) ");
     return;
@@ -506,7 +511,7 @@ function publishMessage(channel, options){
 }
 
 
-function getNextPattern(){
+function getNextPattern() {
   state = "WAIT";
   NORESPONSE3++;
 
@@ -524,46 +529,46 @@ function setNextDivName(divName) {
   actualTindered.appendChild(document.createTextNode(divName));
 }
 
-window.onbeforeunload = function(){
+window.onbeforeunload = function() {
   //return "";
 };
 
-function randomizeNote(){
-  for (var i = 0; i < patternSize; i++){
+function randomizeNote() {
+  for (var i = 0; i < patternSize; i++) {
     var note = new Note();
     note.setPosition(Math.random(), Math.random());
     pattern[i] = note;
   }
 
-  for (var i = 0; i < patternSize - 1; i++){
+  for (var i = 0; i < patternSize - 1; i++) {
     pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
                                pattern[i+1].x * w, pattern[i+1].y * h);
   }
 }
 
-function refresh(){
+function refresh() {
   window.onbeforeunload = null;
   showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
-  setTimeout(function(){
+  setTimeout(function() {
     window.location.reload();
   },3000);
 }
 
-function update(){
+function update() {
   state = "WAIT";
   publishMessage("performer", {type: "update", index: myIndex, tm: pattern});
   $("#waiting-message").css("visibility", "visible");
   $("#submit_pane").css("visibility", "hidden");
 }
 
-function like(){
+function like() {
   publishMessage("performer", {type: "liked", index: myIndex, likedindex: currentIndex});
   liked.push(currentIndex);
   $("#like_button_area").css("display", "none");
   $("#liked_button_area").css("display", "block");
 }
 
-function modifyPattern(){
+function modifyPattern() {
   state = "EDIT";
   publishMessage("performer", {type: "editing", index: myIndex});
 
@@ -572,13 +577,13 @@ function modifyPattern(){
   $("#top_banner").css("visibility", "hidden");
 }
 
-function mingle(){
+function mingle() {
   state = "MINGLE";
   $("#mingle_pane").css("visibility", "visible");
   $("#like_button_area").css("visibility", "visible");
   $("#liked_button_area").css("visibility", "visible");
 
-  if (liked.indexOf(currentIndex) == -1){
+  if (liked.indexOf(currentIndex) == -1) {
     $("#like_button_area").css("display", "block");
     $("#liked_button_area").css("display", "none");
   }
@@ -588,7 +593,7 @@ function mingle(){
   }
   $("#bottom_banner").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
-  for (var i = 0; i < pattern.length; i++){
+  for (var i = 0; i < pattern.length; i++) {
     var note = new Note();
     note.setPosition(pattern[i].x, pattern[i].y);
     note.distance = pattern[i].distance;
@@ -596,7 +601,7 @@ function mingle(){
   }
 }
 
-function exit(){
+function exit() {
   state = "WAIT";
   publishMessage("performer", {type :"whereami", index: myIndex});
   $("#waiting-message").css("visibility", "visible");
@@ -604,16 +609,16 @@ function exit(){
   $("#like_button_area").css("visibility", "hidden");
   $("#liked_button_area").css("visibility", "hidden");
 
-  for (var i = 0; i < pattern.length; i++){
+  for (var i = 0; i < pattern.length; i++) {
     pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
     pattern[i].distance = originalPattern[i].distance;
   }
 }
 
 // it is either NAME, EDIT, WAIT, CHECK, MINGLE
-function stateTransition(_state){
+function stateTransition(_state) {
   state = _state;
-  switch(state){
+  switch(state) {
     case "NAME":
     break;
     case "EDIT":
@@ -636,7 +641,7 @@ $(document).ready(function () {
   hideAllMessages();
 
   // When message is clicked, hide it
-  $('.message').click(function(){
+  $('.message').click(function() {
     $(this).animate({top: -$(this).outerHeight()}, 500);
   });
 
@@ -644,12 +649,12 @@ $(document).ready(function () {
 
   $("#waiting-message").css("visibility", "hidden");
 
-  $('#answer_yes').button().click(function(){
+  $('#answer_yes').button().click(function() {
     playSample('yes', true);
     $("#question-message").css("visibility","hidden");
   })
 
-  $('#answer_no').button().click(function(){
+  $('#answer_no').button().click(function() {
     playSample('no', true);
     $("#question-message").css("visibility","hidden");
   });
@@ -661,9 +666,9 @@ $(document).ready(function () {
 
   NORESPONSE2 = true;
 
-  (function loopPublish2(){
-    setTimeout(function(){
-      if (NORESPONSE2){
+  (function loopPublish2() {
+    setTimeout(function() {
+      if (NORESPONSE2) {
         publishMessage("performer", {type:"state", my_id:my_id});
         loopPublish2();
       }
@@ -672,7 +677,7 @@ $(document).ready(function () {
 
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
-  $("#start").button().css({margin:'5px'}).click(function(){
+  $("#start").button().css({margin:'5px'}).click(function() {
     context.resume();
     $("#name_error_msg").text("");
 
@@ -688,14 +693,9 @@ $(document).ready(function () {
     }
     NORESPONSE1 = true;
     publishMessage("performer", {"type":"create", "my_id": my_id, "nickname": strScreenName});
-    publishMessage('performer', {
-      type: 'update',
-      index: myIndex,
-      tm: pattern
-    });
-    (function loopPublish1(){
-      setTimeout(function(){
-        if (NORESPONSE1){
+    (function loopPublish1() {
+      setTimeout(function() {
+        if (NORESPONSE1) {
           publishMessage("performer", {"type":"create", "my_id":my_id, "nickname": strScreenName});
           loopPublish1();
         }
@@ -703,7 +703,7 @@ $(document).ready(function () {
     })();
     $("#name_error_msg").text("Waiting for response...");
 
-    if (soundEnabled){
+    if (soundEnabled) {
       var masterGain = context.createGain();
       masterGain.gain.value = 0.7;
       masterGain.connect(context.destination);
@@ -758,12 +758,12 @@ $(document).ready(function () {
     // Clear the canvas
     ctx.clearRect(0, 0, w, h);
     var weightSum = 0;
-    for (var i = 0; i < selectedScale.length; i++){
+    for (var i = 0; i < selectedScale.length; i++) {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == "EDIT" || state == "MINGLE" || state == "CHECK"){
-       for (var i = 0; i < selectedScale.length; i++){
+    if (state == "EDIT" || state == "MINGLE" || state == "CHECK") {
+       for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
          ctx.rect(0, accHeight, w, height);
@@ -776,9 +776,9 @@ $(document).ready(function () {
        }
     }
 
-    if (state == "EDIT" || state == "MINGLE"){
+    if (state == "EDIT" || state == "MINGLE") {
       
-      for (var i = 0; i < patternSize; i++){
+      for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
           drawLine(ctx,pattern[i].x * w, pattern[i].y * h, 
@@ -787,7 +787,7 @@ $(document).ready(function () {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize/3, '#57bd72');
       }
 
-      if (playBarNote >= 0){
+      if (playBarNote >= 0) {
         var playBarCircleX = pattern[playBarNote].x * (1-progress) + 
             pattern[playBarNote+1].x * (progress);
         var playBarCircleY = pattern[playBarNote].y * (1-progress) + 
@@ -797,9 +797,9 @@ $(document).ready(function () {
       }
     }
 
-    if (state == "CHECK" || state == "MINGLE"){
+    if (state == "CHECK" || state == "MINGLE") {
 
-      for (var i = 0; i < patternElse.length; i++){
+      for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
           drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h, 
@@ -808,7 +808,7 @@ $(document).ready(function () {
         drawCircle(ctx, patternElse[i].x * w, patternElse[i].y * h, noteSize/3, '#d16970');
       }
       
-      if (playBarNoteElse >= 0){
+      if (playBarNoteElse >= 0) {
         var playBarCircleX = patternElse[playBarNoteElse].x * 
             (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
         var playBarCircleY = patternElse[playBarNoteElse].y * 
@@ -830,16 +830,16 @@ $(document).ready(function () {
     var detune = 20;
     var maxNumOsc = oscType.length;
 
-    if (state == "EDIT" || state == "MINGLE" || state == "WAIT"){
+    if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
       progress = (currentTime - lastPingTime ) / interval;
-      if (playBarNote < 0 && lastPingTime + interval < currentTime){
+      if (playBarNote < 0 && lastPingTime + interval < currentTime) {
         playBarNote++;
         lastPingTime = currentTime;
         interval = pattern[playBarNote].distance / speed;
         intervalInSec = interval/1000;
         progress = 0;
 
-        if (soundEnabled){
+        if (soundEnabled) {
           var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc )  + 1;
           var numDetune = Math.floor(pattern[playBarNote].x * detune );
           var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
@@ -852,7 +852,7 @@ $(document).ready(function () {
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
-      else if (playBarNote >= 0 && lastPingTime + interval < currentTime){
+      else if (playBarNote >= 0 && lastPingTime + interval < currentTime) {
         playBarNote++;
         progress = 0;
         var numOsc = Math.floor(pattern[playBarNote].x * maxNumOsc) + 1;
@@ -869,7 +869,7 @@ $(document).ready(function () {
           interval = pattern[playBarNote].distance / speed;
         }
         intervalInSec = interval/1000;
-        if (soundEnabled){
+        if (soundEnabled) {
           var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
@@ -878,19 +878,19 @@ $(document).ready(function () {
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
-    } // end of if (state == "EDIT" || state == "MINGLE"){
+    } // end of if (state == "EDIT" || state == "MINGLE") {
 
 
-    if (state == "CHECK" || state == "MINGLE"){
+    if (state == "CHECK" || state == "MINGLE") {
       
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
-      if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime){
+      if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
         playBarNoteElse++;
         progressElse = 0;
         lastPingTimeElse = currentTime;
         intervalElse = patternElse[playBarNoteElse].distance / speedElse;
         intervalInSec = interval/1000;
-        if (soundEnabled){
+        if (soundEnabled) {
           var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc) + 1;
           var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune);
           var pitchIndex = getPitchIndex(1 - patternElse[playBarNoteElse].y);
@@ -903,7 +903,7 @@ $(document).ready(function () {
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
-      else if (playBarNoteElse >= 0 && lastPingTimeElse + intervalElse < currentTime){
+      else if (playBarNoteElse >= 0 && lastPingTimeElse + intervalElse < currentTime) {
         playBarNoteElse++;
         progressElse = 0;
         var numOsc = Math.floor(patternElse[playBarNoteElse].x * maxNumOsc) + 1;
@@ -921,7 +921,7 @@ $(document).ready(function () {
           intervalElse = patternElse[playBarNoteElse].distance / speedElse;
         }
         intervalInSec = interval/1000;
-        if (soundEnabled){
+        if (soundEnabled) {
           var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
@@ -930,7 +930,7 @@ $(document).ready(function () {
                             intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
-    } // end of if (state == "EDIT" || state == "MINGLE"){
+    } // end of if (state == "EDIT" || state == "MINGLE") {
     draw();
   };
 
@@ -938,15 +938,15 @@ $(document).ready(function () {
   
   var selectedNote = -1;
   
-  $(document).bind('touchstart', function(event){
+  $(document).bind('touchstart', function(event) {
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;
     var e = event.originalEvent.changedTouches[0];
 
-    for (var i = 0; i < patternSize; i++){
+    for (var i = 0; i < patternSize; i++) {
       var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
-      if (minDistance >= distance){
+      if (minDistance >= distance) {
         minDistance = distance;
         tempNoteID = i;
       }
@@ -957,7 +957,7 @@ $(document).ready(function () {
     }
   });
   
-  function touchHandler(){
+  function touchHandler() {
     //Assume only one touch/only process one touch even if there's more
     var e = event.targetTouches[0];
     if (selectedNote < 0)
@@ -976,18 +976,18 @@ $(document).ready(function () {
     event.preventDefault();
   }
 
-  $(document).bind('touchend',function(event){
+  $(document).bind('touchend',function(event) {
       selectedNote = -1;
   });
   
-  $(document).mousedown(function(e){
+  $(document).mousedown(function(e) {
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;
 
-    for (var i=0; i< patternSize; i++){
+    for (var i=0; i< patternSize; i++) {
       var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
-      if (minDistance >= distance){
+      if (minDistance >= distance) {
         minDistance = distance;
         tempNoteID = i;
       }
@@ -998,7 +998,7 @@ $(document).ready(function () {
     }
   });
   
-  function mouseHandler(e){
+  function mouseHandler(e) {
     if (selectedNote < 0)
       return;
 
@@ -1016,7 +1016,7 @@ $(document).ready(function () {
     event.preventDefault();
   }
 
-  $(document).mouseup(function(e){
+  $(document).mouseup(function(e) {
     // Left mouse button was released, clear flag
     selectedNote = -1;
   });
