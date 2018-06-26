@@ -345,11 +345,15 @@ function get_next_user_to_follow(userIndex) {
   // if user is already following someone
   if (typeof(user.follow) == 'number') {
     suggestedIndex = user.follow + 1;
+    // so the user doesn't go from following someone else to following themself
+    if (suggestedIndex == userIndex) {
+      suggestedIndex--;
+    }
   }
   else {
     var suggestedIndex = userIndex + 1;
   }
-  
+  // user has reached the last person in queue, loop back to beginning
   if (suggestedIndex >= arrayUsers.length) {
     suggestedIndex = 0;
   }

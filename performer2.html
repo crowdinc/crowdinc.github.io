@@ -24,20 +24,20 @@
       <div class="col col-lg-8 col-md-8">
         <h1> Crowd in C[loud] : crowdinc.github.io</h1>
         <form>
-          <div class = "chat_div" >
-            <span class = "chat_row">
+          <div class="chat_div" >
+            <span class="chat_row">
               <select name="chat" id="chat">
-              <option value = "warning">Warning</option>
-              <option value = "error">Error</option>
-              <option value = "success" selected="selected">Success</option>
-              <option value = "info">Info</option>
-              <option value = "question">Question</option>
+              <option value="warning">Warning</option>
+              <option value="error">Error</option>
+              <option value="success" selected="selected">Success</option>
+              <option value="info">Info</option>
+              <option value="question">Question</option>
               </select>
             </span>
             <span class="chat_row">
               <input type="text" id="chat_message" >
             </span>
-            <span class = "chat_row">
+            <span class="chat_row">
               <button type="submit" id="broadcast">Broadcast</button>
             </span>
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -67,8 +67,8 @@
       </div>
     </div>
     <div>
-      <div class = "row">
-        <div id="availables" class = col-sm-11 col-md-11 col-lg-11>
+      <div class="row">
+        <div id="availables" class=col-sm-11 col-md-11 col-lg-11>
         </div>
       </div>
       <div id="resizable" class="ui-widget-content editor">
@@ -88,78 +88,78 @@
 
 
             // cmajor
-            baseNote = 60;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=60;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
             //cminor
-            selectedScale = [0,2,3,5,7,9,11,12];
+            selectedScale=[0,2,3,5,7,9,11,12];
 
             //cMajor
-            selectedScale = [0,2,4,5,7,9,11,12];
+            selectedScale=[0,2,4,5,7,9,11,12];
 
             // Dmajor
-            baseNote = 62;
+            baseNote=62;
 
             // Cmajor
-            baseNote = 60;
+            baseNote=60;
 
             // Emajor
-            baseNote = 64;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=64;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
             // cmajor
-            baseNote = 60;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=60;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
 
             // Eminor
-            selectedScale = [0,2,3,5,7,9,11,12];
+            selectedScale=[0,2,3,5,7,9,11,12];
 
-            baseNote = 60;
-            selectedScale = [0];
+            baseNote=60;
+            selectedScale=[0];
 
-            baseNote = 71;
+            baseNote=71;
 
-            baseNote = 72;
+            baseNote=72;
 
-            baseNote = 67;
+            baseNote=67;
 
-            baseNote = 60;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=60;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
 
-            baseNote = 60;
-            selectedScale = [0];
+            baseNote=60;
+            selectedScale=[0];
 
-            baseNote = 71;
+            baseNote=71;
 
-            baseNote = 72;
+            baseNote=72;
 
-            baseNote = 70;
+            baseNote=70;
 
-            baseNote = 64;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=64;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
-            baseNote = 60 + Math.Random() * 17;
-            selectedScale = [0,2,4,5,7,9,11,12];
+            baseNote=60 + Math.Random() * 17;
+            selectedScale=[0,2,4,5,7,9,11,12];
 
-            selectedScale = [0,2,4,5,7,9,11,12];
-            soundEnabled = false; 
+            selectedScale=[0,2,4,5,7,9,11,12];
+            soundEnabled=false; 
 
-            var span = 20;
-            handle = setInterval(function(){
-                baseNote = 60 + Math.Random() * span;
+            var span=20;
+            handle=setInterval(function(){
+                baseNote=60 + Math.Random() * span;
                 span *= 0.9 
             }, 2000);
 
 
-            setTimeout(function(){alert(“this is fade out. wait a bit”); soundEnabled = false;}, Math.random()*10000);
+            setTimeout(function(){alert(“this is fade out. wait a bit”); soundEnabled=false;}, Math.random()*10000);
 
 
-            baseNote = 60;selectedScale = [0];
-            setTimeout(function(){baseNote = 72;}, 1000);
-            setTimeout(function(){baseNote = 71;}, 2000);
-            setTimeout(function(){baseNote = 67;}, 3000);
+            baseNote=60;selectedScale=[0];
+            setTimeout(function(){baseNote=72;}, 1000);
+            setTimeout(function(){baseNote=71;}, 2000);
+            setTimeout(function(){baseNote=67;}, 3000);
 
             // dice button will give you random tunes but you can drag and drop circles.
               // Top part is high notes, The bottom is low notes
