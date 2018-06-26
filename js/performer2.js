@@ -1,6 +1,11 @@
 /*window.onbeforeunload = function() {
   return "";
 };*/
+/*
+TODO: 
+-enforce single performer interface
+-audience user updates on dot move
+*/
 
 var DEBUG = true;
 var soundEnabled = false;
@@ -95,7 +100,18 @@ $(document).ready(function() {
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
+  setTimeout(checkOccupancy, 3000);
 });
+
+function checkOccupancy() {
+  pubnub.hereNow({
+    channels: ['performer'],
+    includeUUIDs: true
+  },
+  function(status, response) {
+    console.log('status: ', status, ' response: ', response);
+  });
+}
 
 // handler for message events
 function parseMessage(m) {
@@ -129,6 +145,7 @@ function parseMessage(m) {
           respondState(m.my_id);
           break;
         case 'liked':
+          liked(m.index, m.likedindex);
           break;
         default:
           console.log('unhandled message type: ', m.type);
@@ -172,10 +189,10 @@ function publishMessage(channel, options){
     channel: channel,
     message: options
   });
-  pubnub.publish({
+  /*pubnub.publish({
     channel: "log",
     message: "{" + channel + ":" + JSON.stringify(options) + "}"
-  });
+  });*/
   if (DEBUG) console.log("sent a message to channel (" + channel + ") : " + 
                          JSON.stringify(options));
 }
@@ -203,6 +220,7 @@ function create(userID, userNickname) {
       'res': "s",
       'index': index
     });
+    displayUser(index);
   }
   // if the nickname already exists
   else {
@@ -235,9 +253,9 @@ function create(userID, userNickname) {
         publishMessage(userID, {"type": "create-response", "res": "f"});
         console.log("nickname conflict! (although s/he is an existing user)");
       }
+      displayUser(foundIndex);
     }
   }
-  displayUser(index);
 }
 
 function displayUser(index) {
@@ -409,8 +427,44 @@ function updateDiv(index) {
   user.obj.find('#'+index+'_crowd').text(user.followers.length);
 }
 
-function liked(user_index, liked_index) {
+function liked(likerIndex, likedIndex) {
+  // likerUser hearts likedUser's tune
+  var likedUser = arrayUsers[likedIndex];
+  var likerUser = arrayUsers[likerIndex];
+  if (!likedUser || !likerUser) return;
+  likerUser.obj.css('background', '');
   
+  // liked hasn't been hearted by this user yet
+  if (likedUser.likedby.indexOf(likerIndex) == -1) {
+    likedUser.likedby.push(likerIndex);
+    // notify liked user
+    publishMessage(likedUser.id, {
+      type: 'liked-response',
+      nickname: likerUser.nickname,
+      index: likerUser.index
+    });
+  }
+  
+  // if liker hasn't hearted liked's tune in the past
+  if (likerUser.likes.indexOf(likedIndex) == -1) {
+    likerUser.likes.push(likedIndex);
+    // it's a match!
+    if (likedUser.likes.indexOf(likerIndex) != -1 && likerIndex != likedIndex) {
+      publishMessage(likerUser.id, {
+        type: 'liked-response',
+        nickname: likedUser.nickname,
+        index: likedUser.index
+      });
+    }
+  }
+  
+  // update most liked if necessary
+  if (likedUser.likedby.length > likesMostLiked) {
+    indexMostLiked = likedUser.index;
+    likesMostLiked = user.likedby.length;
+    $('#most-liked').text(likedUser.nickname);
+  }
+  updateDiv(likedIndex);
 }
 
 
