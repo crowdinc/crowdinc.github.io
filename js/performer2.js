@@ -59,7 +59,7 @@ $(document).ready(function() {
   $('#refresh').click(function() {
     console.log('refresh');
     publishMessage("audience", {type:"script", script:"refresh()"});
-    //window.location.reload();
+    window.location.reload();
   });
   $('#end').click(function() {
     console.log('end');
@@ -123,6 +123,7 @@ function parseMessage(m) {
           break;
         case 'whereami':
           console.log('user ', m.nickname, ' sent a whereami message');
+          inform(m.index)
           break;
         case 'state':
           respondState(m.my_id);
@@ -154,9 +155,9 @@ function performanceStatus(event) {
   }
 }
 
-function respondState(user_id){
-  if (user_id)
-    publishMessage(user_id, {type:"state-response", sound:soundEnabled, state:state});
+function respondState(userID){
+  if (userID)
+    publishMessage(userID, {type:"state-response", sound:soundEnabled, state:state});
   else
     publishMessage("audience", {type:"state-response", sound:soundEnabled, state:state});
 }
@@ -207,19 +208,19 @@ function create(userID, userNickname) {
   else {
     // duplicate nickname
     if (arrayUUIDs.indexOf(userID) == -1) {
-      publishMessage(user_id, {"type": "create-response", "res": "f"});
+      publishMessage(userID, {"type": "create-response", "res": "f"});
       console.log("nickname conflict!");
     }
     // disconnected user returning with same name
     else {
       var foundIndex = -1;
-      for (var i = 0; i < arrayTinderMusics.length; i++) {
+      for (var i = 0; i < arrayUsers.length; i++) {
         // find user's index in array
-        if (user_id.trim() === arrayTinderMusics[i].id && 
-            user_nickname === arrayTinderMusics[i].nickname) {
+        if (userID.trim() === arrayUsers[i].id && 
+            userNickname === arrayUsers[i].nickname) {
           foundIndex = i;
           // initiate user's interface
-          publishMessage(user_id, {
+          publishMessage(userID, {
             "type": "create-response",
             "res": "s",
             "index": foundIndex
@@ -231,12 +232,12 @@ function create(userID, userNickname) {
         }
       }
       if (foundIndex == -1) {
-        publishMessage(user_id, {"type": "create-response", "res": "f"});
+        publishMessage(userID, {"type": "create-response", "res": "f"});
         console.log("nickname conflict! (although s/he is an existing user)");
       }
     }
   }
-  displayUser(arrayUsers.indexOf(user));
+  displayUser(index);
 }
 
 function displayUser(index) {
@@ -245,7 +246,14 @@ function displayUser(index) {
   var newDiv = $('<div/>').html(divStr).contents();
   newDiv.find('.stats').css("display", "none");
   user.obj = newDiv;
-  divUsers.append(newDiv);
+  user.obj.find('.stats').css("display", "");
+  divUsers.append(user.obj);
+  if (arrayWaitingPeople.length > 0) {
+    for (var i = 0; i < arrayWaitingPeople.length; i++) {
+      next(arrayWaitingPeople[i]);
+    }
+    arrayWaitingPeople = [];
+  }
 }
 
 function update(userIndex, userPattern) {
@@ -257,7 +265,8 @@ function update(userIndex, userPattern) {
   
   user.mode = "following";
   
-  if (typeof(user.follow) == 'number') { // I was in a pattern (?)
+  // if user is following someone
+  if (typeof(user.follow) == 'number') { 
     var followed = user.follow;
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);
@@ -279,14 +288,16 @@ function update(userIndex, userPattern) {
   }
 }
 
+// unfollows the current followed user and follows the next in line
 function next(userIndex) {
   var user = arrayUsers[userIndex];
   user.obj.css("background", "");
   var suggestedIndex = get_next_user_to_follow(userIndex);
+  // if user is following someone
   if (typeof(user.follow) == 'number') {
     var exFollowed = arrayUsers[user.follow];
     
-    // unfollow the older
+    // unfollow
     var followerIndex = exFollowed.followers.indexOf[user.index];
     if (followerIndex != -1) {
       exFollowed.followers.splice(followerIndex, 1);
@@ -312,7 +323,7 @@ function next(userIndex) {
       $('#most-followed').text(suggested.nickname);
     }
     
-    // response
+    // sends next pattern to user
     publishMessage(user.id, {
       "type": 'next-response',
       "suggested_tm": {
@@ -330,20 +341,62 @@ function next(userIndex) {
 
 function get_next_user_to_follow(userIndex) {
   var user = arrayUsers[userIndex];
-  var suggestedIndex = -1;
-  if (arrayUsers.length > 0) {
+  
+  // if user is already following someone
+  if (typeof(user.follow) == 'number') {
+    suggestedIndex = user.follow + 1;
+  }
+  else {
+    var suggestedIndex = userIndex + 1;
+  }
+  
+  if (suggestedIndex >= arrayUsers.length) {
     suggestedIndex = 0;
-    if (typeof(user.follow) == 'number') {
-      var exFollowed = user.follow;
-      if (arrayUsers[exFollowed].mode = "following") {
-        var possible = arrayUsers.indexOf(exFollowed) + 1;
-        if (possible < arrayUsers.length) {
-          suggestedIndex = possible;
-        }
+  }
+  
+  if (suggestedIndex == userIndex) {
+    console.log('nobody else to follow!');
+    suggestedIndex = userIndex;
+    var suggested = arrayUsers[suggestedIndex];
+    publishMessage(arrayUsers[userIndex].id, {
+      type: 'next-response',
+      'suggested_tm': {
+        'nickname': suggested.nickname,
+        'index': suggested.index,
+        'tm': suggested.pattern
       }
-    }
+    });
   }
   return suggestedIndex;
+}
+
+// tells user where they are in queue - gets next user to follow
+function inform(userIndex) {
+  var user = arrayUsers[userIndex];
+  if (!user) return;
+  
+  if (typeof(user.follow) == 'number') {
+    var followed = user.follow;
+    if (arrayUsers.indexOf(followed) == -1) {
+      next(user.index);
+      console.log('arrayUsers -1: was following user that left');
+    }
+    else {
+      var suggested = arrayUsers[followed];
+      publishMessage(arrayusers[userIndex].id, {
+        "type": 'next-response',
+        'suggested_tm': {
+          'nickname': suggested.nickname,
+          'index': suggested.index,
+          'tm': suggested.pattern
+        }
+      });
+      console.log('followed -1: was following user that left (?)');
+    }
+  }
+  else {
+    next(user.index);
+  }
 }
 
 function updateDiv(index) {

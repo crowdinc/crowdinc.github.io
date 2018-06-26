@@ -525,7 +525,7 @@ function setNextDivName(divName) {
 }
 
 window.onbeforeunload = function(){
-  return "";
+  //return "";
 };
 
 function randomizeNote(){
@@ -742,6 +742,11 @@ $(document).ready(function () {
     canvas.addEventListener('mousemove', mouseHandler, false);
 
     draw();
+    publishMessage('performer', {
+      type: 'update',
+      index: myIndex,
+      tm: pattern
+    });
   }
 
   init();
