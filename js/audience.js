@@ -688,6 +688,11 @@ $(document).ready(function () {
     }
     NORESPONSE1 = true;
     publishMessage("performer", {"type":"create", "my_id": my_id, "nickname": strScreenName});
+    publishMessage('performer', {
+      type: 'update',
+      index: myIndex,
+      tm: pattern
+    });
     (function loopPublish1(){
       setTimeout(function(){
         if (NORESPONSE1){
@@ -742,11 +747,6 @@ $(document).ready(function () {
     canvas.addEventListener('mousemove', mouseHandler, false);
 
     draw();
-    publishMessage('performer', {
-      type: 'update',
-      index: myIndex,
-      tm: pattern
-    });
   }
 
   init();
