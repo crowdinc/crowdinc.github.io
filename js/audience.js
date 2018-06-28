@@ -977,7 +977,6 @@ $(document).ready(function () {
   $(document).bind('touchend',function(event) {
     selectedNote = -1;
     var e = event.originalEvent.changedTouches[0];
-    //console.log(e.pageX);
     var minDistance = 100000;
     var tempNoteID = -1;
 
@@ -994,7 +993,6 @@ $(document).ready(function () {
           index: myIndex,
           tm: pattern
       });
-      //console.log('on a note');
     }
   });
   
@@ -1037,5 +1035,22 @@ $(document).ready(function () {
   $(document).mouseup(function(e) {
     // Left mouse button was released, clear flag
     selectedNote = -1;
+    var minDistance = 100000;
+    var tempNoteID = -1;
+
+    for (var i = 0; i < patternSize; i++) {
+      var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
+      if (minDistance >= distance) {
+        minDistance = distance;
+        tempNoteID = i;
+      }
+    }
+    if (tempNoteID > -1 && minDistance < noteSize) {
+      publishMessage('performer', {
+        type: 'update',
+        index: myIndex,
+        tm: pattern
+      });
+    }
   });
 });
