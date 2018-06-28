@@ -1,5 +1,3 @@
-
-// this is snaglee@umich.edu
-// this is demo key so no one is paying it. 
-publishKey ="pub-c-90ec0e12-8375-42a7-8315-15bf68f7ab04";
-subscribeKey = "sub-c-60152074-fb22-11e5-8916-0619f8945a4f";
+// using keys aaron generated with presence add-on
+publishKey = "pub-c-fbfe165e-f0ce-4d49-ad6d-d67bd91656ca";
+subscribeKey = "sub-c-5ab50318-6846-11e8-b843-a2a72714bb03";

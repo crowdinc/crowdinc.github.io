@@ -3,11 +3,10 @@
 };*/
 /*
 TODO: 
--enforce single performer interface
 -audience user updates on dot move
 */
 
-var DEBUG = true;
+var DEBUG = false;
 var soundEnabled = false;
 var state = "STANDBY"; // STANDBY, GOLIVE, END
 var STOPWORKING = false;
@@ -32,19 +31,20 @@ var pubnub = new PubNub({
   ssl: (('https:' == document.location.protocol) ? true : false)
 });
 
-pubnub.subscribe({
-  channels: ['performer', 'audience'],
-  withPresence: true,
-  heartbeat: 15
-});
-
 pubnub.addListener({
   message: function(m) {
     parseMessage(m.message);
   },
   presence: function(p) {
+    //console.log(p);
     performanceStatus(p);
   }
+});
+
+pubnub.subscribe({
+  channels: ['performer', 'audience'],
+  withPresence: true,
+  heartbeat: 15
 });
 
 $(document).ready(function() {
@@ -100,16 +100,21 @@ $(document).ready(function() {
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
-  setTimeout(checkOccupancy, 3000);
+  setTimeout(checkOccupancy, 1500);
 });
 
+// enforces limit of one performer
 function checkOccupancy() {
   pubnub.hereNow({
-    channels: ['performer'],
+    channels: ['audience'],
     includeUUIDs: true
   },
   function(status, response) {
-    console.log('status: ', status, ' response: ', response);
+    console.log(' response: ', response);
+    if (response.totalOccupancy > 1) {
+      alert('Someone\'s already performing!');
+      STOPWORKING = true;
+    }
   });
 }
 
@@ -117,7 +122,7 @@ function checkOccupancy() {
 function parseMessage(m) {
   if (STOPWORKING) return;
   try {
-    //if (DEBUG) console.log("message received: " + JSON.stringify(m));
+    if (DEBUG) console.log("message received: " + JSON.stringify(m));
     if (typeof m.type !== 'undefined') {
       if (typeof m.index !== 'undefined') {
         if (arrayUsers[m.index] == 'undefined') {
@@ -158,7 +163,7 @@ function parseMessage(m) {
 }
 
 // handler for presence events
-function performanceStatus(event) {
+function performanceStatus(message) {
   if (DEBUG) console.log("status: " + JSON.stringify(event));
   // change backgroud of a disconnected user
   if (typeof message.action !== 'undefined') {
@@ -182,17 +187,13 @@ function respondState(userID){
 // central message sending function
 function publishMessage(channel, options){
   if (STOPWORKING) {
-    alert("you can't publish a message");
+    alert("Can't publish when another performer is active");
     return;
   }
   pubnub.publish({
     channel: channel,
     message: options
   });
-  /*pubnub.publish({
-    channel: "log",
-    message: "{" + channel + ":" + JSON.stringify(options) + "}"
-  });*/
   if (DEBUG) console.log("sent a message to channel (" + channel + ") : " + 
                          JSON.stringify(options));
 }
