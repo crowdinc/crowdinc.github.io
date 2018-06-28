@@ -106,7 +106,7 @@ $(document).ready(function() {
 // enforces limit of one performer
 function checkOccupancy() {
   pubnub.hereNow({
-    channels: ['audience'],
+    channels: ['performer'],
     includeUUIDs: true
   },
   function(status, response) {
