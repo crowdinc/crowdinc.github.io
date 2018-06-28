@@ -154,9 +154,7 @@ if (soundEnabled) {
     // still needed for Safari
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     // create an AudioContext
-    // context = WX._ctx
     context = new window.AudioContext();
-    // alert('Web Audio API supported.');
     compressor = context.createDynamicsCompressor()
     reverb = context.createConvolver();
   } catch(e) {
@@ -977,7 +975,27 @@ $(document).ready(function () {
   }
 
   $(document).bind('touchend',function(event) {
-      selectedNote = -1;
+    selectedNote = -1;
+    var e = event.originalEvent.changedTouches[0];
+    //console.log(e.pageX);
+    var minDistance = 100000;
+    var tempNoteID = -1;
+
+    for (var i = 0; i < patternSize; i++) {
+      var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
+      if (minDistance >= distance) {
+        minDistance = distance;
+        tempNoteID = i;
+      }
+    }
+    if (tempNoteID > -1 && minDistance < noteSize) {
+      publishMessage('performer', {
+          type: 'update',
+          index: myIndex,
+          tm: pattern
+      });
+      //console.log('on a note');
+    }
   });
   
   $(document).mousedown(function(e) {
@@ -985,7 +1003,7 @@ $(document).ready(function () {
     var minDistance = 100000;
     var tempNoteID = -1;
 
-    for (var i=0; i< patternSize; i++) {
+    for (var i = 0; i < patternSize; i++) {
       var distance = dist(e.pageX, e.pageY, pattern[i].x * w, pattern[i].y * h);
       if (minDistance >= distance) {
         minDistance = distance;

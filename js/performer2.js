@@ -171,6 +171,7 @@ function parseMessage(m) {
             alert('Someone\'s already performing!');
             STOPWORKING = true;
           }
+          break;
         default:
           console.log('unhandled message type: ', m.type);
       }
@@ -305,12 +306,12 @@ function update(userIndex, userPattern) {
   
   // if user is following someone
   if (typeof(user.follow) == 'number') { 
-    var followed = user.follow;
+    var followed = arrayUsers[user.follow];
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);
     }
     else {
-      var suggested = arrayUsers[followed];
+      var suggested = followed;
       publishMessage(user.id, {
         "type": 'next-response',
         "suggested_tm": {
