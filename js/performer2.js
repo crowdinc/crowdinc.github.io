@@ -386,7 +386,7 @@ function get_next_user_to_follow(userIndex) {
     suggestedIndex = user.follow + 1;
     // so the user doesn't go from following someone else to following themself
     if (suggestedIndex == userIndex) {
-      suggestedIndex--;
+      suggestedIndex++;
     }
   }
   else {
