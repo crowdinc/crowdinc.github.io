@@ -100,10 +100,16 @@ $(document).ready(function() {
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
-  setTimeout(checkOccupancy, 1500);
+  //setTimeout(checkOccupancy, 1500);
+  
+  // checks if another performer is present
+  publishMessage('performer', {
+    type: 'amialone',
+    uuid: pubnub.getUUID()
+  });
 });
 
-// enforces limit of one performer
+// enforces limit of one performer (not currently used, pubnub presence too unreliable)
 function checkOccupancy() {
   pubnub.hereNow({
     channels: ['performer'],
@@ -152,6 +158,19 @@ function parseMessage(m) {
         case 'liked':
           liked(m.index, m.likedindex);
           break;
+        case 'amialone':
+          if (pubnub.getUUID() != m.uuid) {
+            publishMessage('performer', {
+              type: 'youarenotalone',
+              uuid: m.uuid
+            });
+          }
+          break;
+        case 'youarenotalone':
+          if (pubnub.getUUID() == m.uuid) {
+            alert('Someone\'s already performing!');
+            STOPWORKING = true;
+          }
         default:
           console.log('unhandled message type: ', m.type);
       }

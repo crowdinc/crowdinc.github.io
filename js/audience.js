@@ -1,16 +1,16 @@
-var state = 'NAME'; // it is either NAME, EDIT, WAIT, CHECK, MINGLE
+var state = "NAME"; // it is either NAME, EDIT, WAIT, CHECK, MINGLE
 var DEBUG = false;
-var performerState = 'STANDBY';
+var performerState = "STANDBY";
 /*
 
 State Diagram
 
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : update msg sent
-WAIT -> CHECK : next-response msg received in 'WAIT' state
+WAIT -> CHECK : next-response msg received in "WAIT" state
 CHECK -> MINGLE : user press HEART button
 MINGLE -> CHECK : user press exit button
-CHECK -> EDIT : user press 'update' button
+CHECK -> EDIT : user press "update" button
 
 */
 
@@ -33,7 +33,7 @@ var pattern = [];
 var originalPattern = [];
 var patternElse = [];
 var patternSize = 5;
-var currentNickname = ''
+var currentNickname = ""
 
 var liked = new Array();
 
@@ -52,8 +52,8 @@ function hideAllMessages() {
 
 function showMessage(type, message, autoHide, hideTime) {
   hideAllMessages();
-  $('.' + type + ' .msg_header').text(message);
-  $('.' + type).animate({top: '0'}, 500);
+  $("." + type + " .msg_header").text(message);
+  $('.' + type).animate({top: "0"}, 500);
   if (autoHide) {
     hideTime = hideTime | 3000;
     setTimeout(hideAllMessages, hideTime);
@@ -71,8 +71,8 @@ function BufferLoader(context, urlList, callback) {
 BufferLoader.prototype.loadBuffer = function(url, index) {
   // Load buffer asynchronously
   var request = new XMLHttpRequest();
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
+  request.open("GET", url, true);
+  request.responseType = "arraybuffer";
 
   var loader = this;
 
@@ -222,7 +222,7 @@ function ScissorVoice(noteNum, numOsc, oscType, detune) {
   this.time = context.currentTime;
   for (var i = 0; i < numOsc; i++) {
     var osc = context.createOscillator();
-    if (oscType.length === 'undefined')
+    if (oscType.length === "undefined")
       osc.type = oscType;
     else
       osc.type = oscType[i % oscType.length];
@@ -344,7 +344,7 @@ var pubnub = PUBNUB.init({
 
 // Subscribe to a channel
 pubnub.subscribe({
-    channel: my_id + ',audience',
+    channel: my_id + ",audience",
     message: parseMessage,
     error: function (error) {
       // Handle error here
@@ -356,22 +356,22 @@ pubnub.subscribe({
 
 function parseMessage(message) {
   if (DEBUG) {
-    console.log('message - received:' + JSON.stringify(message));
+    console.log("message - received:" + JSON.stringify(message));
   }
   if (typeof message.nextDivName !== 'undefined') {
     setNextDivName(message.nextDivName);
   }
   else if (typeof message.type !== 'undefined') {
-    if (message.type == 'create-response') {
+    if (message.type == "create-response") {
       NORESPONSE1 = false;
-      if (message.res == 's') {
-        state = 'EDIT';
+      if (message.res == "s") {
+        state = "EDIT";
         $('#initial-message').bPopup().close();
-        strScreenName = $('#screenname').val();
+        strScreenName = $("#screenname").val();
         $('#screenname_display').text(strScreenName);
         myIndex = message.index;
         lastPingTime = Date.now();
-        $('#submit_pane').css('visibility', 'visible');
+        $("#submit_pane").css("visibility", "visible");
         publishMessage('performer', {
           type: 'update',
           index: myIndex,
@@ -379,10 +379,10 @@ function parseMessage(message) {
         });
       }
       else {
-        $('#name_error_msg').text($('#screenname').val() + ' is already taken.');
+        $('#name_error_msg').text($('#screenname').val() + " is already taken.");
       }
     }
-    else if ( message.type == 'next-response') {
+    else if ( message.type == "next-response") {
       NORESPONSE3--;
       patternElse = message.suggested_tm.tm;
       currentNickname = message.suggested_tm.nickname;
@@ -393,34 +393,34 @@ function parseMessage(message) {
         patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
                                        patternElse[i+1].x * w, patternElse[i+1].y * h);
       }
-      if ( state == 'WAIT') {
-        $('#bottom_banner').css('visibility', 'visible');
-        $('#top_banner').css('visibility', 'visible');
+      if ( state == "WAIT") {
+        $("#bottom_banner").css("visibility", "visible");
+        $("#top_banner").css("visibility", "visible");
         lastPingTimeElse = Date.now();
-        state = 'CHECK';
-        $('#waiting-message').css('visibility', 'hidden');
+        state = "CHECK";
+        $("#waiting-message").css("visibility", "hidden");
       }
     }
-    else if (message.type == 'liked-response') {
+    else if (message.type == "liked-response") {
       if (message.index == myIndex) {
-        showMessage('error',  'I know! You like your tune.', true, 1000);
+        showMessage('error',  "I know! You like your tune.", true, 1000);
       }
       else if (liked.indexOf(message.index) == -1) {
         showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
-        playSample('liked', true);
+        playSample("liked", true);
       }
       else {
-        showMessage('error', 'It's a match! ' + message.nickname + ' likes your tune, too!', true, 1000);
-        playSample('matched', true);
+        showMessage('error', "It's a match! " + message.nickname + ' likes your tune, too!', true, 1000);
+        playSample("matched", true);
       }
     }
-    else if (message.type == 'question') {
+    else if (message.type == "question") {
       if (message.text.length > 0) {
-        $('#question_content').text(message.text);
-        $('#question-message').css('visibility', 'visible');
+        $("#question_content").text(message.text);
+        $("#question-message").css("visibility", "visible");
       }
     }
-    else if (message.type == 'scale') {
+    else if (message.type == "scale") {
       if (message.probability >= 0) {
         if (message.probability > Math.random()) {
           baseNote = message.baseNote;
@@ -430,10 +430,10 @@ function parseMessage(message) {
       else {
         baseNote = message.baseNote;
         selectedScale = message.scale;
-        showMessage('info', 'The performer changed the scale.', true);
+        showMessage("info", "The performer changed the scale.", true);
       }
     }
-    else if (message.type == 'sound-toggle') {
+    else if (message.type == "sound-toggle") {
       if (message.probability >= 0) {
         if (message.probability > Math.random()) {
           soundEnabled = message.on;
@@ -443,7 +443,7 @@ function parseMessage(message) {
         soundEnabled = message.on;
       }
     }
-    else if (message.type == 'script') {
+    else if (message.type == "script") {
       if (message.script) {
         if (message.probability >= 0) {
           if (message.probability > Math.random()) {
@@ -463,27 +463,27 @@ function parseMessage(message) {
         }
       }
     }
-    else if (message.type == 'state-response') {
+    else if (message.type == "state-response") {
       NORESPONSE2 = false;
       soundEnabled = message.sound;
       performerState = message.state;
-      if (performerState == 'STANDBY') {
-        showMessage('warning', 'STANDBY, Crowd in C is about to start.');
-        $('#STANDBY').css('visibility', 'visible');
+      if (performerState == "STANDBY") {
+        showMessage("warning", "STANDBY, Crowd in C is about to start.");
+        $("#STANDBY").css("visibility", "visible");
       }
-      else if (performerState == 'GOLIVE') {
+      else if (performerState == "GOLIVE") {
         hideAllMessages();
-        showMessage('success', 'Let's go live!', true);
-        $('#STANDBY').css('visibility', 'hidden');
+        showMessage("success", "Let's go live!", true);
+        $("#STANDBY").css("visibility", "hidden");
       }
-      else if (performerState == 'END') {
+      else if (performerState == "END") {
         hideAllMessages();
-        showMessage('success', 'This is the end. (Applause)', true);
-        $('#STANDBY').css('visibility', 'hidden');
+        showMessage("success", "This is the end. (Applause)", true);
+        $("#STANDBY").css("visibility", "hidden");
       }
     }
     else {
-      console.log('unhandled type:' + message.type);
+      console.log("unhandled type:" + message.type);
     }
   }
   else {
@@ -492,45 +492,45 @@ function parseMessage(message) {
 }
 
 function publishMessage(channel, options) {
-  if (channel == 'audience') {
-    console.error('please not hack this application. :) ');
+  if (channel == "audience") {
+    console.error("please not hack this application. :) ");
     return;
   }
   pubnub.publish({
     channel: channel,
     message: options,
     error: function(m) {
-      console.log('Message send failed - ['
-          + JSON.stringify(m) + '] - Retrying in 3 seconds!');
+      console.log("Message send failed - ["
+          + JSON.stringify(m) + "] - Retrying in 3 seconds!");
       setTimeout(publishMessage(channel, options), 2000);
     }
   });
   if (DEBUG) {
-    console.log('sent a message to channel ('+channel+') : ' + JSON.stringify(options));
+    console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
   }
 }
 
 
 function getNextPattern() {
-  state = 'WAIT';
+  state = "WAIT";
   NORESPONSE3++;
 
-  publishMessage('performer', {type:'next', index: myIndex});
+  publishMessage("performer", {type:"next", index: myIndex});
 
-  $('#bottom_banner').css('visibility', 'hidden');
-  $('#top_banner').css('visibility', 'hidden');
-  $('#waiting-message').css('visibility', 'visible');
+  $("#bottom_banner").css("visibility", "hidden");
+  $("#top_banner").css("visibility", "hidden");
+  $("#waiting-message").css("visibility", "visible");
 }
 
 // Set the name of the next div
 function setNextDivName(divName) {
   var actualTindered =  document.getElementById('tindered');
-  actualTindered.innerHTML = '';
+  actualTindered.innerHTML = "";
   actualTindered.appendChild(document.createTextNode(divName));
 }
 
 window.onbeforeunload = function() {
-  //return '';
+  //return "";
 };
 
 function randomizeNote() {
@@ -548,51 +548,51 @@ function randomizeNote() {
 
 function refresh() {
   window.onbeforeunload = null;
-  showMessage('info', 'This page will be refreshed in 3 seconds...', true, 2500);
+  showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
   setTimeout(function() {
     window.location.reload();
   },3000);
 }
 
 function update() {
-  state = 'WAIT';
-  publishMessage('performer', {type: 'update', index: myIndex, tm: pattern});
-  $('#waiting-message').css('visibility', 'visible');
-  $('#submit_pane').css('visibility', 'hidden');
+  state = "WAIT";
+  publishMessage("performer", {type: "update", index: myIndex, tm: pattern});
+  $("#waiting-message").css("visibility", "visible");
+  $("#submit_pane").css("visibility", "hidden");
 }
 
 function like() {
-  publishMessage('performer', {type: 'liked', index: myIndex, likedindex: currentIndex});
+  publishMessage("performer", {type: "liked", index: myIndex, likedindex: currentIndex});
   liked.push(currentIndex);
-  $('#like_button_area').css('display', 'none');
-  $('#liked_button_area').css('display', 'block');
+  $("#like_button_area").css("display", "none");
+  $("#liked_button_area").css("display", "block");
 }
 
 function modifyPattern() {
-  state = 'EDIT';
-  publishMessage('performer', {type: 'editing', index: myIndex});
+  state = "EDIT";
+  publishMessage("performer", {type: "editing", index: myIndex});
 
-  $('#submit_pane').css('visibility', 'visible');
-  $('#bottom_banner').css('visibility', 'hidden');
-  $('#top_banner').css('visibility', 'hidden');
+  $("#submit_pane").css("visibility", "visible");
+  $("#bottom_banner").css("visibility", "hidden");
+  $("#top_banner").css("visibility", "hidden");
 }
 
 function mingle() {
-  state = 'MINGLE';
-  $('#mingle_pane').css('visibility', 'visible');
-  $('#like_button_area').css('visibility', 'visible');
-  $('#liked_button_area').css('visibility', 'visible');
+  state = "MINGLE";
+  $("#mingle_pane").css("visibility", "visible");
+  $("#like_button_area").css("visibility", "visible");
+  $("#liked_button_area").css("visibility", "visible");
 
   if (liked.indexOf(currentIndex) == -1) {
-    $('#like_button_area').css('display', 'block');
-    $('#liked_button_area').css('display', 'none');
+    $("#like_button_area").css("display", "block");
+    $("#liked_button_area").css("display", "none");
   }
   else {
-    $('#like_button_area').css('display', 'none');
-    $('#liked_button_area').css('display', 'block');
+    $("#like_button_area").css("display", "none");
+    $("#liked_button_area").css("display", "block");
   }
-  $('#bottom_banner').css('visibility', 'hidden');
-  $('#top_banner').css('visibility', 'hidden');
+  $("#bottom_banner").css("visibility", "hidden");
+  $("#top_banner").css("visibility", "hidden");
   for (var i = 0; i < pattern.length; i++) {
     var note = new Note();
     note.setPosition(pattern[i].x, pattern[i].y);
@@ -602,12 +602,12 @@ function mingle() {
 }
 
 function exit() {
-  state = 'WAIT';
-  publishMessage('performer', {type :'whereami', index: myIndex});
-  $('#waiting-message').css('visibility', 'visible');
-  $('#mingle_pane').css('visibility', 'hidden');
-  $('#like_button_area').css('visibility', 'hidden');
-  $('#liked_button_area').css('visibility', 'hidden');
+  state = "WAIT";
+  publishMessage("performer", {type :"whereami", index: myIndex});
+  $("#waiting-message").css("visibility", "visible");
+  $("#mingle_pane").css("visibility", "hidden");
+  $("#like_button_area").css("visibility", "hidden");
+  $("#liked_button_area").css("visibility", "hidden");
 
   for (var i = 0; i < pattern.length; i++) {
     pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
@@ -619,18 +619,18 @@ function exit() {
 function stateTransition(_state) {
   state = _state;
   switch(state) {
-    case 'NAME':
+    case "NAME":
     break;
-    case 'EDIT':
+    case "EDIT":
     break;
-    case 'WAIT':
+    case "WAIT":
     break;
-    case 'CHECK':
+    case "CHECK":
     break;
-    case 'MINGLE':
+    case "MINGLE":
     break;
     default:
-    if (DEBUG) alert('unknown state:' + _state);
+    if (DEBUG) alert("unknown state:" + _state);
     break;
   }
   return;
@@ -645,23 +645,23 @@ $(document).ready(function () {
     $(this).animate({top: -$(this).outerHeight()}, 500);
   });
 
-  $('#question-message').css('visibility', 'hidden');
+  $("#question-message").css("visibility", "hidden");
 
-  $('#waiting-message').css('visibility', 'hidden');
+  $("#waiting-message").css("visibility", "hidden");
 
   $('#answer_yes').button().click(function() {
     playSample('yes', true);
-    $('#question-message').css('visibility','hidden');
+    $("#question-message").css("visibility","hidden");
   })
 
   $('#answer_no').button().click(function() {
     playSample('no', true);
-    $('#question-message').css('visibility','hidden');
+    $("#question-message").css("visibility","hidden");
   });
 
-  $('.tenpercent').each(function() {
+  $(".tenpercent").each(function() {
     var height =  window.innerHeight * 0.08; // Max width for the image
-    $(this).css('height', height);
+    $(this).css("height", height);
   });
 
   NORESPONSE2 = true;
@@ -669,7 +669,7 @@ $(document).ready(function () {
   (function loopPublish2() {
     setTimeout(function() {
       if (NORESPONSE2) {
-        publishMessage('performer', {type:'state', my_id:my_id});
+        publishMessage("performer", {type:"state", my_id:my_id});
         loopPublish2();
       }
     }, 3000);
@@ -677,31 +677,31 @@ $(document).ready(function () {
 
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
-  $('#start').button().css({margin:'5px'}).click(function() {
+  $("#start").button().css({margin:'5px'}).click(function() {
     context.resume();
-    $('#name_error_msg').text('');
+    $("#name_error_msg").text("");
 
-    strScreenName = $('#screenname').val();
+    strScreenName = $("#screenname").val();
     if (strScreenName.length > 12) {
-      $('#name_error_msg').text('screen name is too long');
+      $("#name_error_msg").text("screen name is too long");
       return;
     }
 
     if (textAlphanumeric(strScreenName) == false) {
-      $('#name_error_msg').text('Please, use only letters and numbers for the screen name. ');
+      $("#name_error_msg").text("Please, use only letters and numbers for the screen name. ");
       return;
     }
     NORESPONSE1 = true;
-    publishMessage('performer', {'type':'create', 'my_id': my_id, 'nickname': strScreenName});
+    publishMessage("performer", {"type":"create", "my_id": my_id, "nickname": strScreenName});
     (function loopPublish1() {
       setTimeout(function() {
         if (NORESPONSE1) {
-          publishMessage('performer', {'type':'create', 'my_id':my_id, 'nickname': strScreenName});
+          publishMessage("performer", {"type":"create", "my_id":my_id, "nickname": strScreenName});
           loopPublish1();
         }
       }, 3000);
     })();
-    $('#name_error_msg').text('Waiting for response...');
+    $("#name_error_msg").text("Waiting for response...");
 
     if (soundEnabled) {
       var masterGain = context.createGain();
@@ -732,7 +732,7 @@ $(document).ready(function () {
 
 
   function init() {
-    canvas = $('#patternCanvas')[0];
+    canvas = $("#patternCanvas")[0];
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight * 0.9;
@@ -752,7 +752,7 @@ $(document).ready(function () {
   init();
   
   function draw() {
-    canvas = $('#patternCanvas')[0];
+    canvas = $("#patternCanvas")[0];
     var ctx = canvas.getContext('2d');
 
     // Clear the canvas
@@ -762,7 +762,7 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'CHECK') {
+    if (state == "EDIT" || state == "MINGLE" || state == "CHECK") {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -776,7 +776,7 @@ $(document).ready(function () {
        }
     }
 
-    if (state == 'EDIT' || state == 'MINGLE') {
+    if (state == "EDIT" || state == "MINGLE") {
       
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
@@ -797,7 +797,7 @@ $(document).ready(function () {
       }
     }
 
-    if (state == 'CHECK' || state == 'MINGLE') {
+    if (state == "CHECK" || state == "MINGLE") {
 
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
@@ -822,15 +822,15 @@ $(document).ready(function () {
   var animate = function() {
 
     window.requestAnimFrame(animate);
-    if (state == 'NAME')
+    if (state == "NAME")
       return;
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
-    var oscType = ['sine','sine','triangle','triangle','sawtooth','square','triangle','sawtooth','square' ];
+    var oscType = ["sine","sine","triangle","triangle","sawtooth","square","triangle","sawtooth","square" ];
     var detune = 20;
     var maxNumOsc = oscType.length;
 
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
+    if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
       progress = (currentTime - lastPingTime ) / interval;
       if (playBarNote < 0 && lastPingTime + interval < currentTime) {
         playBarNote++;
@@ -878,10 +878,10 @@ $(document).ready(function () {
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
-    } // end of if (state == 'EDIT' || state == 'MINGLE') {
+    } // end of if (state == "EDIT" || state == "MINGLE") {
 
 
-    if (state == 'CHECK' || state == 'MINGLE') {
+    if (state == "CHECK" || state == "MINGLE") {
       
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
@@ -930,7 +930,7 @@ $(document).ready(function () {
                             intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
-    } // end of if (state == 'EDIT' || state == 'MINGLE') {
+    } // end of if (state == "EDIT" || state == "MINGLE") {
     draw();
   };
 
