@@ -1,10 +1,6 @@
 /*window.onbeforeunload = function() {
   return "";
 };*/
-/*
-TODO: 
--audience user updates on dot move
-*/
 
 var DEBUG = false;
 var soundEnabled = false;
@@ -145,12 +141,11 @@ function parseMessage(m) {
         case 'next':
           next(m.index);
           break;
-        case 'editing':
-          console.log('user ', m.nickname, ' is editing');
-          break;
         case 'whereami':
-          console.log('user ', m.nickname, ' sent a whereami message');
           inform(m.index)
+          break;
+        case 'save':
+          savePattern(m.index, m.nickname, m.pattern);
           break;
         case 'state':
           respondState(m.my_id);
@@ -218,28 +213,41 @@ function publishMessage(channel, options){
                          JSON.stringify(options));
 }
 
+function getRandomInt (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function create(userID, userNickname) {
   // if the nickname doesn't exist yet
   if (arrayUniqueNicknames.indexOf(userNickname) == -1) {
-    // push returns the length
-    var index = arrayUniqueNicknames.push(userNickname) - 1;
-    arrayUUIDs.push(userID);
+    // insert the user into a random place in the queue
+    var index = getRandomInt(0, arrayUsers.length - 1);
+    
+    arrayUniqueNicknames.splice(index, 0, userNickname);
+    arrayUUIDs.splice(index, 0, userID);
     var user = {
-      'id': userID,
-      'nickname': userNickname,
-      'index': index,
-      'pattern': "",
-      'mode': "editing",
-      'follow': "",
-      'followers': [],
-      'likes': [],
-      'likedby': []
+      id: userID,
+      nickname: userNickname,
+      index: index,
+      pattern: "",
+      mode: "editing",
+      follow: "",
+      followers: [],
+      likes: [],
+      likedby: []
     };
-    arrayUsers.push(user);
+    arrayUsers.splice(index, 0, user);
+    // update displaced users' indices
+    for (var i = 0; i < arrayUsers.length; ++i) {
+      arrayUsers[i].index = i;
+      // update displaced follow indices
+      if (arrayUsers[i].follow > index && arrayUsers[i].follow != "") 
+        arrayUsers[i].follow++;
+    }
     publishMessage(userID, {
-      'type': "create-response",
-      'res': "s",
-      'index': index
+      type: "create-response",
+      res: "s",
+      index: index
     });
     displayUser(index);
   }
@@ -247,7 +255,7 @@ function create(userID, userNickname) {
   else {
     // duplicate nickname
     if (arrayUUIDs.indexOf(userID) == -1) {
-      publishMessage(userID, {"type": "create-response", "res": "f"});
+      publishMessage(userID, {type: "create-response", res: "f"});
       console.log("nickname conflict!");
     }
     // disconnected user returning with same name
@@ -260,9 +268,10 @@ function create(userID, userNickname) {
           foundIndex = i;
           // initiate user's interface
           publishMessage(userID, {
-            "type": "create-response",
-            "res": "s",
-            "index": foundIndex
+            type: "create-response",
+            res: "s",
+            index: foundIndex,
+            pattern: arrayUsers[foundIndex].pattern
           });
           var user = arrayUsers[foundIndex];
           user.obj.remove();
@@ -294,7 +303,7 @@ function displayUser(index) {
     arrayWaitingPeople = [];
   }
 }
-
+//TODO: browse function for initial following
 function update(userIndex, userPattern) {
   var user = arrayUsers[userIndex];
   if (!user) return;
@@ -305,7 +314,7 @@ function update(userIndex, userPattern) {
   user.mode = "following";
   
   // if user is following someone
-  if (typeof(user.follow) == 'number') { 
+  if (user.follow != "") { 
     var followed = arrayUsers[user.follow];
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);
@@ -333,7 +342,7 @@ function next(userIndex) {
   user.obj.css("background", "");
   var suggestedIndex = get_next_user_to_follow(userIndex);
   // if user is following someone
-  if (typeof(user.follow) == 'number') {
+  if (user.follow != "") {
     var exFollowed = arrayUsers[user.follow];
     
     // unfollow
@@ -382,25 +391,16 @@ function get_next_user_to_follow(userIndex) {
   var user = arrayUsers[userIndex];
   
   // if user is already following someone
-  if (typeof(user.follow) == 'number') {
-    suggestedIndex = user.follow + 1;
-    // so the user doesn't go from following someone else to following themself
-    if (suggestedIndex >= arrayUsers.length) {
-      suggestedIndex = 0;
-    }
+  if (user.follow != "") {
+    suggestedIndex = (user.follow + 1) % arrayUsers.length;
     if (suggestedIndex == userIndex) {
-      suggestedIndex++;
-      if (suggestedIndex >= arrayUsers.length) {
-        suggestedIndex = 0;
-      }
+      suggestedIndex = (suggestedIndex + 1) % arrayUsers.length;
     }
   }
+  
+  // first assignment of follow
   else {
-    var suggestedIndex = userIndex + 1;
-  }
-  // user has reached the last person in queue, loop back to beginning
-  if (suggestedIndex >= arrayUsers.length) {
-    suggestedIndex = 0;
+    var suggestedIndex = (userIndex + 1) % arrayUsers.length;
   }
   
   if (suggestedIndex == userIndex) {
@@ -424,7 +424,7 @@ function inform(userIndex) {
   var user = arrayUsers[userIndex];
   if (!user) return;
   
-  if (typeof(user.follow) == 'number') {
+  if (user.follow != "") {
     var followed = user.follow;
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);
@@ -447,6 +447,10 @@ function inform(userIndex) {
     next(user.index);
   }
 }
+
+/*function savePattern(userIndex, userNickname, userPattern) {
+  
+}*/
 
 function updateDiv(index) {
   user = arrayUsers[index];

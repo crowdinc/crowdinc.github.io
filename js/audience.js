@@ -370,6 +370,11 @@ function parseMessage(message) {
         myIndex = message.index;
         lastPingTime = Date.now();
         $("#submit_pane").css("visibility", "visible");
+        /*if (message.pattern) {
+          console.log('pattern exists');
+          pattern = message.pattern;
+        }*/
+        console.log(message.pattern);
         publishMessage('performer', {
           type: 'update',
           index: myIndex,
@@ -380,7 +385,7 @@ function parseMessage(message) {
         $('#name_error_msg').text($('#screenname').val() + " is already taken.");
       }
     }
-    else if ( message.type == "next-response") {
+    else if (message.type == "next-response") {
       NORESPONSE3--;
       patternElse = message.suggested_tm.tm;
       currentNickname = message.suggested_tm.nickname;
@@ -391,7 +396,7 @@ function parseMessage(message) {
         patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
                                        patternElse[i+1].x * w, patternElse[i+1].y * h);
       }
-      if ( state == "WAIT") {
+      if (state == "WAIT") {
         $("#bottom_banner").css("visibility", "visible");
         $("#top_banner").css("visibility", "visible");
         lastPingTimeElse = Date.now();
@@ -568,7 +573,6 @@ function like() {
 
 function modifyPattern() {
   state = "EDIT";
-  publishMessage("performer", {type: "editing", index: myIndex});
 
   $("#submit_pane").css("visibility", "visible");
   $("#bottom_banner").css("visibility", "hidden");
