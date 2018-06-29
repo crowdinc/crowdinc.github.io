@@ -370,11 +370,10 @@ function parseMessage(message) {
         myIndex = message.index;
         lastPingTime = Date.now();
         $("#submit_pane").css("visibility", "visible");
-        /*if (message.pattern) {
+        if (message.pattern) {
           console.log('pattern exists');
           pattern = message.pattern;
-        }*/
-        console.log(message.pattern);
+        }
         publishMessage('performer', {
           type: 'update',
           index: myIndex,
