@@ -144,8 +144,8 @@ function parseMessage(m) {
         case 'whereami':
           inform(m.index)
           break;
-        case 'save':
-          savePattern(m.index, m.nickname, m.pattern);
+        case 'unfollow':
+          unfollow(m.index);
           break;
         case 'state':
           respondState(m.my_id);
@@ -336,6 +336,18 @@ function update(userIndex, userPattern) {
   }
 }
 
+// user at userIndex unfollows whoever they are following
+function unfollow(userIndex) {
+  var user = arrayUsers[userIndex];
+  var exFollowed = arrayUsers[user.follow];
+  var followerIndex = exFollowed.followers.indexOf(user.index);
+  exFollowed.followers.splice(followerIndex, 1);
+  if (exFollowed.index == indexMostFollowed) {
+    followersMostFollowed = followersMostFollowed - 1;
+  }
+  updateDiv(user.follow);
+}
+
 // unfollows the current followed user and follows the next in line
 function next(userIndex) {
   var user = arrayUsers[userIndex];
@@ -343,18 +355,7 @@ function next(userIndex) {
   var suggestedIndex = get_next_user_to_follow(userIndex);
   // if user is following someone
   if (user.follow != "") {
-    var exFollowed = arrayUsers[user.follow];
-    
-    // unfollow
-    var followerIndex = exFollowed.followers.indexOf[user.index];
-    if (followerIndex != -1) {
-      exFollowed.followers.splice(followerIndex, 1);
-    }
-    
-    if (exFollowed.index == indexMostFollowed) {
-      followersMostFollowed = followersMostFollowed - 1;
-    }
-    updateDiv(user.follow);
+    unfollow(userIndex);
   }
   if (suggestedIndex != -1) {
     var suggested = arrayUsers[suggestedIndex];
@@ -447,10 +448,6 @@ function inform(userIndex) {
     next(user.index);
   }
 }
-
-/*function savePattern(userIndex, userNickname, userPattern) {
-  
-}*/
 
 function updateDiv(index) {
   user = arrayUsers[index];

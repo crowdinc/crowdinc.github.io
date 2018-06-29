@@ -372,7 +372,9 @@ function parseMessage(message) {
         $("#submit_pane").css("visibility", "visible");
         if (message.pattern) {
           console.log('pattern exists');
-          pattern = message.pattern;
+          for (var i = 0; i < message.pattern.length; ++i) {
+            pattern[i].setPosition(message.pattern[i].x, message.pattern[i].y);
+          }
         }
         publishMessage('performer', {
           type: 'update',
@@ -532,8 +534,19 @@ function setNextDivName(divName) {
 }
 
 window.onbeforeunload = function() {
+  publishMessage('performer', {
+    type: 'unfollow',
+    index: myIndex
+  });
   //return "";
 };
+
+window.onunload = function() {
+  publishMessage('performer', {
+    type: 'unfollow',
+    index: myIndex
+  });
+}
 
 function randomizeNote() {
   for (var i = 0; i < patternSize; i++) {
