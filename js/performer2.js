@@ -44,7 +44,7 @@ pubnub.subscribe({
 });
 
 $(document).ready(function() {
-  divUsers = $('#availables');
+  divUsers = $('#users');
   $('#standby').click(function() {
     console.log('standby');
     state = "STANDBY";
@@ -221,10 +221,12 @@ function create(userID, userNickname) {
   // if the nickname doesn't exist yet
   if (arrayUniqueNicknames.indexOf(userNickname) == -1) {
     // insert the user into a random place in the queue
-    var index = getRandomInt(0, arrayUsers.length - 1);
+    //var index = getRandomInt(0, arrayUsers.length - 1);
+    //arrayUniqueNicknames.splice(index, 0, userNickname);
+    //arrayUUIDs.splice(index, 0, userID);
     
-    arrayUniqueNicknames.splice(index, 0, userNickname);
-    arrayUUIDs.splice(index, 0, userID);
+    var index = arrayUniqueNicknames.push(userNickname) - 1;
+    arrayUUIDs.push(userID);
     var user = {
       id: userID,
       nickname: userNickname,
@@ -236,19 +238,24 @@ function create(userID, userNickname) {
       likes: [],
       likedby: []
     };
-    arrayUsers.splice(index, 0, user);
+    //arrayUsers.splice(index, 0, user);
+    arrayUsers.push(user);
     // update displaced users' indices
-    for (var i = 0; i < arrayUsers.length; ++i) {
+    /*for (var i = 0; i < arrayUsers.length; ++i) {
       arrayUsers[i].index = i;
       // update displaced follow indices
       if (arrayUsers[i].follow > index && arrayUsers[i].follow != "") 
         arrayUsers[i].follow++;
-    }
+    }*/
     publishMessage(userID, {
       type: "create-response",
       res: "s",
       index: index
     });
+    /*divUsers.remove();
+    for (var i = 0; i < arrayUsers.length; ++i) {
+      displayUser(i);
+    }*/
     displayUser(index);
   }
   // if the nickname already exists
@@ -295,7 +302,7 @@ function displayUser(index) {
   newDiv.find('.stats').css("display", "none");
   user.obj = newDiv;
   user.obj.find('.stats').css("display", "");
-  divUsers.append(user.obj);
+  $('#users').append(user.obj);
   if (arrayWaitingPeople.length > 0) {
     for (var i = 0; i < arrayWaitingPeople.length; i++) {
       next(arrayWaitingPeople[i]);
@@ -314,7 +321,7 @@ function update(userIndex, userPattern) {
   user.mode = "following";
   
   // if user is following someone
-  if (user.follow != "") { 
+  /*if (user.follow !== "") { 
     var followed = arrayUsers[user.follow];
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);
@@ -333,7 +340,7 @@ function update(userIndex, userPattern) {
   }
   else {
     next(user.index);
-  }
+  }*/
 }
 
 // user at userIndex unfollows whoever they are following
@@ -354,7 +361,7 @@ function next(userIndex) {
   user.obj.css("background", "");
   var suggestedIndex = get_next_user_to_follow(userIndex);
   // if user is following someone
-  if (user.follow != "") {
+  if (user.follow !== "") {
     unfollow(userIndex);
   }
   if (suggestedIndex != -1) {
@@ -392,7 +399,7 @@ function get_next_user_to_follow(userIndex) {
   var user = arrayUsers[userIndex];
   
   // if user is already following someone
-  if (user.follow != "") {
+  if (user.follow !== "") {
     suggestedIndex = (user.follow + 1) % arrayUsers.length;
     if (suggestedIndex == userIndex) {
       suggestedIndex = (suggestedIndex + 1) % arrayUsers.length;
@@ -425,7 +432,7 @@ function inform(userIndex) {
   var user = arrayUsers[userIndex];
   if (!user) return;
   
-  if (user.follow != "") {
+  if (user.follow !== "") {
     var followed = user.follow;
     if (arrayUsers.indexOf(followed) == -1) {
       next(user.index);

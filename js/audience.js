@@ -95,10 +95,10 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
     );
   }
 
-  request.onerror = function(error) {
+  /*request.onerror = function(error) {
     console.log('BufferLoader: XHR error', error);
     debugger;
-  }
+  }*/
   request.send();
 };
 
@@ -521,7 +521,7 @@ function getNextPattern() {
 
   publishMessage("performer", {type:"next", index: myIndex});
 
-  $("#bottom_banner").css("visibility", "hidden");
+  $(".bottom_banner2").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
   $("#waiting-message").css("visibility", "visible");
 }
@@ -534,19 +534,14 @@ function setNextDivName(divName) {
 }
 
 window.onbeforeunload = function() {
-  publishMessage('performer', {
-    type: 'unfollow',
-    index: myIndex
-  });
+  if (state != "NAME") {
+    publishMessage('performer', {
+      type: 'unfollow',
+      index: myIndex
+    });
+  }
   //return "";
 };
-
-window.onunload = function() {
-  publishMessage('performer', {
-    type: 'unfollow',
-    index: myIndex
-  });
-}
 
 function randomizeNote() {
   for (var i = 0; i < patternSize; i++) {
@@ -716,7 +711,7 @@ $(document).ready(function () {
       }, 3000);
     })();
     $("#name_error_msg").text("Waiting for response...");
-
+    
     if (soundEnabled) {
       var masterGain = context.createGain();
       masterGain.gain.value = 0.7;
@@ -730,6 +725,11 @@ $(document).ready(function () {
     testOsc.start(0);
     testOsc.stop(context.currentTime + 0.3);
     
+  });
+  
+  $('#browse').click(function() {
+    console.log('browse');
+    getNextPattern();
   });
 
   var playBarNote = -1;
