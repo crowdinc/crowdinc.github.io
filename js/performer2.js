@@ -58,6 +58,7 @@ $(document).ready(function() {
     respondState();
   });
   $('#refresh').click(function() {
+    // refreshes all users' pages
     console.log('refresh');
     publishMessage("audience", {type:"script", script:"refresh()"});
     window.location.reload();
@@ -96,7 +97,6 @@ $(document).ready(function() {
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
-  //setTimeout(checkOccupancy, 1500);
   
   // checks if another performer is present
   publishMessage('performer', {
@@ -104,21 +104,6 @@ $(document).ready(function() {
     uuid: pubnub.getUUID()
   });
 });
-
-// enforces limit of one performer (not currently used, pubnub presence too unreliable)
-function checkOccupancy() {
-  pubnub.hereNow({
-    channels: ['performer'],
-    includeUUIDs: true
-  },
-  function(status, response) {
-    console.log(' response: ', response);
-    if (response.totalOccupancy > 1) {
-      alert('Someone\'s already performing!');
-      STOPWORKING = true;
-    }
-  });
-}
 
 // handler for message events
 function parseMessage(m) {
@@ -142,6 +127,7 @@ function parseMessage(m) {
           next(m.index);
           break;
         case 'whereami':
+          // gives user position in queue
           inform(m.index)
           break;
         case 'unfollow':
@@ -220,10 +206,6 @@ function getRandomInt (min, max) {
 function create(userID, userNickname) {
   // if the nickname doesn't exist yet
   if (arrayUniqueNicknames.indexOf(userNickname) == -1) {
-    // insert the user into a random place in the queue
-    //var index = getRandomInt(0, arrayUsers.length - 1);
-    //arrayUniqueNicknames.splice(index, 0, userNickname);
-    //arrayUUIDs.splice(index, 0, userID);
     
     var index = arrayUniqueNicknames.push(userNickname) - 1;
     arrayUUIDs.push(userID);
@@ -238,26 +220,15 @@ function create(userID, userNickname) {
       likes: [],
       likedby: []
     };
-    //arrayUsers.splice(index, 0, user);
     arrayUsers.push(user);
-    // update displaced users' indices
-    /*for (var i = 0; i < arrayUsers.length; ++i) {
-      arrayUsers[i].index = i;
-      // update displaced follow indices
-      if (arrayUsers[i].follow > index && arrayUsers[i].follow != "") 
-        arrayUsers[i].follow++;
-    }*/
     publishMessage(userID, {
       type: "create-response",
       res: "s",
       index: index
     });
-    /*divUsers.remove();
-    for (var i = 0; i < arrayUsers.length; ++i) {
-      displayUser(i);
-    }*/
     displayUser(index);
   }
+  
   // if the nickname already exists
   else {
     // duplicate nickname
@@ -395,6 +366,10 @@ function next(userIndex) {
   }
 }
 
+function getRandomInt (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function get_next_user_to_follow(userIndex) {
   var user = arrayUsers[userIndex];
   
@@ -406,9 +381,9 @@ function get_next_user_to_follow(userIndex) {
     }
   }
   
-  // first assignment of follow
+  // initial assignment of follow - chooses a random user
   else {
-    var suggestedIndex = (userIndex + 1) % arrayUsers.length;
+    var suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
   }
   
   if (suggestedIndex == userIndex) {

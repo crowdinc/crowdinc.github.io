@@ -6,7 +6,7 @@ var performerState = "STANDBY";
 State Diagram
 
 NAME -> EDIT : create-response msg received
-EDIT -> WAIT : update msg sent
+EDIT -> WAIT : 'next' msg sent
 WAIT -> CHECK : next-response msg received in "WAIT" state
 CHECK -> MINGLE : user press HEART button
 MINGLE -> CHECK : user press exit button
@@ -352,7 +352,7 @@ pubnub.subscribe({
     heartbeat: 15
 });
 
-function parseMessage(message) {
+/*function parseMessage(message) {
   if (DEBUG) {
     console.log("message - received:" + JSON.stringify(message));
   }
@@ -493,6 +493,151 @@ function parseMessage(message) {
   else {
     console.log(JSON.stringify(message));
   }
+}*/
+
+function parseMessage(message) {
+  if (DEBUG) console.log("message - received:" + JSON.stringify(message));
+  if (typeof message.nextDivName !== 'undefined') {
+    setNextDivName(message.nextDivName);
+  }
+  else if (typeof message.type !== 'undefined') {
+    switch(message.type) {
+      case 'create-response':
+        NORESPONSE1 = false;
+        if (message.res == "s") {
+          state = "EDIT";
+          $('#initial-message').bPopup().close();
+          strScreenName = $("#screenname").val();
+          $('#screenname_display').text(strScreenName);
+          myIndex = message.index;
+          lastPingTime = Date.now();
+          $("#submit_pane").css("visibility", "visible");
+          if (message.pattern) {
+            console.log('pattern exists');
+            for (var i = 0; i < message.pattern.length; ++i) {
+              pattern[i].setPosition(message.pattern[i].x, message.pattern[i].y);
+            }
+          }
+          publishMessage('performer', {
+            type: 'update',
+            index: myIndex,
+            tm: pattern
+          });
+        }
+        else {
+          $('#name_error_msg').text($('#screenname').val() + " is already taken.");
+        }
+        break;
+      case 'next-response':
+        setTimeout(next, 5000, message.suggested_tm.index, message.suggested_tm.nickname,
+                   message.suggested_tm.tm);
+        break;
+      case 'liked-response': 
+        if (message.index == myIndex) {
+          showMessage('error',  "I know! You like your tune.", true, 1000);
+        }
+        else if (liked.indexOf(message.index) == -1) {
+          showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
+          playSample("liked", true);
+        }
+        else {
+          showMessage('error', "It's a match! " + message.nickname + ' likes your tune, too!', true, 1000);
+          playSample("matched", true);
+        }
+        break;
+      case 'question':
+        if (message.text.length > 0) {
+          $("#question_content").text(message.text);
+          $("#question-message").css("visibility", "visible");
+        }
+        break;
+      case 'scale':
+        if (message.probability >= 0) {
+          if (message.probability > Math.random()) {
+            baseNote = message.baseNote;
+            selectedScale = message.scale;
+          }
+        }
+        else {
+          baseNote = message.baseNote;
+          selectedScale = message.scale;
+          showMessage("info", "The performer changed the scale.", true);
+        }
+        break;
+      case 'sound-toggle':
+        if (message.probability >= 0) {
+          if (message.probability > Math.random()) {
+            soundEnabled = message.on;
+          }
+        }
+        else {
+          soundEnabled = message.on;
+        }
+        break;
+      case 'script':
+        if (message.script) {
+          if (message.probability >= 0) {
+            if (message.probability > Math.random()) {
+              try {
+                eval(message.script);
+              } catch (e) {
+                console.log(e);
+              }
+            }
+          }
+          else {
+            try {
+              eval(message.script);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+        break;
+      case 'state-response':
+        NORESPONSE2 = false;
+        soundEnabled = message.sound;
+        performerState = message.state;
+        if (performerState == "STANDBY") {
+          showMessage("warning", "STANDBY, Crowd in C is about to start.");
+          $("#STANDBY").css("visibility", "visible");
+        }
+        else if (performerState == "GOLIVE") {
+          hideAllMessages();
+          showMessage("success", "Let's go live!", true);
+          $("#STANDBY").css("visibility", "hidden");
+        }
+        else if (performerState == "END") {
+          hideAllMessages();
+          showMessage("success", "This is the end. (Applause)", true);
+          $("#STANDBY").css("visibility", "hidden");
+        }
+        break;
+      default:
+        console.log('unhandled type received: ', message.type);
+    }
+  }
+  else console.log('undefined type, message: ', JSON.stringify(message));
+}
+
+function next(elseIndex, elseNickname, elsePattern) {
+  NORESPONSE3--;
+  patternElse = elsePattern;
+  currentNickname = elseNickname;
+  currentIndex = elseIndex;
+  $('#screenname_display').text(currentNickname);
+
+  for (var i = 0; i < patternElse.length - 1; i++) {
+    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
+  }
+  if (state == "WAIT") {
+    $("#bottom_banner").css("visibility", "visible");
+    $("#top_banner").css("visibility", "visible");
+    lastPingTimeElse = Date.now();
+    state = "CHECK";
+    $("#waiting-message").css("visibility", "hidden");
+  }
 }
 
 function publishMessage(channel, options) {
@@ -518,12 +663,18 @@ function publishMessage(channel, options) {
 function getNextPattern() {
   state = "WAIT";
   NORESPONSE3++;
-
+  
+  for (var i = 0; i < patternElse.length - 1; i++) {
+    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
+  }
+  
   publishMessage("performer", {type:"next", index: myIndex});
 
   $(".bottom_banner2").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
   $("#waiting-message").css("visibility", "visible");
+  
 }
 
 // Set the name of the next div
@@ -728,7 +879,6 @@ $(document).ready(function () {
   });
   
   $('#browse').click(function() {
-    console.log('browse');
     getNextPattern();
   });
 
@@ -776,7 +926,7 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == "EDIT" || state == "MINGLE" || state == "CHECK") {
+    if (state == "EDIT" || state == "MINGLE" || state == "CHECK" || state == "WAIT") {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -790,7 +940,7 @@ $(document).ready(function () {
        }
     }
 
-    if (state == "EDIT" || state == "MINGLE") {
+    if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
       
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
@@ -953,6 +1103,7 @@ $(document).ready(function () {
   var selectedNote = -1;
   
   $(document).bind('touchstart', function(event) {
+    if (state == "WAIT") return;
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;
@@ -1013,6 +1164,7 @@ $(document).ready(function () {
   });
   
   $(document).mousedown(function(e) {
+    if (state == "WAIT") return;
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;
