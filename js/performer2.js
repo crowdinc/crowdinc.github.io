@@ -45,6 +45,23 @@ pubnub.subscribe({
 
 $(document).ready(function() {
   divUsers = $('#users');
+  $('#broadcast').click(function(event) {
+    if ($('#chat').val() == 'question') {
+      publishMessage('audience', {
+        type: 'question',
+        text: $('#chat_message').val()
+      });
+      event.preventDefault();
+    }
+    else {
+      publishMessage('audience', {
+        type: 'script',
+        script: "showMessage('" + $("#chat").val() + "','" + 
+                            $('#chat_message').val() + "', true, 2000)"
+      });
+      event.preventDefault();
+    }
+  });
   $('#standby').click(function() {
     console.log('standby');
     state = "STANDBY";
@@ -119,6 +136,10 @@ function parseMessage(m) {
       switch(m.type) {
         case 'create':
           create(m.my_id, m.nickname);
+          publishMessage('log', {
+            type: 'create',
+            user: m.my_id
+          });
           break;
         case 'update':
           update(m.index, m.tm);
@@ -135,6 +156,14 @@ function parseMessage(m) {
           break;
         case 'state':
           respondState(m.my_id);
+          break;
+        case 'mingle':
+          console.log('mingle received');
+          publishMessage(arrayUUIDs[m.index], {
+            type: 'mingle-request',
+            index: m.index,
+            nickname: m.nickname
+          });
           break;
         case 'liked':
           liked(m.index, m.likedindex);

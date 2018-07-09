@@ -529,8 +529,15 @@ function parseMessage(message) {
         }
         break;
       case 'next-response':
-        setTimeout(next, 5000, message.suggested_tm.index, message.suggested_tm.nickname,
+        setTimeout(next, 500, message.suggested_tm.index, message.suggested_tm.nickname,
                    message.suggested_tm.tm);
+        break;
+      case 'mingle-request':
+        //alert(message.nickname + ' wants to mingle :0');
+        $("#question_content").text(message.nickname + ' wants to mingle! Enter real-time mingle mode?');
+        $("#question-message").css("visibility", "visible");
+        
+        
         break;
       case 'liked-response': 
         if (message.index == myIndex) {
@@ -882,6 +889,15 @@ $(document).ready(function () {
     getNextPattern();
   });
 
+  $('#mingle').click(function() {
+    publishMessage('performer', {
+      type: 'mingle',
+      index: myIndex,
+      nickname: currentNickname
+    });
+    mingle();
+  });
+  
   var playBarNote = -1;
   var playBarNoteElse = -1;
   var intervalBetweenPattern = 1000;
