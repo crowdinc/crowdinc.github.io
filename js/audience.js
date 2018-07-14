@@ -729,15 +729,6 @@ function update() {
   $("#submit_pane").css("visibility", "hidden");
 }
 
-function like() {
-  publishMessage("performer", {type: "liked", index: myIndex, likedindex: currentIndex});
-  liked.push(currentIndex);
-  $("#like_button_area").css("display", "none");
-  $("#liked_button_area").css("display", "block");
-}
-
-
-
 function mingle() {
   state = "MINGLE";
   $("#mingle_pane").css("visibility", "visible");
@@ -914,6 +905,17 @@ $(document).ready(function () {
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
+  });
+  
+  $('#like').click(function() {
+    publishMessage("performer", {
+      type: "liked", 
+      index: myIndex, 
+      likedindex: currentIndex
+    });
+    liked.push(currentIndex);
+    $("#like_button_area").css("display", "none");
+    $("#liked_button_area").css("display", "block");
   });
   
   $('#mingle').click(function() {

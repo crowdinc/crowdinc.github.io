@@ -546,6 +546,14 @@ function liked(likerIndex, likedIndex) {
     $('#most-liked').text(likedUser.nickname);
   }
   updateDiv(likedIndex);
+  publishMessage('log', {
+    type: 'like',
+    user: likerUser.nickname,
+    timestamp: Math.floor(Date.now()),
+    info: {
+      targetUser: likedUser.nickname
+    }
+  });
 }
 
 
