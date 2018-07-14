@@ -15,7 +15,25 @@
   </head>
   <body>
     <h3>Logged interactions:</h3>
-    <h5>Action type:</h5>
-    <p id="interactions"></p>
+    <div class="row">
+      <div class="col-3">
+        <h5>Action type:</h5>
+      </div>
+      <div class="col-3">
+        <h5>Acting user:</h5>
+      </div>
+      <div class="col-3">
+        <h5>Timestamp (ms since beginning):</h5>
+      </div>
+      <div class="col-3">
+        <h5>Additional info:</h5>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3" id="actionTypes"></div>
+      <div class="col-3" id="actingUsers"></div>
+      <div class="col-3" id="timestamps"></div>
+      <div class="col-3" id="info"></div>
+    </div>
   </body>
 </html>

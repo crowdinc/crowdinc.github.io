@@ -24,8 +24,14 @@ $(document).ready(function() {
   
 });
 
+var startTime;
+
 function parseMessage(m) {
-  $('#interactions').append(m.type);
+  if (m.type == 'golive') startTime = m.timestamp;
+  $('#actionTypes').append(m.type + '<br/>');
+  $('#actingUsers').append(m.user + '<br/>');
+  $('#timestamps').append((m.timestamp - startTime) + '<br/>');
+  $('#info').append(JSON.stringify(m.info) + '<br/>');
 }
 
 function parsePresence(p) {

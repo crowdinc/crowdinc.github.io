@@ -73,18 +73,36 @@ $(document).ready(function() {
     state = "GOLIVE";
     soundEnabled = true;
     respondState();
+    publishMessage('log', {
+      type: 'golive',
+      user: 'Performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   });
   $('#refresh').click(function() {
     // refreshes all users' pages
     console.log('refresh');
     publishMessage("audience", {type:"script", script:"refresh()"});
     window.location.reload();
+    publishMessage('log', {
+      type: 'refresh',
+      user: 'Performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   });
   $('#end').click(function() {
     console.log('end');
     state = "END";
     soundEnabled = false;
     respondState();
+    publishMessage('log', {
+      type: 'end',
+      user: 'Performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   });
   var myTextArea = $('#code');
   var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -136,10 +154,6 @@ function parseMessage(m) {
       switch(m.type) {
         case 'create':
           create(m.my_id, m.nickname);
-          publishMessage('log', {
-            type: 'create',
-            user: m.my_id
-          });
           break;
         case 'update':
           update(m.index, m.tm);
@@ -256,6 +270,12 @@ function create(userID, userNickname) {
       index: index
     });
     displayUser(index);
+    publishMessage('log', {
+      type: 'create',
+      user: userNickname,
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   }
   
   // if the nickname already exists
@@ -283,6 +303,12 @@ function create(userID, userNickname) {
           var user = arrayUsers[foundIndex];
           user.obj.remove();
           console.log("user exists and returned");
+          publishMessage('log', {
+            type: 'return',
+            user: userNickname,
+            timestamp: Math.floor(Date.now()),
+            info: 'N/A'
+          });
           break;
         }
       }
@@ -360,10 +386,16 @@ function next(userIndex) {
   var user = arrayUsers[userIndex];
   user.obj.css("background", "");
   var suggestedIndex = get_next_user_to_follow(userIndex);
+  var previousFollow = '';
+  var newFollow = arrayUsers[userIndex].nickname;
+  
   // if user is following someone
-  if (user.follow !== "") {
+  if (user.follow !== '') {
+    previousFollow = arrayUsers[user.follow].nickname;
     unfollow(userIndex);
   }
+  else previousFollow = 'N/A';
+  
   if (suggestedIndex != -1) {
     var suggested = arrayUsers[suggestedIndex];
     
@@ -388,11 +420,21 @@ function next(userIndex) {
         "tm": suggested.pattern
       }
     });
+    newFollow = suggested.nickname;
   }
   // no user to follow
   else {
     arrayWaitingPeople.push(user.index);
   }
+  publishMessage('log', {
+    type: 'next',
+    user: arrayUsers[userIndex].nickname,
+    timestamp: Math.floor(Date.now()),
+    info: {
+      previousFollow: previousFollow,
+      newFollow: newFollow
+    }
+  });
 }
 
 function getRandomInt (min, max) {

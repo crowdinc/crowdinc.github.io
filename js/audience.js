@@ -736,13 +736,7 @@ function like() {
   $("#liked_button_area").css("display", "block");
 }
 
-function modifyPattern() {
-  state = "EDIT";
 
-  $("#submit_pane").css("visibility", "visible");
-  $("#bottom_banner").css("visibility", "hidden");
-  $("#top_banner").css("visibility", "hidden");
-}
 
 function mingle() {
   state = "MINGLE";
@@ -887,8 +881,41 @@ $(document).ready(function () {
   
   $('#browse').click(function() {
     getNextPattern();
+    /*publishMessage('log', {
+      type: 'browse',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });*/
   });
 
+  $('#nextPattern').click(function() {
+    getNextPattern();
+  });
+  
+  $('#randomize').click(function() {
+    randomizeNote();
+    publishMessage('log', {
+      type: 'randomize',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
+  });
+  
+  $('#modify').click(function() {
+    state = "EDIT";
+    $("#submit_pane").css("visibility", "visible");
+    $("#bottom_banner").css("visibility", "hidden");
+    $("#top_banner").css("visibility", "hidden");
+    publishMessage('log', {
+      type: 'modify',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
+  });
+  
   $('#mingle').click(function() {
     publishMessage('performer', {
       type: 'mingle',
