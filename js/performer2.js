@@ -184,6 +184,12 @@ function parseMessage(m) {
             index: m.index,
             nickname: m.nickname
           });
+          publishMessage('log', {
+            type: 'mingle',
+            user: arrayUsers[m.index].nickname,
+            timestamp: Math.floor(Date.now()),
+            info: arrayUsers[m.index].nickname + ' is mingling with ' + m.nickname
+          });
           break;
         case 'liked':
           liked(m.index, m.likedindex);
