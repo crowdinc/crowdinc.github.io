@@ -534,8 +534,8 @@ function parseMessage(message) {
         break;
       case 'mingle-request':
         //alert(message.nickname + ' wants to mingle :0');
-        $("#question_content").text(message.nickname + ' wants to mingle! Enter real-time mingle mode?');
-        $("#question-message").css("visibility", "visible");
+        /*$("#question_content").text(message.nickname + ' wants to mingle! Enter real-time mingle mode?');
+        $("#question-message").css("visibility", "visible");*/
         
         
         break;
