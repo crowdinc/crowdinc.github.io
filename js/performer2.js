@@ -61,6 +61,12 @@ $(document).ready(function() {
       });
       event.preventDefault();
     }
+    publishMessage('log', {
+      type: $('#chat').val(),
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: $('#chat_message').val()
+    });
   });
   $('#standby').click(function() {
     console.log('standby');
@@ -75,7 +81,7 @@ $(document).ready(function() {
     respondState();
     publishMessage('log', {
       type: 'golive',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -87,7 +93,7 @@ $(document).ready(function() {
     window.location.reload();
     publishMessage('log', {
       type: 'refresh',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -99,7 +105,7 @@ $(document).ready(function() {
     respondState();
     publishMessage('log', {
       type: 'end',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -535,6 +541,12 @@ function liked(likerIndex, likedIndex) {
         type: 'liked-response',
         nickname: likedUser.nickname,
         index: likedUser.index
+      });
+      publishMessage('log', {
+        type: 'match',
+        user: likerUser.nickname,
+        timestamp: Math.floor(Date.now()),
+        info: likerUser.nickname + ' matched with ' + likedUser.nickname
       });
     }
   }

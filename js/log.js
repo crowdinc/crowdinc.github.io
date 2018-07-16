@@ -8,9 +8,6 @@ var pubnub = new PubNub({
 pubnub.addListener({
   message: function(m) {
     parseMessage(m.message);
-  },
-  presence: function(p) {
-    parsePresence(p);
   }
 });
 
@@ -32,8 +29,4 @@ function parseMessage(m) {
   $('#actingUsers').append(m.user + '<br/>');
   $('#timestamps').append((m.timestamp - startTime) + '<br/>');
   $('#info').append(JSON.stringify(m.info) + '<br/>');
-}
-
-function parsePresence(p) {
-
 }
