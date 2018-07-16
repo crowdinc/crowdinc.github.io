@@ -23,10 +23,19 @@ $(document).ready(function() {
 
 var startTime;
 
+
+
 function parseMessage(m) {
+  if (m.type == 'total refresh') window.location.reload();
   if (m.type == 'golive') startTime = m.timestamp;
-  $('#actionTypes').append(m.type + '<br/>');
-  $('#actingUsers').append(m.user + '<br/>');
-  $('#timestamps').append((m.timestamp - startTime) + '<br/>');
-  $('#info').append(JSON.stringify(m.info) + '<br/>');
+  
+  // add a row containing the info in the message
+  $('#interactions').append('<div class="row">' + 
+                              '<div class="col-3">' + m.type + '</div>' + 
+                              '<div class="col-3">' + m.user + '</div>' + 
+                              '<div class="col-3">' + (m.timestamp - startTime) + '</div>' + 
+                              '<div class="col-3">' + JSON.stringify(m.info) + '</div>' + 
+                            '</div>');
 }
+
+

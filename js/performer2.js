@@ -1,6 +1,10 @@
-/*window.onbeforeunload = function() {
-  return "";
-};*/
+window.onbeforeunload = function() {
+  //return "";
+  publishMessage('log', {
+    type: 'total refresh',
+    user: 'performer'
+  });
+};
 
 var DEBUG = false;
 var soundEnabled = false;
@@ -73,6 +77,12 @@ $(document).ready(function() {
     state = "STANDBY";
     soundEnabled = false;
     respondState();
+    publishMessage('log', {
+      type: 'standby',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   });
   $('#golive').click(function() {
     console.log('golive');
@@ -135,6 +145,12 @@ $(document).ready(function() {
         script: selectedText
       });
     }
+    publishMessage('log', {
+      type: 'codeSnippet',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: selectedText
+    });
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
