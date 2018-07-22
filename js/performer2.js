@@ -1,9 +1,9 @@
 window.onbeforeunload = function() {
   //return "";
-  publishMessage('log', {
+  /*publishMessage('log', {
     type: 'total refresh',
     user: 'performer'
-  });
+  });*/
 };
 
 var DEBUG = false;
@@ -201,10 +201,14 @@ function parseMessage(m) {
             nickname: m.nickname
           });
           publishMessage('log', {
-            type: 'mingle',
+            type: 'stateChange',
             user: arrayUsers[m.index].nickname,
             timestamp: Math.floor(Date.now()),
-            info: arrayUsers[m.index].nickname + ' is mingling with ' + m.nickname
+            info: {
+              prevState: 'BROWSE',
+              currentState: 'MINGLE',
+              otherUser: m.nickname
+            }
           });
           break;
         case 'liked':
@@ -236,7 +240,15 @@ function parseMessage(m) {
 
 // handler for presence events
 function performanceStatus(message) {
-  if (DEBUG) console.log("status: " + JSON.stringify(event));
+  if (message.action == 'join' && message.channel == 'performer') {
+    publishMessage('log', {
+      type: 'join',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
+  }
+  if (DEBUG) console.log('status: ' + JSON.stringify(event));
   // change backgroud of a disconnected user
   if (typeof message.action !== 'undefined') {
     if (message.action == 'timeout') {

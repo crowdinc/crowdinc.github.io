@@ -1,4 +1,4 @@
-var state = "NAME"; // it is either NAME, EDIT, WAIT, CHECK, MINGLE
+var state = "NAME"; // it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 var DEBUG = false;
 var performerState = "STANDBY";
 /*
@@ -7,10 +7,10 @@ State Diagram
 
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : 'next' msg sent
-WAIT -> CHECK : next-response msg received in "WAIT" state
-CHECK -> MINGLE : user press HEART button
-MINGLE -> CHECK : user press exit button
-CHECK -> EDIT : user press "update" button
+WAIT -> BROWSE : next-response msg received in "WAIT" state
+BROWSE -> MINGLE : user press HEART button
+MINGLE -> BROWSE : user press exit button
+BROWSE -> EDIT : user press "update" button
 
 */
 
@@ -344,6 +344,7 @@ var pubnub = PUBNUB.init({
 pubnub.subscribe({
     channel: my_id + ",audience",
     message: parseMessage,
+    presence: parsePresence,
     error: function (error) {
       // Handle error here
       console.log(JSON.stringify(error));
@@ -484,6 +485,23 @@ function parseMessage(message) {
   else console.log('undefined type, message: ', JSON.stringify(message));
 }
 
+var joinMessageSent = false;
+
+function parsePresence(p) {
+  if (p.action == 'join' && !joinMessageSent) {
+    console.log(p);
+    publishMessage('log', {
+      type: 'join',
+      user: 'audience',
+      timestamp: Math.floor(Date.now()),
+      info: {
+        uuid: my_id
+      }
+    });
+    joinMessageSent = true;
+  }
+}
+
 function next(elseIndex, elseNickname, elsePattern) {
   NORESPONSE3--;
   patternElse = elsePattern;
@@ -499,7 +517,7 @@ function next(elseIndex, elseNickname, elsePattern) {
     $("#bottom_banner").css("visibility", "visible");
     $("#top_banner").css("visibility", "visible");
     lastPingTimeElse = Date.now();
-    state = "CHECK";
+    state = "BROWSE";
     $("#waiting-message").css("visibility", "hidden");
   }
 }
@@ -610,7 +628,7 @@ function mingle() {
   }
 }
 
-// it is either NAME, EDIT, WAIT, CHECK, MINGLE
+// it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 function stateTransition(_state) {
   state = _state;
   switch(state) {
@@ -620,7 +638,7 @@ function stateTransition(_state) {
     break;
     case "WAIT":
     break;
-    case "CHECK":
+    case "BROWSE":
     break;
     case "MINGLE":
     break;
@@ -647,11 +665,29 @@ $(document).ready(function () {
   $('#answer_yes').button().click(function() {
     playSample('yes', true);
     $("#question-message").css("visibility","hidden");
+    publishMessage('log', {
+      type: 'questionAnswer',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        question: $("#question_content").text(),
+        answer: 'yes'
+      }
+    });
   })
 
   $('#answer_no').button().click(function() {
     playSample('no', true);
     $("#question-message").css("visibility","hidden");
+    publishMessage('log', {
+      type: 'questionAnswer',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        question: $("#question_content").text(),
+        answer: 'no'
+      }
+    });
   });
 
   $(".tenpercent").each(function() {
@@ -714,6 +750,15 @@ $(document).ready(function () {
   });
   
   $('#browse').click(function() {
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        prevState: 'EDIT',
+        currentState: 'BROWSE'
+      }
+    });
     getNextPattern();
   });
 
@@ -737,10 +782,13 @@ $(document).ready(function () {
     $("#bottom_banner").css("visibility", "hidden");
     $("#top_banner").css("visibility", "hidden");
     publishMessage('log', {
-      type: 'modify',
+      type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      info: {
+        prevState: 'BROWSE',
+        currentState: 'EDIT'
+      }
     });
   });
   
@@ -778,10 +826,14 @@ $(document).ready(function () {
     }
     
     publishMessage('log', {
-      type: 'exit',
+      type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: strScreenName + ' stopped mingling with ' + currentNickname
+      info: {
+        prevState: 'MINGLE',
+        currentState: 'BROWSE',
+        otherUser: currentNickname
+      }
     });
   });
   
@@ -829,7 +881,7 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == "EDIT" || state == "MINGLE" || state == "CHECK" || state == "WAIT") {
+    if (state == "EDIT" || state == "MINGLE" || state == "BROWSE" || state == "WAIT") {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -864,7 +916,7 @@ $(document).ready(function () {
       }
     }
 
-    if (state == "CHECK" || state == "MINGLE") {
+    if (state == "BROWSE" || state == "MINGLE") {
 
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
@@ -948,7 +1000,7 @@ $(document).ready(function () {
     } // end of if (state == "EDIT" || state == "MINGLE") {
 
 
-    if (state == "CHECK" || state == "MINGLE") {
+    if (state == "BROWSE" || state == "MINGLE") {
       
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
@@ -1067,7 +1119,10 @@ $(document).ready(function () {
         type: 'noteMove',
         user: strScreenName,
         timestamp: Math.floor(Date.now()),
-        info: 'N/A'
+        info: {
+          state: state,
+          pattern: pattern
+        }
       });
     }
   });
@@ -1132,7 +1187,10 @@ $(document).ready(function () {
         type: 'noteMove',
         user: strScreenName,
         timestamp: Math.floor(Date.now()),
-        info: 'N/A'
+        info: {
+          state: state,
+          pattern: pattern
+        }
       });
     }
   });

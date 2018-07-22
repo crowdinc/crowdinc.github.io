@@ -17,17 +17,11 @@ pubnub.subscribe({
   heartbeat: 15
 });
 
-$(document).ready(function() {
-  
-});
-
 var startTime;
-
-
 
 function parseMessage(m) {
   if (m.type == 'total refresh') window.location.reload();
-  if (m.type == 'golive') startTime = m.timestamp;
+  if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
   
   // add a row containing the info in the message
   $('#interactions').append('<div class="row">' + 
@@ -36,6 +30,7 @@ function parseMessage(m) {
                               '<div class="col-3">' + (m.timestamp - startTime) + '</div>' + 
                               '<div class="col-3">' + JSON.stringify(m.info) + '</div>' + 
                             '</div>');
+  window.scrollTo(0, document.body.scrollHeight);
 }
 
 
