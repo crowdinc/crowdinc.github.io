@@ -24,13 +24,18 @@ function parseMessage(m) {
   if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
   
   // add a row containing the info in the message
-  $('#interactions').append('<div class="row">' + 
-                              '<div class="col-3">' + m.type + '</div>' + 
-                              '<div class="col-3">' + m.user + '</div>' + 
-                              '<div class="col-3">' + (m.timestamp - startTime) + '</div>' + 
-                              '<div class="col-3">' + JSON.stringify(m.info) + '</div>' + 
-                            '</div>');
+  $('#actionsTable').append('<tr><td>' + m.type + '</td><td>' 
+                            + m.user + '</td><td>' 
+                            + (m.timestamp - startTime) + '</td><td>' 
+                            + JSON.stringify(m.info) +  '</td></tr>');
+  
+  
   window.scrollTo(0, document.body.scrollHeight);
 }
 
+$(document).ready(function() {
+  $('#csvButton').click(function() {
+    $('#actionsTable').table2CSV();
+  });
+});
 
