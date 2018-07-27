@@ -11,29 +11,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <script src="./js/pubnub-keys.js"></script>
+    <script src="./js/table2CSV.js"></script>
     <script src="./js/log.js"></script>
   </head>
   <body>
-    <h3>Logged interactions:</h3>
-    <div class="row">
-      <div class="col-3">
-        <h5>Action type:</h5>
-      </div>
-      <div class="col-3">
-        <h5>Acting user:</h5>
-      </div>
-      <div class="col-3">
-        <h5>Timestamp (ms since beginning):</h5>
-      </div>
-      <div class="col-3">
-        <h5>Additional info:</h5>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3" id="actionTypes"></div>
-      <div class="col-3" id="actingUsers"></div>
-      <div class="col-3" id="timestamps"></div>
-      <div class="col-3" id="info"></div>
-    </div>
+    <h3>Logged interactions:</h3> 
+    <table id="actionsTable">
+      <tr>
+        <th>Action type:</th>
+        <th>Acting user:</th>
+        <th>Timestamp (ms since beginning):</th>
+        <th>Additional info:</th>
+      </tr>
+    </table>
   </body>
 </html>

@@ -1,6 +1,10 @@
-/*window.onbeforeunload = function() {
-  return "";
-};*/
+window.onbeforeunload = function() {
+  //return "";
+  /*publishMessage('log', {
+    type: 'total refresh',
+    user: 'performer'
+  });*/
+};
 
 var DEBUG = false;
 var soundEnabled = false;
@@ -61,12 +65,24 @@ $(document).ready(function() {
       });
       event.preventDefault();
     }
+    publishMessage('log', {
+      type: $('#chat').val(),
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: $('#chat_message').val()
+    });
   });
   $('#standby').click(function() {
     console.log('standby');
     state = "STANDBY";
     soundEnabled = false;
     respondState();
+    publishMessage('log', {
+      type: 'standby',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
   });
   $('#golive').click(function() {
     console.log('golive');
@@ -75,7 +91,7 @@ $(document).ready(function() {
     respondState();
     publishMessage('log', {
       type: 'golive',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -87,7 +103,7 @@ $(document).ready(function() {
     window.location.reload();
     publishMessage('log', {
       type: 'refresh',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -99,7 +115,7 @@ $(document).ready(function() {
     respondState();
     publishMessage('log', {
       type: 'end',
-      user: 'Performer',
+      user: 'performer',
       timestamp: Math.floor(Date.now()),
       info: 'N/A'
     });
@@ -129,6 +145,12 @@ $(document).ready(function() {
         script: selectedText
       });
     }
+    publishMessage('log', {
+      type: 'codeSnippet',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: selectedText
+    });
   };
   var map = {"Shift-Enter": livecode};
   editor.addKeyMap(map);
@@ -178,6 +200,16 @@ function parseMessage(m) {
             index: m.index,
             nickname: m.nickname
           });
+          publishMessage('log', {
+            type: 'stateChange',
+            user: arrayUsers[m.index].nickname,
+            timestamp: Math.floor(Date.now()),
+            info: {
+              prevState: 'BROWSE',
+              currentState: 'MINGLE',
+              otherUser: m.nickname
+            }
+          });
           break;
         case 'liked':
           liked(m.index, m.likedindex);
@@ -208,7 +240,15 @@ function parseMessage(m) {
 
 // handler for presence events
 function performanceStatus(message) {
-  if (DEBUG) console.log("status: " + JSON.stringify(event));
+  if (message.action == 'join' && message.channel == 'performer') {
+    publishMessage('log', {
+      type: 'join',
+      user: 'performer',
+      timestamp: Math.floor(Date.now()),
+      info: 'N/A'
+    });
+  }
+  if (DEBUG) console.log('status: ' + JSON.stringify(event));
   // change backgroud of a disconnected user
   if (typeof message.action !== 'undefined') {
     if (message.action == 'timeout') {
@@ -535,6 +575,12 @@ function liked(likerIndex, likedIndex) {
         type: 'liked-response',
         nickname: likedUser.nickname,
         index: likedUser.index
+      });
+      publishMessage('log', {
+        type: 'match',
+        user: likerUser.nickname,
+        timestamp: Math.floor(Date.now()),
+        info: likerUser.nickname + ' matched with ' + likedUser.nickname
       });
     }
   }

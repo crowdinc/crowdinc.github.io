@@ -8,9 +8,6 @@ var pubnub = new PubNub({
 pubnub.addListener({
   message: function(m) {
     parseMessage(m.message);
-  },
-  presence: function(p) {
-    parsePresence(p);
   }
 });
 
@@ -20,20 +17,25 @@ pubnub.subscribe({
   heartbeat: 15
 });
 
-$(document).ready(function() {
-  
-});
-
 var startTime;
 
 function parseMessage(m) {
-  if (m.type == 'golive') startTime = m.timestamp;
-  $('#actionTypes').append(m.type + '<br/>');
-  $('#actingUsers').append(m.user + '<br/>');
-  $('#timestamps').append((m.timestamp - startTime) + '<br/>');
-  $('#info').append(JSON.stringify(m.info) + '<br/>');
+  if (m.type == 'total refresh') window.location.reload();
+  if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
+  
+  // add a row containing the info in the message
+  $('#actionsTable').append('<tr><td>' + m.type + '</td><td>' 
+                            + m.user + '</td><td>' 
+                            + (m.timestamp - startTime) + '</td><td>' 
+                            + JSON.stringify(m.info) +  '</td></tr>');
+  
+  
+  window.scrollTo(0, document.body.scrollHeight);
 }
 
-function parsePresence(p) {
+$(document).ready(function() {
+  $('#csvButton').click(function() {
+    $('#actionsTable').table2CSV();
+  });
+});
 
-}

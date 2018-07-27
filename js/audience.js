@@ -1,4 +1,4 @@
-var state = "NAME"; // it is either NAME, EDIT, WAIT, CHECK, MINGLE
+var state = "NAME"; // it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 var DEBUG = false;
 var performerState = "STANDBY";
 /*
@@ -7,10 +7,10 @@ State Diagram
 
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : 'next' msg sent
-WAIT -> CHECK : next-response msg received in "WAIT" state
-CHECK -> MINGLE : user press HEART button
-MINGLE -> CHECK : user press exit button
-CHECK -> EDIT : user press "update" button
+WAIT -> BROWSE : next-response msg received in "WAIT" state
+BROWSE -> MINGLE : user press HEART button
+MINGLE -> BROWSE : user press exit button
+BROWSE -> EDIT : user press "update" button
 
 */
 
@@ -344,6 +344,7 @@ var pubnub = PUBNUB.init({
 pubnub.subscribe({
     channel: my_id + ",audience",
     message: parseMessage,
+    presence: parsePresence,
     error: function (error) {
       // Handle error here
       console.log(JSON.stringify(error));
@@ -351,149 +352,6 @@ pubnub.subscribe({
     },
     heartbeat: 15
 });
-
-/*function parseMessage(message) {
-  if (DEBUG) {
-    console.log("message - received:" + JSON.stringify(message));
-  }
-  if (typeof message.nextDivName !== 'undefined') {
-    setNextDivName(message.nextDivName);
-  }
-  else if (typeof message.type !== 'undefined') {
-    if (message.type == "create-response") {
-      NORESPONSE1 = false;
-      if (message.res == "s") {
-        state = "EDIT";
-        $('#initial-message').bPopup().close();
-        strScreenName = $("#screenname").val();
-        $('#screenname_display').text(strScreenName);
-        myIndex = message.index;
-        lastPingTime = Date.now();
-        $("#submit_pane").css("visibility", "visible");
-        if (message.pattern) {
-          console.log('pattern exists');
-          for (var i = 0; i < message.pattern.length; ++i) {
-            pattern[i].setPosition(message.pattern[i].x, message.pattern[i].y);
-          }
-        }
-        publishMessage('performer', {
-          type: 'update',
-          index: myIndex,
-          tm: pattern
-        });
-      }
-      else {
-        $('#name_error_msg').text($('#screenname').val() + " is already taken.");
-      }
-    }
-    else if (message.type == "next-response") {
-      NORESPONSE3--;
-      patternElse = message.suggested_tm.tm;
-      currentNickname = message.suggested_tm.nickname;
-      currentIndex = message.suggested_tm.index;
-      $('#screenname_display').text(currentNickname);
-
-      for (var i = 0; i < patternElse.length - 1; i++) {
-        patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
-                                       patternElse[i+1].x * w, patternElse[i+1].y * h);
-      }
-      if (state == "WAIT") {
-        $("#bottom_banner").css("visibility", "visible");
-        $("#top_banner").css("visibility", "visible");
-        lastPingTimeElse = Date.now();
-        state = "CHECK";
-        $("#waiting-message").css("visibility", "hidden");
-      }
-    }
-    else if (message.type == "liked-response") {
-      if (message.index == myIndex) {
-        showMessage('error',  "I know! You like your tune.", true, 1000);
-      }
-      else if (liked.indexOf(message.index) == -1) {
-        showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
-        playSample("liked", true);
-      }
-      else {
-        showMessage('error', "It's a match! " + message.nickname + ' likes your tune, too!', true, 1000);
-        playSample("matched", true);
-      }
-    }
-    else if (message.type == "question") {
-      if (message.text.length > 0) {
-        $("#question_content").text(message.text);
-        $("#question-message").css("visibility", "visible");
-      }
-    }
-    else if (message.type == "scale") {
-      if (message.probability >= 0) {
-        if (message.probability > Math.random()) {
-          baseNote = message.baseNote;
-          selectedScale = message.scale;
-        }
-      }
-      else {
-        baseNote = message.baseNote;
-        selectedScale = message.scale;
-        showMessage("info", "The performer changed the scale.", true);
-      }
-    }
-    else if (message.type == "sound-toggle") {
-      if (message.probability >= 0) {
-        if (message.probability > Math.random()) {
-          soundEnabled = message.on;
-        }
-      }
-      else {
-        soundEnabled = message.on;
-      }
-    }
-    else if (message.type == "script") {
-      if (message.script) {
-        if (message.probability >= 0) {
-          if (message.probability > Math.random()) {
-            try {
-              eval(message.script);
-            } catch (e) {
-              console.log(e);
-            }
-          }
-        }
-        else {
-          try {
-            eval(message.script);
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      }
-    }
-    else if (message.type == "state-response") {
-      NORESPONSE2 = false;
-      soundEnabled = message.sound;
-      performerState = message.state;
-      if (performerState == "STANDBY") {
-        showMessage("warning", "STANDBY, Crowd in C is about to start.");
-        $("#STANDBY").css("visibility", "visible");
-      }
-      else if (performerState == "GOLIVE") {
-        hideAllMessages();
-        showMessage("success", "Let's go live!", true);
-        $("#STANDBY").css("visibility", "hidden");
-      }
-      else if (performerState == "END") {
-        hideAllMessages();
-        showMessage("success", "This is the end. (Applause)", true);
-        $("#STANDBY").css("visibility", "hidden");
-      }
-    }
-    else {
-      console.log("unhandled type:" + message.type);
-    }
-  }
-  else {
-    console.log(JSON.stringify(message));
-  }
-}*/
 
 function parseMessage(message) {
   if (DEBUG) console.log("message - received:" + JSON.stringify(message));
@@ -627,6 +485,23 @@ function parseMessage(message) {
   else console.log('undefined type, message: ', JSON.stringify(message));
 }
 
+var joinMessageSent = false;
+
+function parsePresence(p) {
+  if (p.action == 'join' && !joinMessageSent) {
+    console.log(p);
+    publishMessage('log', {
+      type: 'join',
+      user: 'audience',
+      timestamp: Math.floor(Date.now()),
+      info: {
+        uuid: my_id
+      }
+    });
+    joinMessageSent = true;
+  }
+}
+
 function next(elseIndex, elseNickname, elsePattern) {
   NORESPONSE3--;
   patternElse = elsePattern;
@@ -642,7 +517,7 @@ function next(elseIndex, elseNickname, elsePattern) {
     $("#bottom_banner").css("visibility", "visible");
     $("#top_banner").css("visibility", "visible");
     lastPingTimeElse = Date.now();
-    state = "CHECK";
+    state = "BROWSE";
     $("#waiting-message").css("visibility", "hidden");
   }
 }
@@ -753,21 +628,7 @@ function mingle() {
   }
 }
 
-function exit() {
-  state = "WAIT";
-  publishMessage("performer", {type :"whereami", index: myIndex});
-  $("#waiting-message").css("visibility", "visible");
-  $("#mingle_pane").css("visibility", "hidden");
-  $("#like_button_area").css("visibility", "hidden");
-  $("#liked_button_area").css("visibility", "hidden");
-
-  for (var i = 0; i < pattern.length; i++) {
-    pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
-    pattern[i].distance = originalPattern[i].distance;
-  }
-}
-
-// it is either NAME, EDIT, WAIT, CHECK, MINGLE
+// it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 function stateTransition(_state) {
   state = _state;
   switch(state) {
@@ -777,7 +638,7 @@ function stateTransition(_state) {
     break;
     case "WAIT":
     break;
-    case "CHECK":
+    case "BROWSE":
     break;
     case "MINGLE":
     break;
@@ -804,11 +665,29 @@ $(document).ready(function () {
   $('#answer_yes').button().click(function() {
     playSample('yes', true);
     $("#question-message").css("visibility","hidden");
+    publishMessage('log', {
+      type: 'questionAnswer',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        question: $("#question_content").text(),
+        answer: 'yes'
+      }
+    });
   })
 
   $('#answer_no').button().click(function() {
     playSample('no', true);
     $("#question-message").css("visibility","hidden");
+    publishMessage('log', {
+      type: 'questionAnswer',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        question: $("#question_content").text(),
+        answer: 'no'
+      }
+    });
   });
 
   $(".tenpercent").each(function() {
@@ -871,13 +750,16 @@ $(document).ready(function () {
   });
   
   $('#browse').click(function() {
-    getNextPattern();
-    /*publishMessage('log', {
-      type: 'browse',
+    publishMessage('log', {
+      type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: 'N/A'
-    });*/
+      info: {
+        prevState: 'EDIT',
+        currentState: 'BROWSE'
+      }
+    });
+    getNextPattern();
   });
 
   $('#nextPattern').click(function() {
@@ -900,10 +782,13 @@ $(document).ready(function () {
     $("#bottom_banner").css("visibility", "hidden");
     $("#top_banner").css("visibility", "hidden");
     publishMessage('log', {
-      type: 'modify',
+      type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      info: {
+        prevState: 'BROWSE',
+        currentState: 'EDIT'
+      }
     });
   });
   
@@ -925,6 +810,31 @@ $(document).ready(function () {
       nickname: currentNickname
     });
     mingle();
+  });
+  
+  $('#exit').click(function() {
+    state = "WAIT";
+    publishMessage("performer", {type :"whereami", index: myIndex});
+    $("#waiting-message").css("visibility", "visible");
+    $("#mingle_pane").css("visibility", "hidden");
+    $("#like_button_area").css("visibility", "hidden");
+    $("#liked_button_area").css("visibility", "hidden");
+
+    for (var i = 0; i < pattern.length; i++) {
+      pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
+      pattern[i].distance = originalPattern[i].distance;
+    }
+    
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      info: {
+        prevState: 'MINGLE',
+        currentState: 'BROWSE',
+        otherUser: currentNickname
+      }
+    });
   });
   
   var playBarNote = -1;
@@ -971,7 +881,7 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == "EDIT" || state == "MINGLE" || state == "CHECK" || state == "WAIT") {
+    if (state == "EDIT" || state == "MINGLE" || state == "BROWSE" || state == "WAIT") {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -1006,7 +916,7 @@ $(document).ready(function () {
       }
     }
 
-    if (state == "CHECK" || state == "MINGLE") {
+    if (state == "BROWSE" || state == "MINGLE") {
 
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
@@ -1090,7 +1000,7 @@ $(document).ready(function () {
     } // end of if (state == "EDIT" || state == "MINGLE") {
 
 
-    if (state == "CHECK" || state == "MINGLE") {
+    if (state == "BROWSE" || state == "MINGLE") {
       
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
@@ -1201,9 +1111,18 @@ $(document).ready(function () {
     }
     if (tempNoteID > -1 && minDistance < noteSize) {
       publishMessage('performer', {
-          type: 'update',
-          index: myIndex,
-          tm: pattern
+        type: 'update',
+        index: myIndex,
+        tm: pattern
+      });
+      publishMessage('log', {
+        type: 'noteMove',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        info: {
+          state: state,
+          pattern: pattern
+        }
       });
     }
   });
@@ -1263,6 +1182,15 @@ $(document).ready(function () {
         type: 'update',
         index: myIndex,
         tm: pattern
+      });
+      publishMessage('log', {
+        type: 'noteMove',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        info: {
+          state: state,
+          pattern: pattern
+        }
       });
     }
   });
