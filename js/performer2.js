@@ -69,7 +69,7 @@ $(document).ready(function() {
       type: $('#chat').val(),
       user: 'performer',
       timestamp: Math.floor(Date.now()),
-      info: $('#chat_message').val()
+      data1: $('#chat_message').val()
     });
   });
   $('#standby').click(function() {
@@ -80,8 +80,7 @@ $(document).ready(function() {
     publishMessage('log', {
       type: 'standby',
       user: 'performer',
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   });
   $('#golive').click(function() {
@@ -92,8 +91,7 @@ $(document).ready(function() {
     publishMessage('log', {
       type: 'golive',
       user: 'performer',
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   });
   $('#refresh').click(function() {
@@ -104,8 +102,7 @@ $(document).ready(function() {
     publishMessage('log', {
       type: 'refresh',
       user: 'performer',
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   });
   $('#end').click(function() {
@@ -116,8 +113,7 @@ $(document).ready(function() {
     publishMessage('log', {
       type: 'end',
       user: 'performer',
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   });
   var myTextArea = $('#code');
@@ -149,7 +145,7 @@ $(document).ready(function() {
       type: 'codeSnippet',
       user: 'performer',
       timestamp: Math.floor(Date.now()),
-      info: selectedText
+      data1: selectedText
     });
   };
   var map = {"Shift-Enter": livecode};
@@ -204,11 +200,9 @@ function parseMessage(m) {
             type: 'stateChange',
             user: arrayUsers[m.index].nickname,
             timestamp: Math.floor(Date.now()),
-            info: {
-              prevState: 'BROWSE',
-              currentState: 'MINGLE',
-              otherUser: m.nickname
-            }
+            data1: 'BROWSE',
+            data2: 'MINGLE',
+            data3: m.nickname
           });
           break;
         case 'liked':
@@ -245,9 +239,9 @@ function performanceStatus(message) {
       type: 'join',
       user: 'performer',
       timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      data1: pubnub.getUUID()
     });
-  }
+  };
   if (DEBUG) console.log('status: ' + JSON.stringify(event));
   // change backgroud of a disconnected user
   if (typeof message.action !== 'undefined') {
@@ -313,8 +307,7 @@ function create(userID, userNickname) {
     publishMessage('log', {
       type: 'create',
       user: userNickname,
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   }
   
@@ -346,8 +339,7 @@ function create(userID, userNickname) {
           publishMessage('log', {
             type: 'return',
             user: userNickname,
-            timestamp: Math.floor(Date.now()),
-            info: 'N/A'
+            timestamp: Math.floor(Date.now())
           });
           break;
         }
@@ -470,10 +462,8 @@ function next(userIndex) {
     type: 'next',
     user: arrayUsers[userIndex].nickname,
     timestamp: Math.floor(Date.now()),
-    info: {
-      previousFollow: previousFollow,
-      newFollow: newFollow
-    }
+    data1: previousFollow,
+    data2: newFollow
   });
 }
 
@@ -580,7 +570,8 @@ function liked(likerIndex, likedIndex) {
         type: 'match',
         user: likerUser.nickname,
         timestamp: Math.floor(Date.now()),
-        info: likerUser.nickname + ' matched with ' + likedUser.nickname
+        data1: likerUser.nickname,
+        data2: likedUser.nickname
       });
     }
   }
@@ -596,9 +587,7 @@ function liked(likerIndex, likedIndex) {
     type: 'like',
     user: likerUser.nickname,
     timestamp: Math.floor(Date.now()),
-    info: {
-      targetUser: likedUser.nickname
-    }
+    data1: likedUser.nickname
   });
 }
 
