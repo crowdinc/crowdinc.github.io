@@ -145,7 +145,7 @@ $(document).ready(function() {
       type: 'codeSnippet',
       user: 'performer',
       timestamp: Math.floor(Date.now()),
-      data1: selectedText
+      data1: '"' + selectedText + '"'
     });
   };
   var map = {"Shift-Enter": livecode};

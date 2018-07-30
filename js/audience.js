@@ -1102,13 +1102,14 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
+      var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
       if (state == 'EDIT' || state == 'MINGLE') {
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
           timestamp: Math.floor(Date.now()),
           data1: state,
-          data2: JSON.stringify(pattern)
+          data2: patternStr
         });
       }
     }
@@ -1170,13 +1171,14 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
+      var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
       if (state == 'EDIT' || state == 'MINGLE') {
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
           timestamp: Math.floor(Date.now()),
           data1: state,
-          data2: JSON.stringify(pattern)
+          data2: patternStr
         });
       }
     }
