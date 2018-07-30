@@ -27,7 +27,9 @@ function parseMessage(m) {
   $('#actionsTable').append('<tr><td>' + m.type + '</td><td>' 
                             + m.user + '</td><td>' 
                             + (m.timestamp - startTime) + '</td><td>' 
-                            + JSON.stringify(m.info) +  '</td></tr>');
+                            + m.data1 +  '</td><td>'
+                            + m.data2 +  '</td><td>'
+                            + m.data3 +  '</td></tr>');
   
   
   window.scrollTo(0, document.body.scrollHeight);

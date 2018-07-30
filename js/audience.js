@@ -494,9 +494,7 @@ function parsePresence(p) {
       type: 'join',
       user: 'audience',
       timestamp: Math.floor(Date.now()),
-      info: {
-        uuid: my_id
-      }
+      data1: my_id
     });
     joinMessageSent = true;
   }
@@ -669,10 +667,8 @@ $(document).ready(function () {
       type: 'questionAnswer',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: {
-        question: $("#question_content").text(),
-        answer: 'yes'
-      }
+      data1: $("#question_content").text(),
+      data2: 'yes'
     });
   })
 
@@ -683,10 +679,8 @@ $(document).ready(function () {
       type: 'questionAnswer',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: {
-        question: $("#question_content").text(),
-        answer: 'no'
-      }
+      data1: $("#question_content").text(),
+      data2: 'no'
     });
   });
 
@@ -754,10 +748,8 @@ $(document).ready(function () {
       type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: {
-        prevState: 'EDIT',
-        currentState: 'BROWSE'
-      }
+      data1: 'EDIT',
+      data2: 'BROWSE'
     });
     getNextPattern();
   });
@@ -771,8 +763,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'randomize',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      info: 'N/A'
+      timestamp: Math.floor(Date.now())
     });
   });
   
@@ -785,10 +776,8 @@ $(document).ready(function () {
       type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: {
-        prevState: 'BROWSE',
-        currentState: 'EDIT'
-      }
+      data1: 'BROWSE',
+      data2: 'EDIT'
     });
   });
   
@@ -829,11 +818,9 @@ $(document).ready(function () {
       type: 'stateChange',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      info: {
-        prevState: 'MINGLE',
-        currentState: 'BROWSE',
-        otherUser: currentNickname
-      }
+      data1: 'MINGLE',
+      data2: 'BROWSE',
+      data3: currentNickname
     });
   });
   
@@ -1115,15 +1102,15 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
-      publishMessage('log', {
-        type: 'noteMove',
-        user: strScreenName,
-        timestamp: Math.floor(Date.now()),
-        info: {
-          state: state,
-          pattern: pattern
-        }
-      });
+      if (state == 'EDIT' || state == 'MINGLE') {
+        publishMessage('log', {
+          type: 'noteMove',
+          user: strScreenName,
+          timestamp: Math.floor(Date.now()),
+          data1: state,
+          data2: JSON.stringify(pattern)
+        });
+      }
     }
   });
   
@@ -1183,15 +1170,15 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
-      publishMessage('log', {
-        type: 'noteMove',
-        user: strScreenName,
-        timestamp: Math.floor(Date.now()),
-        info: {
-          state: state,
-          pattern: pattern
-        }
-      });
+      if (state == 'EDIT' || state == 'MINGLE') {
+        publishMessage('log', {
+          type: 'noteMove',
+          user: strScreenName,
+          timestamp: Math.floor(Date.now()),
+          data1: state,
+          data2: JSON.stringify(pattern)
+        });
+      }
     }
   });
 });
