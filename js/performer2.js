@@ -49,11 +49,12 @@ pubnub.subscribe({
 
 $(document).ready(function() {
   divUsers = $('#users');
-  $('#broadcast').click(function(event) {
+  $('#broadcast').click(function() {
+    var newChatVal = $('#chat_message').val().replace(/'/g, "\\'")
     if ($('#chat').val() == 'question') {
       publishMessage('audience', {
         type: 'question',
-        text: $('#chat_message').val()
+        text: newChatVal
       });
       event.preventDefault();
     }
@@ -61,7 +62,7 @@ $(document).ready(function() {
       publishMessage('audience', {
         type: 'script',
         script: "showMessage('" + $("#chat").val() + "','" + 
-                            $('#chat_message').val() + "', true, 2000)"
+          newChatVal + "', true, 2000)"
       });
       event.preventDefault();
     }
@@ -69,7 +70,7 @@ $(document).ready(function() {
       type: $('#chat').val(),
       user: 'performer',
       timestamp: Math.floor(Date.now()),
-      data1: $('#chat_message').val()
+      data1: '"' + $('#chat_message').val().replace(/"/g, '""') + '"'
     });
   });
   $('#standby').click(function() {
