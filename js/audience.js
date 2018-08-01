@@ -291,8 +291,8 @@ function Note() {
 }
 
 Note.prototype.setPosition = function(x,y) {
-  this.x = x;
-  this.y = y;
+  this.x = x.toFixed(3);
+  this.y = y.toFixed(3);
 }
 
 function dist(x1,y1,x2,y2) {
@@ -1067,8 +1067,7 @@ $(document).ready(function () {
   function touchHandler() {
     //Assume only one touch/only process one touch even if there's more
     var e = event.targetTouches[0];
-    if (selectedNote < 0)
-      return;
+    if (selectedNote < 0) return;
 
     // Assign new coordinates to our object
     pattern[selectedNote].setPosition((e.pageX -  noteSize / 2) / w, (e.pageY -  noteSize / 2) / h);
@@ -1102,8 +1101,11 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
-      var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
       if (state == 'EDIT' || state == 'MINGLE') {
+        var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
+        for (var i = 0; i < pattern.length; ++i) {
+          pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
+        }
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
@@ -1171,8 +1173,12 @@ $(document).ready(function () {
         index: myIndex,
         tm: pattern
       });
-      var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
       if (state == 'EDIT' || state == 'MINGLE') {
+        for (var i = 0; i < pattern.length; ++i) {
+          pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
+        }
+        var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
+        
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,

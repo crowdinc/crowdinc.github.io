@@ -21,7 +21,14 @@ var startTime;
 
 function parseMessage(m) {
   if (m.type == 'total refresh') window.location.reload();
-  if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
+  else if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
+  else if (m.type == 'epoch') {
+    startTime = m.epoch;
+    return;
+  }
+  if (!m.data1) m.data1 = '';
+  if (!m.data2) m.data2 = '';
+  if (!m.data3) m.data3 = '';
   
   // add a row containing the info in the message
   $('#actions').append(m.type + ',' + m.user + ',' + (m.timestamp - startTime) 
@@ -42,6 +49,12 @@ function parseMessage(m) {
 $(document).ready(function() {
   $('#csvButton').click(function() {
     $('#actionsTable').table2CSV();
+  });
+  pubnub.publish({
+    channel: 'performer',
+    message: {
+      type: 'sendEpoch'
+    }
   });
 });
 
