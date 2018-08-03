@@ -100,7 +100,6 @@ $(document).ready(function() {
     // refreshes all users' pages
     console.log('refresh');
     publishMessage("audience", {type:"script", script:"refresh()"});
-    //window.location.reload();
     publishMessage('log', {
       type: 'refresh',
       user: 'performer',
@@ -199,9 +198,9 @@ function parseMessage(m) {
           break;
         case 'mingle':
           console.log('mingle received');
-          publishMessage(arrayUUIDs[m.index], {
+          var targetUser = arrayUsers[arrayUsers[m.index].follow];
+          publishMessage(targetUser.id, {
             type: 'mingle-request',
-            index: m.index,
             nickname: m.nickname
           });
           publishMessage('log', {

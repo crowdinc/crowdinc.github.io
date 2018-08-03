@@ -37,7 +37,7 @@ var currentNickname = ""
 
 var liked = new Array();
 
-var myMessages = ['info','warning','error','success', 'like'];
+var myMessages = ['info','warning','error','success', 'like', 'mingleRequest'];
 
 function hideAllMessages() {
   var messagesHeights = new Array(); // this array will store height for each
@@ -291,8 +291,8 @@ function Note() {
 }
 
 Note.prototype.setPosition = function(x,y) {
-  this.x = x.toFixed(3);
-  this.y = y.toFixed(3);
+  this.x = parseFloat(x).toFixed(3);
+  this.y = parseFloat(y).toFixed(3);
 }
 
 function dist(x1,y1,x2,y2) {
@@ -391,10 +391,7 @@ function parseMessage(message) {
                    message.suggested_tm.tm);
         break;
       case 'mingle-request':
-        //alert(message.nickname + ' wants to mingle :0');
-        /*$("#question_content").text(message.nickname + ' wants to mingle! Enter real-time mingle mode?');
-        $("#question-message").css("visibility", "visible");*/
-        
+        showMessage('mingleRequest', 'mingle request from ' + message.nickname, false);
         
         break;
       case 'liked-response': 
@@ -539,7 +536,6 @@ function publishMessage(channel, options) {
   }
 }
 
-
 function getNextPattern() {
   state = "WAIT";
   NORESPONSE3++;
@@ -554,7 +550,6 @@ function getNextPattern() {
   $(".bottom_banner2").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
   $("#waiting-message").css("visibility", "visible");
-  
 }
 
 // Set the name of the next div
@@ -796,10 +791,18 @@ $(document).ready(function () {
     publishMessage('performer', {
       type: 'mingle',
       index: myIndex,
-      nickname: currentNickname
+      nickname: strScreenName
     });
-    mingle();
+    //mingle();
   });
+  
+  $('#mingleYes').click(function() {
+    publishMessage('performer', {
+      type: 'mingleYes',
+      index: myIndex,
+      nickname: strScreenName
+    });
+  })
   
   $('#exit').click(function() {
     state = "WAIT";
@@ -926,7 +929,6 @@ $(document).ready(function () {
   }
 
   var animate = function() {
-
     window.requestAnimFrame(animate);
     if (state == "NAME")
       return;
@@ -985,7 +987,6 @@ $(document).ready(function () {
         }
       }
     } // end of if (state == "EDIT" || state == "MINGLE") {
-
 
     if (state == "BROWSE" || state == "MINGLE") {
       

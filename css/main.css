@@ -45,18 +45,6 @@ size_10{
 	font-size:10px;
 }
 
-#availables {
-  background-color: white;
-  color: black;
-  height: auto;
-}
-
-#unavailables {
-  background-color: white;
-  height: auto;
-  height: 100%;
-  border: 2px grey dashed;
-}
 .CodeMirror {
   border: 1px solid #eee;
   height: 100%!important;
@@ -374,32 +362,37 @@ h1,h2,h3,h4 {
      border-color: #3b8eb5;
 }
 
-.error{
+.error {
      background-color: #de4343;
      border-color: #c43d3d;
 }
 
 
-.error{
+.error {
      background-color: #FF3399;
      border-color: #99004C;
 }
 
-.warning{
+.warning {
      background-color: #eaaf51;
      border-color: #d99a36;
 }
 
-.success{
+.success {
      background-color: #61b832;
      border-color: #55a12c;
 }
 
-.message h3{
+.mingleRequest {
+  background-color: #d35400;
+  border-color: #dc7633
+}
+
+.message h3 {
      margin: 0 0 5px 0;
 }
 
-.message p{
+.message p {
      margin: 0;
 }
 
@@ -418,3 +411,17 @@ h1,h2,h3,h4 {
 	.span_1_of_4, .span_2_of_4, .span_3_of_4, .span_4_of_4 { width: 100%; }
 }
 */
+
+/*
+#availables {
+background-color: white;
+color: black;
+height: auto;
+}
+
+#unavailables {
+background-color: white;
+height: auto;
+height: 100%;
+border: 2px grey dashed;
+}*/
