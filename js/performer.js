@@ -200,17 +200,35 @@ function parseMessage(m) {
           console.log('mingle received');
           var targetUser = arrayUsers[arrayUsers[m.index].follow];
           publishMessage(targetUser.id, {
-            type: 'mingle-request',
+            type: 'mingleRequest',
+            index: m.index,
             nickname: m.nickname
           });
-          publishMessage('log', {
+          /*publishMessage('log', {
             type: 'stateChange',
             user: arrayUsers[m.index].nickname,
             timestamp: Math.floor(Date.now()),
             data1: 'BROWSE',
             data2: 'MINGLE',
             data3: m.nickname
+          });*/
+          break;
+        case 'mingleYes':
+          publishMessage(arrayUsers[m.index].id, {
+            type: 'beginMingle',
+            index: m.sender,
+            nickname: arrayUsers[m.sender].nickname,
+            pattern: arrayUsers[m.sender].pattern
           });
+          publishMessage(arrayUsers[m.sender].id, {
+            type: 'beginMingle',
+            index: m.index,
+            nickname: m.nickname,
+            pattern: m.pattern
+          });
+          break;
+        case 'mingleNo':
+          
           break;
         case 'liked':
           liked(m.index, m.likedindex);
@@ -395,7 +413,7 @@ function update(userIndex, userPattern) {
     else {
       var suggested = followed;
       publishMessage(user.id, {
-        "type": 'next-response',
+        "type": 'nextResponse',
         "suggested_tm": {
           "nickname": suggested.nickname,
           "index": suggested.index,
@@ -453,7 +471,7 @@ function next(userIndex) {
     
     // sends next pattern to user
     publishMessage(user.id, {
-      "type": 'next-response',
+      "type": 'nextResponse',
       "suggested_tm": {
         "nickname": suggested.nickname,
         "index": suggested.index,
@@ -500,7 +518,7 @@ function get_next_user_to_follow(userIndex) {
     suggestedIndex = userIndex;
     var suggested = arrayUsers[suggestedIndex];
     publishMessage(arrayUsers[userIndex].id, {
-      type: 'next-response',
+      type: 'nextResponse',
       'suggested_tm': {
         'nickname': suggested.nickname,
         'index': suggested.index,
@@ -525,7 +543,7 @@ function inform(userIndex) {
     else {
       var suggested = arrayUsers[followed];
       publishMessage(arrayusers[userIndex].id, {
-        "type": 'next-response',
+        "type": 'nextResponse',
         'suggested_tm': {
           'nickname': suggested.nickname,
           'index': suggested.index,
@@ -558,7 +576,7 @@ function liked(likerIndex, likedIndex) {
     likedUser.likedby.push(likerIndex);
     // notify liked user
     publishMessage(likedUser.id, {
-      type: 'liked-response',
+      type: 'likedResponse',
       nickname: likerUser.nickname,
       index: likerUser.index
     });
@@ -570,7 +588,7 @@ function liked(likerIndex, likedIndex) {
     // it's a match!
     if (likedUser.likes.indexOf(likerIndex) != -1 && likerIndex != likedIndex) {
       publishMessage(likerUser.id, {
-        type: 'liked-response',
+        type: 'likedResponse',
         nickname: likedUser.nickname,
         index: likedUser.index
       });

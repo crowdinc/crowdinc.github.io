@@ -7,7 +7,7 @@ State Diagram
 
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : 'next' msg sent
-WAIT -> BROWSE : next-response msg received in "WAIT" state
+WAIT -> BROWSE : nextResponse msg received in "WAIT" state
 BROWSE -> MINGLE : user press HEART button
 MINGLE -> BROWSE : user press exit button
 BROWSE -> EDIT : user press "update" button
@@ -24,7 +24,7 @@ var compressor;
 var reverb;
 var myIndex;
 var strScreenName;
-var currentIndex;
+var indexElse;
 var w;
 var h;
 var noteSize;
@@ -33,7 +33,10 @@ var pattern = [];
 var originalPattern = [];
 var patternElse = [];
 var patternSize = 5;
-var currentNickname = ""
+var nicknameElse = "";
+
+// index of the user who sent this user a mingle request
+var requestFrom = -1;
 
 var liked = new Array();
 
@@ -386,15 +389,19 @@ function parseMessage(message) {
           $('#name_error_msg').text($('#screenname').val() + " is already taken.");
         }
         break;
-      case 'next-response':
+      case 'nextResponse':
         setTimeout(next, 500, message.suggested_tm.index, message.suggested_tm.nickname,
                    message.suggested_tm.tm);
         break;
-      case 'mingle-request':
+      case 'mingleRequest':
         showMessage('mingleRequest', 'mingle request from ' + message.nickname, false);
-        
+        requestFrom = message.index;
         break;
-      case 'liked-response': 
+      case 'beginMingle':
+        setTimeout(next, 500, message.index, message.nickname, message.pattern);
+        mingle();
+        break;
+      case 'likedResponse': 
         if (message.index == myIndex) {
           showMessage('error',  "I know! You like your tune.", true, 1000);
         }
@@ -403,7 +410,8 @@ function parseMessage(message) {
           playSample("liked", true);
         }
         else {
-          showMessage('error', "It's a match! " + message.nickname + ' likes your tune, too!', true, 1000);
+          showMessage('error', "It's a match! " + message.nickname + 
+                      ' likes your tune, too!', true, 1000);
           playSample("matched", true);
         }
         break;
@@ -500,9 +508,9 @@ function parsePresence(p) {
 function next(elseIndex, elseNickname, elsePattern) {
   NORESPONSE3--;
   patternElse = elsePattern;
-  currentNickname = elseNickname;
-  currentIndex = elseIndex;
-  $('#screenname_display').text(currentNickname);
+  nicknameElse = elseNickname;
+  indexElse = elseIndex;
+  $('#screenname_display').text(nicknameElse);
 
   for (var i = 0; i < patternElse.length - 1; i++) {
     patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
@@ -603,7 +611,7 @@ function mingle() {
   $("#like_button_area").css("visibility", "visible");
   $("#liked_button_area").css("visibility", "visible");
 
-  if (liked.indexOf(currentIndex) == -1) {
+  if (liked.indexOf(indexElse) == -1) {
     $("#like_button_area").css("display", "block");
     $("#liked_button_area").css("display", "none");
   }
@@ -780,9 +788,9 @@ $(document).ready(function () {
     publishMessage("performer", {
       type: "liked", 
       index: myIndex, 
-      likedindex: currentIndex
+      likedindex: indexElse
     });
-    liked.push(currentIndex);
+    liked.push(indexElse);
     $("#like_button_area").css("display", "none");
     $("#liked_button_area").css("display", "block");
   });
@@ -800,9 +808,22 @@ $(document).ready(function () {
     publishMessage('performer', {
       type: 'mingleYes',
       index: myIndex,
-      nickname: strScreenName
+      nickname: strScreenName,
+      pattern: pattern,
+      sender: requestFrom
     });
-  })
+    requestFrom = -1;
+  });
+  
+  $('#mingleNo').click(function() {
+    publishMessage('performer', {
+      type: 'mingleNo',
+      index: myIndex,
+      nickname: strScreenName,
+      sender: requestFrom
+    });
+    requestFrom = -1;
+  });
   
   $('#exit').click(function() {
     state = "WAIT";
@@ -823,7 +844,7 @@ $(document).ready(function () {
       timestamp: Math.floor(Date.now()),
       data1: 'MINGLE',
       data2: 'BROWSE',
-      data3: currentNickname
+      data3: nicknameElse
     });
   });
   
