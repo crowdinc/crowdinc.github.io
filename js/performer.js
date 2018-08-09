@@ -410,7 +410,7 @@ function getUserToFollow(userIndex, direction) {
   var suggestedIndex = -1;
   
   // initial assignment of follow - chooses a random user
-  if (user.follow == '') {
+  if (user.follow === '') {
     suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
     if (suggestedIndex == userIndex) {
       // wraps around if end of queue is reached, via %
