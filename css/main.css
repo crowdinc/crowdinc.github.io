@@ -9,17 +9,16 @@ body {
 	min-height: 400px;
 
 }
-.msg_header{
+.msg_header {
   color : black;
   font-size: 40px;
   font-weight: bold;
 }
 .ui-selectmenu-text {
-font-size: 12px !important;
+  font-size: 12px !important;
 }
 .ui-button,  .ui-button-text .ui-button {
-font-size: 12px !important;
-
+  font-size: 12px !important;
 }
 
 .my-textfield {
@@ -31,17 +30,7 @@ font-size: 12px !important;
     width:100%;
 }
 
-.chat_div{
-	display: table;
-	width:100%;
-}
-.chat_row{
-	display: table-cell;
-	vertical-align: middle;
-	padding : 2px;
-}
-
-size_10{
+size_10 {
 	font-size:10px;
 }
 
@@ -56,38 +45,6 @@ size_10{
   height: 100%;
 	width:100%;
   border: 2px grey solid;
-}
-
-.unavailable {
-  background-color: yellow;
-  width: 50%;
-  max-width:100px;
-  padding: 10px;
-  margin: 0 auto 10px;
-}
-
-.unavailable-editing {
-  background-color: orange;
-  width: 50%;
-  max-width:100px;
-  padding: 10px;
-  margin: 0 auto 10px;
-}
-
-.available {
-  background-color: white;
-  width: auto;
-  float: left;
-  padding: 10px;
-  margin: 10px;
-}
-
-.available-editing {
-  background-color: grey;
-  width: 20%;
-  float: left;
-  padding: 10px;
-  margin: 10px;
 }
 
 .modalDialog {
@@ -151,41 +108,16 @@ h1,h2,h3,h4 {
 	min-width: 90px;
 }
 
-/*  COLUMN SETUP  */
-.col-left {
-	display: block;
-	float:left;
-}
-.col-right {
-	display: block;
-	float:right;
-}
-.col:first-child { margin-left: 0; }
+/*.col:first-child { margin-left: 0; }
 
-/*  COLUMN SETUP  */
+  //COLUMN SETUP  
 .col {
 	display: block;
 	float:left;
-}
-/*  GRID OF FIVE  */
-.span_5_of_5 {
-	width: 100%;
-}
-.span_4_of_5 {
-	width: 79.68%;
-}
-.span_3_of_5 {
-	width: 65.0%;
-}
-.span_2_of_5 {
-	width: 39.04%;
-}
-.span_1_of_5 {
-	width: 15.0%;
-}
+}*/
 
 
-.top_banner{
+.top_banner {
 	position: fixed;
 	width:100%;
 	height:12%;
@@ -205,7 +137,7 @@ h1,h2,h3,h4 {
     max-height: 100%;
 }
 
-.bottom_pane{
+.bottom_pane {
 	width:100%;
 	height:10%;
 	opacity:0.7;
@@ -215,7 +147,7 @@ h1,h2,h3,h4 {
 	text-align: center;
 }
 
-.bottom_banner{
+.bottom_banner {
 	position: fixed;
 	width:100%;
 	height:12%;
@@ -230,7 +162,7 @@ h1,h2,h3,h4 {
 	visibility: hidden;
 }
 
-.bottom_banner2{
+.bottom_banner2 {
 	position: fixed;
 	width:100%;
 	height:10%;
@@ -244,7 +176,7 @@ h1,h2,h3,h4 {
 	visibility: hidden;
 }
 
-.fullscreenblock{
+.fullscreenblock {
 	position:fixed;
 	left:0px;
 	top:0px;
@@ -261,22 +193,6 @@ h1,h2,h3,h4 {
 .group:after { content:""; display:table; }
 .group:after { clear:both;}
 .group { zoom:1; /* For IE 6/7 */ }
-/*  GRID OF FOUR  */
-.span_4_of_4 {
-	width: 99%;
-}
-.span_3_of_4 {
-	width: 74.6%;
-}
-.span_2_of_4_ {
-	width: 49%;
-}
-.span_2_of_4 {
-	width: 50%;
-}
-.span_1_of_4 {
-	width: 22.8%;
-}
 
 .banner{
 	display: table;
@@ -289,33 +205,33 @@ h1,h2,h3,h4 {
   vertical-align: middle;
   line-height: normal;
   text-align: center;
+  font-size: 1.4vmin;
 }
-.center{
+.center {
 	text-align: center;
 }
 
-.border{
+.border {
 	border:solid;
 	box-sizing:border-box;
   	-moz-box-sizing:border-box;
   	-webkit-box-sizing:border-box;
 }
 
-.height_50{
+.height_50 {
 	height:50%;
-
 }
-.height_25{
+.height_25 {
 	height:25%;
 }
-.height_100{
+.height_100 {
 	height:100%;
 }
-.red{
+.red {
 	color: red;
 }
 
-.dialog-message{
+.dialog-message {
     font-family: Courier New;
     width:70%;
     max-width:70%;
@@ -331,7 +247,7 @@ h1,h2,h3,h4 {
     background: -o-linear-gradient(#fff, #999);
 }
 
-.editor{
+.editor {
 	position:fixed!important;
 	bottom:10px;
 	right:10px;
@@ -340,7 +256,7 @@ h1,h2,h3,h4 {
 	resize: both;
 }
 
-.message{
+.message {
     background-size: 40px 40px;
     background-image: linear-gradient(135deg, rgba(255, 255, 255, .05) 25%, transparent 25%,
                         transparent 50%, rgba(255, 255, 255, .05) 50%, rgba(255, 255, 255, .05) 75%,
@@ -357,7 +273,7 @@ h1,h2,h3,h4 {
      z-index:2;
 }
 
-.info{
+.info {
      background-color: #4ea5cd;
      border-color: #3b8eb5;
 }

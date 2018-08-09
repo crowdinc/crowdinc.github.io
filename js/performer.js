@@ -13,7 +13,6 @@ var STOPWORKING = false;
 var arrayUUIDs = [];
 var arrayUniqueNicknames = [];
 var arrayUsers = [];
-var arrayWaitingPeople = [];
 var indexMostLiked = -1;
 var likesMostLiked = 0;
 var indexMostFollowed = -1;
@@ -178,13 +177,16 @@ function parseMessage(m) {
           })
           break;
         case 'create':
-          create(m.my_id, m.nickname);
+          create(m.myID, m.nickname);
           break;
         case 'update':
           update(m.index, m.tm);
           break;
+        case 'prev':
+          followNew(m.index, 'prev');
+          break;
         case 'next':
-          next(m.index);
+          followNew(m.index, 'next');
           break;
         case 'whereami':
           // gives user position in queue
@@ -194,7 +196,7 @@ function parseMessage(m) {
           unfollow(m.index);
           break;
         case 'state':
-          respondState(m.my_id);
+          respondState(m.myID);
           break;
         case 'mingle':
           console.log('mingle received');
@@ -229,6 +231,12 @@ function parseMessage(m) {
           break;
         case 'mingleNo':
           
+          break;
+        case 'exitMingle':
+          var user = arrayUsers[m.index];
+          publishMessage(arrayUsers[user.follow], {
+            type: 'stopMingle'
+          });
           break;
         case 'liked':
           liked(m.index, m.likedindex);
@@ -316,17 +324,17 @@ function create(userID, userNickname) {
       id: userID,
       nickname: userNickname,
       index: index,
-      pattern: "",
-      mode: "editing",
-      follow: "",
+      pattern: '',
+      mode: 'editing',
+      follow: '',
       followers: [],
       likes: [],
       likedby: []
     };
     arrayUsers.push(user);
     publishMessage(userID, {
-      type: "create-response",
-      res: "s",
+      type: 'create-response',
+      res: 's',
       index: index
     });
     displayUser(index);
@@ -387,44 +395,59 @@ function displayUser(index) {
   user.obj = newDiv;
   user.obj.find('.stats').css("display", "");
   $('#users').append(user.obj);
-  if (arrayWaitingPeople.length > 0) {
-    for (var i = 0; i < arrayWaitingPeople.length; i++) {
-      next(arrayWaitingPeople[i]);
-    }
-    arrayWaitingPeople = [];
-  }
 }
 //TODO: browse function for initial following
 function update(userIndex, userPattern) {
   var user = arrayUsers[userIndex];
   if (!user) return;
   user.obj.css("background", "");
-  
   user.pattern = userPattern;
-  
   user.mode = "following";
+}
+
+function getUserToFollow(userIndex, direction) {
+  var user = arrayUsers[userIndex];
+  var suggestedIndex = -1;
   
-  // if user is following someone
-  /*if (user.follow !== "") { 
-    var followed = arrayUsers[user.follow];
-    if (arrayUsers.indexOf(followed) == -1) {
-      next(user.index);
-    }
-    else {
-      var suggested = followed;
-      publishMessage(user.id, {
-        "type": 'nextResponse',
-        "suggested_tm": {
-          "nickname": suggested.nickname,
-          "index": suggested.index,
-          "tm": suggested.pattern
-        }
-      });
+  // initial assignment of follow - chooses a random user
+  if (user.follow == '') {
+    suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
+    if (suggestedIndex == userIndex) {
+      // wraps around if end of queue is reached, via %
+      suggestedIndex = (suggestedIndex + 1) % arrayUsers.length;
     }
   }
   else {
-    next(user.index);
-  }*/
+    if (direction == 'next') {
+      suggestedIndex = (user.follow + 1) % arrayUsers.length;
+      if (suggestedIndex == userIndex) {
+        suggestedIndex = (suggestedIndex + 1) % arrayUsers.length;
+      }
+    }
+    else if (direction == 'prev') {
+      suggestedIndex = (user.follow - 1);
+      // wraps around if beginning of queue is reached
+      if (suggestedIndex < 0) suggestedIndex = arrayUsers.length - 1;
+      if (suggestedIndex == userIndex) {
+        suggestedIndex--;
+        if (suggestedIndex < 0) suggestedIndex = arrayUsers.length - 1;
+      }
+    }
+  }
+
+  if (suggestedIndex == userIndex) {
+    console.log('nobody else to follow!');
+    publishMessage(arrayUsers[userIndex].id, {
+      type: 'newFollowResponse',
+      direction: direction,
+      suggested_tm: {
+        nickname: user.nickname,
+        index: user.index,
+        tm: user.pattern
+      }
+    });
+  }
+  return suggestedIndex;
 }
 
 // user at userIndex unfollows whoever they are following
@@ -439,13 +462,14 @@ function unfollow(userIndex) {
   updateDiv(user.follow);
 }
 
-// unfollows the current followed user and follows the next in line
-function next(userIndex) {
+// unfollows the current followed user and follows the next/previous in line
+function followNew(userIndex, direction) {
   var user = arrayUsers[userIndex];
-  user.obj.css("background", "");
-  var suggestedIndex = get_next_user_to_follow(userIndex);
+  user.obj.css('background', '');
+  var suggestedIndex = getUserToFollow(userIndex, direction);
   var previousFollow = '';
-  var newFollow = arrayUsers[userIndex].nickname;
+  // defaults to following self
+  var newFollow = user.nickname;;
   
   // if user is following someone
   if (user.follow !== '') {
@@ -454,42 +478,39 @@ function next(userIndex) {
   }
   else previousFollow = 'N/A';
   
-  if (suggestedIndex != -1) {
-    var suggested = arrayUsers[suggestedIndex];
-    
-    // follow
-    user.follow = suggestedIndex;
-    suggested.followers.push(user.index);
-    
-    updateDiv(suggestedIndex);
-    
-    if (suggested.followers.length > followersMostFollowed) {
-      indexMostFollowed = suggested.index;
-      followersMostFollowed = suggested.followers.length;
-      $('#most-followed').text(suggested.nickname);
+  var suggested = arrayUsers[suggestedIndex];
+
+  // follow
+  user.follow = suggestedIndex;
+  suggested.followers.push(user.index);
+
+  updateDiv(suggestedIndex);
+
+  if (suggested.followers.length > followersMostFollowed) {
+    indexMostFollowed = suggested.index;
+    followersMostFollowed = suggested.followers.length;
+    $('#most-followed').text(suggested.nickname);
+  }
+
+  // sends new pattern to user
+  publishMessage(user.id, {
+    type: 'newFollowResponse',
+    direction: direction,
+    suggested_tm: {
+      nickname: suggested.nickname,
+      index: suggested.index,
+      tm: suggested.pattern
     }
-    
-    // sends next pattern to user
-    publishMessage(user.id, {
-      "type": 'nextResponse',
-      "suggested_tm": {
-        "nickname": suggested.nickname,
-        "index": suggested.index,
-        "tm": suggested.pattern
-      }
-    });
-    newFollow = suggested.nickname;
-  }
-  // no user to follow
-  else {
-    arrayWaitingPeople.push(user.index);
-  }
+  });
+  newFollow = suggested.nickname;
+  
   publishMessage('log', {
-    type: 'next',
+    type: 'newFollow',
     user: arrayUsers[userIndex].nickname,
     timestamp: Math.floor(Date.now()),
-    data1: previousFollow,
-    data2: newFollow
+    data1: direction,
+    data2: previousFollow,
+    data3: newFollow
   });
 }
 
@@ -497,64 +518,33 @@ function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function get_next_user_to_follow(userIndex) {
-  var user = arrayUsers[userIndex];
-  
-  // if user is already following someone
-  if (user.follow !== "") {
-    suggestedIndex = (user.follow + 1) % arrayUsers.length;
-    if (suggestedIndex == userIndex) {
-      suggestedIndex = (suggestedIndex + 1) % arrayUsers.length;
-    }
-  }
-  
-  // initial assignment of follow - chooses a random user
-  else {
-    var suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
-  }
-  
-  if (suggestedIndex == userIndex) {
-    console.log('nobody else to follow!');
-    suggestedIndex = userIndex;
-    var suggested = arrayUsers[suggestedIndex];
-    publishMessage(arrayUsers[userIndex].id, {
-      type: 'nextResponse',
-      'suggested_tm': {
-        'nickname': suggested.nickname,
-        'index': suggested.index,
-        'tm': suggested.pattern
-      }
-    });
-  }
-  return suggestedIndex;
-}
-
 // tells user where they are in queue - gets next user to follow
 function inform(userIndex) {
   var user = arrayUsers[userIndex];
   if (!user) return;
   
-  if (user.follow !== "") {
+  if (user.follow !== '') {
     var followed = user.follow;
     if (arrayUsers.indexOf(followed) == -1) {
-      next(user.index);
+      followNew(user.index, 'next');
       console.log('arrayUsers -1: was following user that left');
     }
     else {
       var suggested = arrayUsers[followed];
       publishMessage(arrayusers[userIndex].id, {
-        "type": 'nextResponse',
-        'suggested_tm': {
-          'nickname': suggested.nickname,
-          'index': suggested.index,
-          'tm': suggested.pattern
+        type: 'newFollowResponse',
+        direction: 'next',
+        suggested_tm: {
+          nickname: suggested.nickname,
+          index: suggested.index,
+          tm: suggested.pattern
         }
       });
       console.log('followed -1: was following user that left (?)');
     }
   }
   else {
-    next(user.index);
+    followNew(user.index, 'next');
   }
 }
 

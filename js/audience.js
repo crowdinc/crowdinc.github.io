@@ -329,7 +329,7 @@ function textAlphanumeric(inputText) {
 }
 
 // get/create/store UUID
-var my_id = PUBNUB.db.get('session') || (function() {
+var myID = PUBNUB.db.get('session') || (function() {
     var uuid = PUBNUB.uuid();
     PUBNUB.db.set('session', uuid);
     return uuid;
@@ -339,13 +339,13 @@ var my_id = PUBNUB.db.get('session') || (function() {
 var pubnub = PUBNUB.init({
     publish_key: publishKey,
     subscribe_key: subscribeKey,
-    uuid: my_id,
+    uuid: myID,
     ssl : (('https:' == document.location.protocol) ? true : false)
 });
 
 // Subscribe to a channel
 pubnub.subscribe({
-    channel: my_id + ",audience",
+    channel: myID + ",audience",
     message: parseMessage,
     presence: parsePresence,
     error: function (error) {
@@ -389,17 +389,21 @@ function parseMessage(message) {
           $('#name_error_msg').text($('#screenname').val() + " is already taken.");
         }
         break;
-      case 'nextResponse':
-        setTimeout(next, 500, message.suggested_tm.index, message.suggested_tm.nickname,
-                   message.suggested_tm.tm);
+      case 'newFollowResponse':
+        setTimeout(browse, 500, message.suggested_tm.index, 
+                   message.suggested_tm.nickname, message.suggested_tm.tm);
         break;
       case 'mingleRequest':
         showMessage('mingleRequest', 'mingle request from ' + message.nickname, false);
         requestFrom = message.index;
         break;
       case 'beginMingle':
-        setTimeout(next, 500, message.index, message.nickname, message.pattern);
+        setTimeout(browse, 500, message.index, message.nickname, message.pattern);
+        $(".bottom_banner2").css("visibility", "hidden");
         mingle();
+        break;
+      case 'stopMingle':
+        exit();
         break;
       case 'likedResponse': 
         if (message.index == myIndex) {
@@ -499,13 +503,13 @@ function parsePresence(p) {
       type: 'join',
       user: 'audience',
       timestamp: Math.floor(Date.now()),
-      data1: my_id
+      data1: myID
     });
     joinMessageSent = true;
   }
 }
 
-function next(elseIndex, elseNickname, elsePattern) {
+function browse(elseIndex, elseNickname, elsePattern) {
   NORESPONSE3--;
   patternElse = elsePattern;
   nicknameElse = elseNickname;
@@ -544,16 +548,35 @@ function publishMessage(channel, options) {
   }
 }
 
-function getNextPattern() {
-  state = "WAIT";
+function getPrevPattern() {
+  state = 'WAIT';
+  NORESPONSE3++;
+  for (var i = 0; i < patternElse.length - 1; i++) {
+    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
+  }
+  publishMessage('performer', {
+    type: 'prev', 
+    index: myIndex
+  });
+  
+  $(".bottom_banner2").css("visibility", "hidden");
+  $("#top_banner").css("visibility", "hidden");
+  $("#waiting-message").css("visibility", "visible");
+}
+
+function getNewPattern(direction) {
+  state = 'WAIT';
   NORESPONSE3++;
   
   for (var i = 0; i < patternElse.length - 1; i++) {
     patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
                                    patternElse[i+1].x * w, patternElse[i+1].y * h);
   }
-  
-  publishMessage("performer", {type:"next", index: myIndex});
+  publishMessage('performer', {
+    type: direction, 
+    index: myIndex
+  });
 
   $(".bottom_banner2").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
@@ -608,16 +631,19 @@ function update() {
 function mingle() {
   state = "MINGLE";
   $("#mingle_pane").css("visibility", "visible");
-  $("#like_button_area").css("visibility", "visible");
-  $("#liked_button_area").css("visibility", "visible");
+  $("#like").css("visibility", "visible");
+  /*$("#like_button_area").css("visibility", "visible");
+  $("#liked_button_area").css("visibility", "visible");*/
 
   if (liked.indexOf(indexElse) == -1) {
-    $("#like_button_area").css("display", "block");
-    $("#liked_button_area").css("display", "none");
+    /*$("#like_button_area").css("display", "block");
+    $("#liked_button_area").css("display", "none");*/
+    $('#like').removeClass('red');
   }
   else {
-    $("#like_button_area").css("display", "none");
-    $("#liked_button_area").css("display", "block");
+    /*$("#like_button_area").css("display", "none");
+    $("#liked_button_area").css("display", "block");*/
+    $('#like').addClass('red');
   }
   $("#bottom_banner").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
@@ -697,7 +723,7 @@ $(document).ready(function () {
   (function loopPublish2() {
     setTimeout(function() {
       if (NORESPONSE2) {
-        publishMessage("performer", {type:"state", my_id:my_id});
+        publishMessage("performer", {type:"state", myID:myID});
         loopPublish2();
       }
     }, 3000);
@@ -720,11 +746,11 @@ $(document).ready(function () {
       return;
     }
     NORESPONSE1 = true;
-    publishMessage("performer", {"type":"create", "my_id": my_id, "nickname": strScreenName});
+    publishMessage("performer", {"type":"create", "myID": myID, "nickname": strScreenName});
     (function loopPublish1() {
       setTimeout(function() {
         if (NORESPONSE1) {
-          publishMessage("performer", {"type":"create", "my_id":my_id, "nickname": strScreenName});
+          publishMessage("performer", {"type":"create", "myID":myID, "nickname": strScreenName});
           loopPublish1();
         }
       }, 3000);
@@ -754,11 +780,15 @@ $(document).ready(function () {
       data1: 'EDIT',
       data2: 'BROWSE'
     });
-    getNextPattern();
+    getNewPattern('next');
   });
 
   $('#nextPattern').click(function() {
-    getNextPattern();
+    getNewPattern('next');
+  });
+  
+  $('#prevPattern').click(function() {
+    getNewPattern('prev');
   });
   
   $('#randomize').click(function() {
@@ -791,8 +821,9 @@ $(document).ready(function () {
       likedindex: indexElse
     });
     liked.push(indexElse);
-    $("#like_button_area").css("display", "none");
-    $("#liked_button_area").css("display", "block");
+    /*$("#like_button_area").css("display", "none");
+    $("#liked_button_area").css("display", "block");*/
+    $('#like').addClass('red');
   });
   
   $('#mingle').click(function() {
@@ -826,18 +857,33 @@ $(document).ready(function () {
   });
   
   $('#exit').click(function() {
-    state = "WAIT";
-    publishMessage("performer", {type :"whereami", index: myIndex});
+    publishMessage('performer', {
+      type: 'exitMingle',
+      index: myIndex,
+      nickname: strScreenName,
+      id: myID
+    });
+    exit();
+  });
+  
+  function exit() {
+    state = 'WAIT';
+    publishMessage('performer', {
+      type: 'whereami', 
+      index: myIndex
+    });
+    
     $("#waiting-message").css("visibility", "visible");
     $("#mingle_pane").css("visibility", "hidden");
-    $("#like_button_area").css("visibility", "hidden");
-    $("#liked_button_area").css("visibility", "hidden");
-
+    /*$("#like_button_area").css("visibility", "hidden");
+    $("#liked_button_area").css("visibility", "hidden");*/
+    $('#like').css('visibility', 'hidden');
+    
     for (var i = 0; i < pattern.length; i++) {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
       pattern[i].distance = originalPattern[i].distance;
     }
-    
+
     publishMessage('log', {
       type: 'stateChange',
       user: strScreenName,
@@ -846,7 +892,7 @@ $(document).ready(function () {
       data2: 'BROWSE',
       data3: nicknameElse
     });
-  });
+  }
   
   var playBarNote = -1;
   var playBarNoteElse = -1;

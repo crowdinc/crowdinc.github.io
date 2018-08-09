@@ -5,91 +5,87 @@
     <title>Crowd in C - audience interface.</title>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css"/>
     <link rel="stylesheet" type="text/css" href="./css/main.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <script src="./js/jquery.bpopup.min.js"></script>
     <script src="https://cdn.pubnub.com/pubnub-3.7.1.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
     <script src="./js/pubnub-keys.js"></script>
     <script src="./js/audience.js"></script>
   </head>
   <body>
     <div id="top_banner" class="top_banner">
-      <div class="section group height_100">
-        <div class="col-left span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text responsive_font_size_4">
-              <h1 id="screenname_display">snaglee</h1>
-            </span>
-          </div>
+      <div class="row section group height_100">
+        <div class="col banner center border height_100">
+          <span class="banner_text responsive_font_size_4">
+            <h1 id="screenname_display">snaglee</h1>
+          </span>
         </div>
-        <div class="col-right span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text">
-              <img src="./images/modify_w.png" class="tenpercent" id="modify">
-            </span>
-          </div>
+        <div class="col banner center border height_100">
+          <span id="modify" class="banner_text">
+            <i class="far fa-edit fa-5x"></i>
+          </span>
         </div>
       </div>
     </div>
-    
     <canvas id="patternCanvas" class="">Sorry, canvas not supported</canvas>
-    
     <div id="submit_pane" class="bottom_banner2">
-      <div class="section group height_100">
-        <div class="col-left span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text responsive_font_size_4">
-              <img src="./images/randomize.png" class="tenpercent" id="randomize">
-            </span>
-          </div>
+      <div class="row section group height_100">
+        <div class="col banner center border height_100">
+          <span id="randomize" class="banner_text responsive_font_size_4">
+            <i class="fas fa-dice fa-5x"></i>
+          </span>
         </div>
-        <div class="col-right span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text responsive_font_size_4">
-              <img src="./images/play.png" id="browse" class="tenpercent">
-            </span>
-          </div>
+        <div class="col banner center border height_100">
+          <span id="browse" class="banner_text responsive_font_size_4">
+            <i class="far fa-check-square fa-5x"></i>
+          </span>
         </div>
       </div>
     </div>
     <div id="mingle_pane" class="bottom_banner2">
-      <div class="section group height_100">
-        <div  class="col-left span_2_of_4 center border height_100">
-          <div  class="banner">
-            <span id="like_button_area" class="banner_text responsive_font_size_4">
-              <img src="./images/heart.png" class="tenpercent" id="like">
-            </span>
-            <span id="liked_button_area" class="banner_text responsive_font_size_4">
-              <img src="./images/heart_liked.png" class="tenpercent">
-            </span>
-          </div>
+      <div class="row section group height_100">
+        <div class="col banner center border height_100">
+          <span id="like" class="banner_text responsive_font_size_4">
+            <i id="likeIcon" class="fas fa-heart fa-4x"></i>
+          </span>
+          <!--<span id="like_button_area" class="banner_text responsive_font_size_4">
+            <img src="./images/heart.png" class="tenpercent" id="like">
+          </span>
+          <span id="liked_button_area" class="banner_text responsive_font_size_4">
+            <img src="./images/heart_liked.png" class="tenpercent">
+          </span>-->
         </div>
-        <div class="col-right span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text responsive_font_size_4">
-              <img src="./images/exit.png" class="tenpercent" id="exit">
-            </span>
-          </div>
+        <div class="col banner center border height_100">
+          <span id="exit" class="banner_text responsive_font_size_4">
+            <i class="fas fa-sign-out-alt fa-4x"></i>
+          </span>
         </div>
       </div>
     </div>
     <div id="bottom_banner" class="bottom_banner2">
-      <div class="section group height_100">
-        <div class="col-left span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text">
-              <img src="./images/mingle.png" id="mingle" class="tenpercent">
-            </span>
-          </div>
+      <div class="row section group height_100">
+        <div class="col banner center border height_100">
+          <span id="browseAll" class="banner_text">
+            <i id="searchIcon" class="fas fa-search fa-4x"></i>
+          </span>
         </div>
-        <div class="col-right span_2_of_4 center border height_100">
-          <div class="banner">
-            <span class="banner_text">
-              <img src="./images/close.png" class="tenpercent" id="nextPattern">
-            </span>
-          </div>
+        <div class="col banner center border height_100">
+          <span id="mingle" class="banner_text">
+            <i class="fas fa-music fa-4x"></i>
+          </span>
+        </div>
+        <div class="col banner center border height_100">
+          <span id="prevPattern" class="banner_text">
+            <i class="fas fa-arrow-circle-left fa-4x"></i>
+          </span>
+        </div>
+        <div class="col banner center border height_100">
+          <span id="nextPattern" class="banner_text">
+            <i class="fas fa-arrow-circle-right fa-4x"></i>
+          </span>
         </div>
       </div>
     </div>
@@ -144,8 +140,9 @@
     </div>
     <div class="mingleRequest message">
       <h1 class="msg_header text-center">mingle request from phil beemis</h1>
-      <div class="row text-center">
+      <div class="row justify-content-center">
         <button id="mingleYes" class="btn btn-primary">Accept</button>
+        &emsp;            
         <button id="mingleNo" class="btn btn-primary">Ignore</button>
       </div>
     </div>
