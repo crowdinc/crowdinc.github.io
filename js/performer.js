@@ -85,8 +85,7 @@ $(document).ready(function() {
     });
   });
   $('#golive').click(function() {
-    console.log('golive');
-    state = "GOLIVE";
+    state = 'GOLIVE';
     soundEnabled = true;
     respondState();
     publishMessage('log', {
@@ -98,7 +97,10 @@ $(document).ready(function() {
   $('#refresh').click(function() {
     // refreshes all users' pages
     console.log('refresh');
-    publishMessage("audience", {type:"script", script:"refresh()"});
+    publishMessage('audience', {
+      type: 'script', 
+      script: 'refresh()'
+    });
     publishMessage('log', {
       type: 'refresh',
       user: 'performer',
@@ -197,6 +199,16 @@ function parseMessage(m) {
           break;
         case 'state':
           respondState(m.myID);
+          break;
+        case 'viewAll':
+          var users = {};
+          for (index in arrayUsers) {
+            users[index] = arrayUsers[index].nickname;
+          }
+          publishMessage(arrayUsers[m.index].id, {
+            type: 'browseResponse',
+            users: users
+          });
           break;
         case 'mingle':
           console.log('mingle received');
@@ -411,6 +423,9 @@ function getUserToFollow(userIndex, direction) {
   
   // initial assignment of follow - chooses a random user
   if (user.follow === '') {
+    /*var random1 = getRandomInt(0, arrayUsers.length - 1);
+    var random2 = getRandomInt(0, arrayUsers.length - 1);
+    var random3 = getRandomInt(0, arrayUsers.length - 1);*/
     suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
     if (suggestedIndex == userIndex) {
       // wraps around if end of queue is reached, via %
@@ -514,7 +529,7 @@ function followNew(userIndex, direction) {
   });
 }
 
-function getRandomInt (min, max) {
+function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 

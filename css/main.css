@@ -188,13 +188,42 @@ h1,h2,h3,h4 {
 	vertical-align: middle;
 }
 
+table {
+  width: 100%;
+}
+
+tr {
+  border: 1px solid black;
+  height: 200%;
+}
+
+td {
+  height: 200%;
+}
+
+table#browseList {
+  visibility: hidden;
+  /*height: 100%;*/
+}
+
+table#browseList tr:nth-child(even) {
+  background-color: #eee;
+}
+table#browseList tr:nth-child(odd) {
+  background-color: #fff;
+}
+table#browseList th {
+  color: white;
+  background-color: black;
+}
+
 /*  GROUPING  */
 .group:before,
 .group:after { content:""; display:table; }
 .group:after { clear:both;}
 .group { zoom:1; /* For IE 6/7 */ }
 
-.banner{
+.banner {
 	display: table;
 	width:100%;
 	height:100%;
@@ -212,39 +241,47 @@ h1,h2,h3,h4 {
 }
 
 .border {
-	border:solid;
-	box-sizing:border-box;
-  	-moz-box-sizing:border-box;
-  	-webkit-box-sizing:border-box;
+  border: solid;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 
 .height_50 {
-	height:50%;
+  height: 50%;
 }
 .height_25 {
-	height:25%;
+  height: 25%;
 }
 .height_100 {
-	height:100%;
+  height: 100%;
 }
 .red {
-	color: red;
+  color: red;
+}
+
+#browseList {
+  position: fixed;
+}
+
+.shortcutButton {
+  margin-right: 5px;
 }
 
 .dialog-message {
-    font-family: Courier New;
-    width:70%;
-    max-width:70%;
-    position:absolute;
-    top:20%;
-    left:15%;
-    margin:20px;
-    padding: 5px 20px 13px 20px;
-    border-radius: 10px;
-    background: #fff;
-    background: -moz-linear-gradient(#fff, #999);
-    background: -webkit-linear-gradient(#fff, #999);
-    background: -o-linear-gradient(#fff, #999);
+  font-family: Courier New;
+  width: 70%;
+  max-width: 70%;
+  position: absolute;
+  top: 20%;
+  left: 15%;
+  margin: 20px;
+  padding: 5px 20px 13px 20px;
+  border-radius: 10px;
+  background: #fff;
+  background: -moz-linear-gradient(#fff, #999);
+  background: -webkit-linear-gradient(#fff, #999);
+  background: -o-linear-gradient(#fff, #999);
 }
 
 .editor {

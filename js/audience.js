@@ -393,6 +393,9 @@ function parseMessage(message) {
         setTimeout(browse, 500, message.suggested_tm.index, 
                    message.suggested_tm.nickname, message.suggested_tm.tm);
         break;
+      case 'browseResponse':
+        viewAll(message.users);
+        break;
       case 'mingleRequest':
         showMessage('mingleRequest', 'mingle request from ' + message.nickname, false);
         requestFrom = message.index;
@@ -628,23 +631,45 @@ function update() {
   $("#submit_pane").css("visibility", "hidden");
 }
 
+//TODO: change icons. eyeball for viewing
+
+// shows browseable list of all active users
+function viewAll(users) {
+  $('#bottom_banner').css('visibility', 'hidden');
+  $('#top_banner').css('visibility', 'hidden');
+  $('#patternCanvas').css('visibility', 'hidden');
+  $('#browseList').css('visibility', 'visible');
+  
+  // empty the table body, then repopulate with current users
+  var oldTbody = $('#browseList').find('tbody');
+  oldTbody.empty();
+  for (index in users) {
+    var row = 
+      '<tr>' + 
+        '<td>' + 
+          users[index] + 
+        '</td>' + 
+        '<td class="text-right">' + 
+          '<button class="btn btn-primary shortcutButton">' + 
+            '<i class="fas fa-eye"></i>' + 
+          '</button> ' + 
+          '<button class="btn btn-danger shortcutButton">' + 
+            '<i class="fas fa-music"></i>' + 
+          '</button>' + 
+        '</td>' + 
+      '</tr>'
+    oldTbody.append(row);
+  }
+}
+
 function mingle() {
   state = "MINGLE";
   $("#mingle_pane").css("visibility", "visible");
   $("#like").css("visibility", "visible");
-  /*$("#like_button_area").css("visibility", "visible");
-  $("#liked_button_area").css("visibility", "visible");*/
 
-  if (liked.indexOf(indexElse) == -1) {
-    /*$("#like_button_area").css("display", "block");
-    $("#liked_button_area").css("display", "none");*/
-    $('#like').removeClass('red');
-  }
-  else {
-    /*$("#like_button_area").css("display", "none");
-    $("#liked_button_area").css("display", "block");*/
-    $('#like').addClass('red');
-  }
+  if (liked.indexOf(indexElse) == -1) $('#like').removeClass('red');
+  else $('#like').addClass('red');
+  
   $("#bottom_banner").css("visibility", "hidden");
   $("#top_banner").css("visibility", "hidden");
   for (var i = 0; i < pattern.length; i++) {
@@ -653,27 +678,6 @@ function mingle() {
     note.distance = pattern[i].distance;
     originalPattern[i] = note;
   }
-}
-
-// it is either NAME, EDIT, WAIT, BROWSE, MINGLE
-function stateTransition(_state) {
-  state = _state;
-  switch(state) {
-    case "NAME":
-    break;
-    case "EDIT":
-    break;
-    case "WAIT":
-    break;
-    case "BROWSE":
-    break;
-    case "MINGLE":
-    break;
-    default:
-    if (DEBUG) alert("unknown state:" + _state);
-    break;
-  }
-  return;
 }
 
 $(document).ready(function () {
@@ -815,15 +819,27 @@ $(document).ready(function () {
   });
   
   $('#like').click(function() {
-    publishMessage("performer", {
-      type: "liked", 
+    publishMessage('performer', {
+      type: 'liked', 
       index: myIndex, 
       likedindex: indexElse
     });
     liked.push(indexElse);
-    /*$("#like_button_area").css("display", "none");
-    $("#liked_button_area").css("display", "block");*/
     $('#like').addClass('red');
+  });
+  
+  $('#viewAll').click(function() {
+    publishMessage('performer', {
+      type: 'viewAll',
+      index: myIndex
+    });
+  });
+  
+  $('#toBrowse').click(function() {
+    $('#bottom_banner').css('visibility', 'visible');
+    $('#top_banner').css('visibility', 'visible');
+    $('#patternCanvas').css('visibility', 'visible');
+    $('#browseList').css('visibility', 'hidden');
   });
   
   $('#mingle').click(function() {
@@ -832,7 +848,6 @@ $(document).ready(function () {
       index: myIndex,
       nickname: strScreenName
     });
-    //mingle();
   });
   
   $('#mingleYes').click(function() {
