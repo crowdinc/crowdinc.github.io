@@ -635,9 +635,9 @@ function update() {
 
 // shows browseable list of all active users
 function viewAll(users) {
-  $('#bottom_banner').css('visibility', 'hidden');
+  /*$('#bottom_banner').css('visibility', 'hidden');
   $('#top_banner').css('visibility', 'hidden');
-  $('#patternCanvas').css('visibility', 'hidden');
+  $('#patternCanvas').css('visibility', 'hidden');*/
   $('#tableContainer').css('visibility', 'visible');
   
   // empty the table body, then repopulate with current users
@@ -836,9 +836,9 @@ $(document).ready(function () {
   });
   
   $('#toBrowse').click(function() {
-    $('#bottom_banner').css('visibility', 'visible');
+    /*$('#bottom_banner').css('visibility', 'visible');
     $('#top_banner').css('visibility', 'visible');
-    $('#patternCanvas').css('visibility', 'visible');
+    $('#patternCanvas').css('visibility', 'visible');*/
     $('#tableContainer').css('visibility', 'hidden');
   });
   

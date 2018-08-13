@@ -88,6 +88,10 @@ size_10 {
     background: #00d9ff;
 }
 
+.responsive_font_size_3{
+  font-size: 3vw;
+}
+
 .responsive_font_size_4{
 	font-size: 4vw;
 }
@@ -194,11 +198,10 @@ table {
 
 tr {
   border: 1px solid black;
-  height: 200%;
 }
 
-td {
-  height: 200%;
+#tableContainer {
+  overflow-y: scroll;
 }
 
 table#browseList {
@@ -272,6 +275,7 @@ table#browseList th {
   font-family: Courier New;
   width: 70%;
   max-width: 70%;
+  max-height: 60%;
   position: absolute;
   top: 20%;
   left: 15%;
