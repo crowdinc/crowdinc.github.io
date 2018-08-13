@@ -16,30 +16,30 @@
     <script src="./js/audience.js"></script>
   </head>
   <body>
-    <table id="browseList">
-      <colgroup>
-        <col span="1" style="width: 65%;">
-        <col span="1" style="width: 35%;">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Click
-            <i class="fas fa-eye"></i>
-            to jump to a user's pattern, or 
-            <i class="fas fa-music"></i>
-            to send a mingle request</th>
-          <th class="text-right">
-            <button id="toBrowse" class="btn btn-secondary shortcutButton">
-              Back to browse
-              <i class="fas fa-sign-out-alt"></i>
-            </button>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        
-      </tbody>
-    </table>
+    <div id="tableContainer" class="dialog-message">
+      <table id="userTable">
+        <colgroup>
+          <col span="1" style="width: 35%;">
+          <col span="1" style="width: 25%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Click
+              <i class="fas fa-eye"></i>
+              to jump to a user's pattern, or 
+              <i class="fas fa-music"></i>
+              to send a mingle request</th>
+            <th class="text-right">
+              <button id="toBrowse" class="btn btn-secondary shortcutButton">
+                Back to browse
+                <i class="fas fa-sign-out-alt"></i>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
     <div id="top_banner" class="top_banner">
       <div class="row section group height_100">
         <div class="col banner center border height_100">

@@ -638,10 +638,10 @@ function viewAll(users) {
   $('#bottom_banner').css('visibility', 'hidden');
   $('#top_banner').css('visibility', 'hidden');
   $('#patternCanvas').css('visibility', 'hidden');
-  $('#browseList').css('visibility', 'visible');
+  $('#tableContainer').css('visibility', 'visible');
   
   // empty the table body, then repopulate with current users
-  var oldTbody = $('#browseList').find('tbody');
+  var oldTbody = $('#userTable').find('tbody');
   oldTbody.empty();
   for (index in users) {
     var row = 
@@ -839,7 +839,7 @@ $(document).ready(function () {
     $('#bottom_banner').css('visibility', 'visible');
     $('#top_banner').css('visibility', 'visible');
     $('#patternCanvas').css('visibility', 'visible');
-    $('#browseList').css('visibility', 'hidden');
+    $('#tableContainer').css('visibility', 'hidden');
   });
   
   $('#mingle').click(function() {

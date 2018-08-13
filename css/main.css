@@ -260,12 +260,12 @@ table#browseList th {
   color: red;
 }
 
-#browseList {
-  position: fixed;
+#tableContainer {
+  visibility: hidden;
 }
 
 .shortcutButton {
-  margin-right: 5px;
+  margin: 5px;
 }
 
 .dialog-message {
