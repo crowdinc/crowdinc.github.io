@@ -212,7 +212,7 @@ function parseMessage(m) {
           break;
         case 'mingle':
           console.log('mingle received');
-          var targetUser = arrayUsers[arrayUsers[m.index].follow];
+          var targetUser = arrayUsers[m.followIndex];
           publishMessage(targetUser.id, {
             type: 'mingleRequest',
             index: m.index,

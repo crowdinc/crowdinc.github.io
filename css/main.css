@@ -85,18 +85,18 @@ size_10 {
 }
 
 .close:hover {
-    background: #00d9ff;
+  background: #00d9ff;
 }
 
-.responsive_font_size_3{
+.responsive_font_size_3 {
   font-size: 3vw;
 }
 
-.responsive_font_size_4{
+.responsive_font_size_4 {
   font-size: 4vw;
 }
 
-.responsive_font_size_5{
+.responsive_font_size_5 {
   font-size: 5vw;
 }
 
@@ -123,15 +123,15 @@ h1,h2,h3,h4 {
 
 .top_banner {
 	position: fixed;
-	width:100%;
-	height:12%;
+	width: 100%;
+	height: 12%;
 	min-width: inherit;
-	top:0px;
-	left:0px;
-	opacity:0.5;
-	display:block;
-	background-color:black;
-	color:white;
+	top: 0px;
+	left: 0px;
+	opacity: 0.5;
+	display: block;
+	background-color: black;
+	color: white;
 	visibility: hidden;
 }
 
@@ -142,53 +142,53 @@ h1,h2,h3,h4 {
 }
 
 .bottom_pane {
-	width:100%;
-	height:10%;
-	opacity:0.7;
-	display:block;
-	color:black;
-	background-color:white;
+	width: 100%;
+	height: 10%;
+	opacity: 0.7;
+	display: block; 
+	color: black;
+	background-color: white;
 	text-align: center;
 }
 
 .bottom_banner {
 	position: fixed;
-	width:100%;
-	height:12%;
+	width: 100%;
+	height: 12%;
 	min-height: 140px;
 	min-width: inherit;
-	bottom:0px;
-	left:0px;
-	opacity:0.5;
-	display:block;
-	color:white;
-	background-color:black;
+	bottom: 0px;
+	left: 0px;
+	opacity: 0.5;
+	display: block;
+	color: white;
+	background-color: black;
 	visibility: hidden;
 }
 
 .bottom_banner2 {
 	position: fixed;
-	width:100%;
-	height:10%;
+	width: 100%;
+	height: 10%;
 	min-width: inherit;
-	bottom:0px;
-	left:0px;
-	opacity:0.7;
-	display:block;
-	color:white;
-	background-color:black;
+	bottom: 0px;
+	left: 0px;
+	opacity: 0.7;
+	display: block;
+	color: white;
+	background-color: black;
 	visibility: hidden;
 }
 
 .fullscreenblock {
-	position:fixed;
-	left:0px;
-	top:0px;
-	opacity:0.7;
-	background-color:white;
-	display:block;
-	width:100%;
-	height:100%;
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	opacity: 0.7;
+	background-color: white;
+	display: block;
+	width: 100%;
+	height: 100%;
 	vertical-align: middle;
 }
 
@@ -202,6 +202,7 @@ tr {
 
 #tableContainer {
   overflow-y: scroll;
+  z-index: 1;
 }
 
 table#browseList {
@@ -273,6 +274,7 @@ table#browseList th {
 
 #toBrowse {
   font-size: 3vw;
+  margin: 1vw;
 }
 
 .dialog-message {

@@ -356,6 +356,35 @@ pubnub.subscribe({
     heartbeat: 15
 });
 
+// shows browseable list of all active users
+function viewAll(users) {
+  $('#STANDBY').css('visibility', 'visible');
+  $('#tableContainer').css('visibility', 'visible');
+
+  // empty the table body, then repopulate with current users
+  var oldTbody = $('#userTable').find('tbody');
+  oldTbody.empty();
+  for (index in users) {
+    var row = 
+        '<tr>' + 
+          '<td>' + 
+            users[index] + 
+          '</td>' + 
+          '<td class="text-right">' + 
+            '<button id="view' + index + 
+                        '" class="btn btn-primary shortcutButton view">' + 
+              '<i class="fas fa-eye fa-2x"></i>' + 
+            '</button> ' + 
+            '<button id="request' + index + 
+                        '" class="btn btn-danger shortcutButton request">' + 
+              '<i class="fas fa-music fa-2x"></i>' + 
+            '</button>' + 
+          '</td>' + 
+        '</tr>'
+    oldTbody.append(row);
+  }
+}
+
 function parseMessage(message) {
   if (DEBUG) console.log("message - received:" + JSON.stringify(message));
   if (typeof message.nextDivName !== 'undefined') {
@@ -478,16 +507,19 @@ function parseMessage(message) {
         if (performerState == "STANDBY") {
           showMessage("warning", "STANDBY, Crowd in C is about to start.");
           $("#STANDBY").css("visibility", "visible");
+          $("#STANDBY").css("z-index", "1");
         }
         else if (performerState == "GOLIVE") {
           hideAllMessages();
           showMessage("success", "Let's go live!", true);
           $("#STANDBY").css("visibility", "hidden");
+          $("#STANDBY").css("z-index", "0");
         }
         else if (performerState == "END") {
           hideAllMessages();
           showMessage("success", "This is the end. (Applause)", true);
           $("#STANDBY").css("visibility", "hidden");
+          $("#STANDBY").css("z-index", "0");
         }
         break;
       default:
@@ -629,37 +661,6 @@ function update() {
   publishMessage("performer", {type: "update", index: myIndex, tm: pattern});
   $("#waiting-message").css("visibility", "visible");
   $("#submit_pane").css("visibility", "hidden");
-}
-
-//TODO: change icons. eyeball for viewing
-
-// shows browseable list of all active users
-function viewAll(users) {
-  /*$('#bottom_banner').css('visibility', 'hidden');
-  $('#top_banner').css('visibility', 'hidden');
-  $('#patternCanvas').css('visibility', 'hidden');*/
-  $('#tableContainer').css('visibility', 'visible');
-  
-  // empty the table body, then repopulate with current users
-  var oldTbody = $('#userTable').find('tbody');
-  oldTbody.empty();
-  for (index in users) {
-    var row = 
-      '<tr>' + 
-        '<td>' + 
-          users[index] + 
-        '</td>' + 
-        '<td class="text-right">' + 
-          '<button class="btn btn-primary shortcutButton">' + 
-            '<i class="fas fa-eye fa-2x"></i>' + 
-          '</button> ' + 
-          '<button class="btn btn-danger shortcutButton">' + 
-            '<i class="fas fa-music fa-2x"></i>' + 
-          '</button>' + 
-        '</td>' + 
-      '</tr>'
-    oldTbody.append(row);
-  }
 }
 
 function mingle() {
@@ -836,16 +837,28 @@ $(document).ready(function () {
   });
   
   $('#toBrowse').click(function() {
-    /*$('#bottom_banner').css('visibility', 'visible');
-    $('#top_banner').css('visibility', 'visible');
-    $('#patternCanvas').css('visibility', 'visible');*/
+    $('#STANDBY').css('visibility', 'hidden');
     $('#tableContainer').css('visibility', 'hidden');
+  });
+  
+  $('#userTable').on('click', '.shortcutButton', function() {
+    if (this.hasClass('view')) {
+      publishMessage('performer', {
+        type: 'followUser',
+        index: myIndex,
+        followIndex: this.id.slice(-1)
+      });
+    }
+    else if (this.hasClass('request')) {
+      
+    }
   });
   
   $('#mingle').click(function() {
     publishMessage('performer', {
       type: 'mingle',
       index: myIndex,
+      followIndex: indexElse,
       nickname: strScreenName
     });
   });
