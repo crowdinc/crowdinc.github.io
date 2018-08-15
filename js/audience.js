@@ -651,10 +651,10 @@ function viewAll(users) {
         '</td>' + 
         '<td class="text-right">' + 
           '<button class="btn btn-primary shortcutButton">' + 
-            '<i class="fas fa-eye"></i>' + 
+            '<i class="fas fa-eye fa-2x"></i>' + 
           '</button> ' + 
           '<button class="btn btn-danger shortcutButton">' + 
-            '<i class="fas fa-music"></i>' + 
+            '<i class="fas fa-music fa-2x"></i>' + 
           '</button>' + 
         '</td>' + 
       '</tr>'

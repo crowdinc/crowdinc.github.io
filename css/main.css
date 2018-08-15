@@ -93,11 +93,11 @@ size_10 {
 }
 
 .responsive_font_size_4{
-	font-size: 4vw;
+  font-size: 4vw;
 }
 
 .responsive_font_size_5{
-	font-size: 5vw;
+  font-size: 5vw;
 }
 
 h1,h2,h3,h4 {
@@ -269,6 +269,10 @@ table#browseList th {
 
 .shortcutButton {
   margin: 5px;
+}
+
+#toBrowse {
+  font-size: 1.8vw;
 }
 
 .dialog-message {
