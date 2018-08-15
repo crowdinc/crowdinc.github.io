@@ -212,7 +212,7 @@ function parseMessage(m) {
           break;
         case 'followUser':
           var userToFollow = arrayUsers[m.followIndex];
-          publishMessage(arrayUsers[index].id, {
+          publishMessage(arrayUsers[m.index].id, {
             type: 'newFollowResponse',
             suggestedUser: {
               index: m.followIndex,
