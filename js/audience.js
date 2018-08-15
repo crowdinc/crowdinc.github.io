@@ -415,12 +415,12 @@ function parseMessage(message) {
           });
         }
         else {
-          $('#name_error_msg').text($('#screenname').val() + " is already taken.");
+          $('#name_error_msg').text($('#screenname').val() + ' is already taken.');
         }
         break;
       case 'newFollowResponse':
-        setTimeout(browse, 500, message.suggested_tm.index, 
-                   message.suggested_tm.nickname, message.suggested_tm.tm);
+        setTimeout(browse, 500, message.suggestedUser.index, 
+                   message.suggestedUser.nickname, message.suggestedUser.pattern);
         break;
       case 'browseResponse':
         viewAll(message.users);
@@ -431,7 +431,8 @@ function parseMessage(message) {
         break;
       case 'beginMingle':
         setTimeout(browse, 500, message.index, message.nickname, message.pattern);
-        $(".bottom_banner2").css("visibility", "hidden");
+        $('.bottom_banner2').css('visibility', 'hidden');
+        $('#tableContainer').css('visibility', 'hidden');
         mingle();
         break;
       case 'stopMingle':
@@ -439,16 +440,16 @@ function parseMessage(message) {
         break;
       case 'likedResponse': 
         if (message.index == myIndex) {
-          showMessage('error',  "I know! You like your tune.", true, 1000);
+          showMessage('error',  'I know! You like your tune.', true, 1000);
         }
         else if (liked.indexOf(message.index) == -1) {
           showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
-          playSample("liked", true);
+          playSample('liked', true);
         }
         else {
-          showMessage('error', "It's a match! " + message.nickname + 
+          showMessage('error', 'It\'s a match! ' + message.nickname + 
                       ' likes your tune, too!', true, 1000);
-          playSample("matched", true);
+          playSample('matched', true);
         }
         break;
       case 'question':
@@ -562,6 +563,8 @@ function browse(elseIndex, elseNickname, elsePattern) {
     state = "BROWSE";
     $("#waiting-message").css("visibility", "hidden");
   }
+  $('#tableContainer').css('visibility', 'hidden');
+  $('#STANDBY').css('visibility', 'hidden');
 }
 
 function publishMessage(channel, options) {
@@ -842,15 +845,20 @@ $(document).ready(function () {
   });
   
   $('#userTable').on('click', '.shortcutButton', function() {
-    if (this.hasClass('view')) {
+    if ($(this).hasClass('view')) {
       publishMessage('performer', {
         type: 'followUser',
         index: myIndex,
         followIndex: this.id.slice(-1)
       });
     }
-    else if (this.hasClass('request')) {
-      
+    else if ($(this).hasClass('request')) {
+      publishMessage('performer', {
+        type: 'mingle',
+        index: myIndex,
+        followIndex: this.id.slice(-1),
+        nickname: strScreenName
+      });
     }
   });
   

@@ -210,6 +210,17 @@ function parseMessage(m) {
             users: users
           });
           break;
+        case 'followUser':
+          var userToFollow = arrayUsers[m.followIndex];
+          publishMessage(arrayUsers[index].id, {
+            type: 'newFollowResponse',
+            suggestedUser: {
+              index: m.followIndex,
+              nickname: userToFollow.nickname,
+              pattern: userToFollow.pattern
+            }
+          });
+          break;
         case 'mingle':
           console.log('mingle received');
           var targetUser = arrayUsers[m.followIndex];
@@ -455,10 +466,10 @@ function getUserToFollow(userIndex, direction) {
     publishMessage(arrayUsers[userIndex].id, {
       type: 'newFollowResponse',
       direction: direction,
-      suggested_tm: {
+      suggestedUser: {
         nickname: user.nickname,
         index: user.index,
-        tm: user.pattern
+        pattern: user.pattern
       }
     });
   }
@@ -511,10 +522,10 @@ function followNew(userIndex, direction) {
   publishMessage(user.id, {
     type: 'newFollowResponse',
     direction: direction,
-    suggested_tm: {
+    suggestedUser: {
       nickname: suggested.nickname,
       index: suggested.index,
-      tm: suggested.pattern
+      pattern: suggested.pattern
     }
   });
   newFollow = suggested.nickname;
@@ -549,10 +560,10 @@ function inform(userIndex) {
       publishMessage(arrayusers[userIndex].id, {
         type: 'newFollowResponse',
         direction: 'next',
-        suggested_tm: {
+        suggestedUser: {
           nickname: suggested.nickname,
           index: suggested.index,
-          tm: suggested.pattern
+          pattern: suggested.pattern
         }
       });
       console.log('followed -1: was following user that left (?)');
