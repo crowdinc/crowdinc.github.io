@@ -3,16 +3,16 @@ var DEBUG = false;
 var performerState = "STANDBY";
 /*
 
-State Diagram
+  State Diagram
 
-NAME -> EDIT : create-response msg received
-EDIT -> WAIT : 'next' msg sent
-WAIT -> BROWSE : newFollowResponse msg received in "WAIT" state
-BROWSE -> MINGLE : user press HEART button
-MINGLE -> BROWSE : user press exit button
-BROWSE -> EDIT : user press "update" button
+  NAME -> EDIT : create-response msg received
+  EDIT -> WAIT : 'next' msg sent
+  WAIT -> BROWSE : newFollowResponse msg received in "WAIT" state
+  BROWSE -> MINGLE : user press HEART button
+  MINGLE -> BROWSE : user press exit button
+  BROWSE -> EDIT : user press "update" button
 
-*/
+  */
 
 var NORESPONSE1 = true;
 var NORESPONSE2 = true;
@@ -39,315 +39,458 @@ var patternElse = [];
 var nicknameElse = '';
 var indexElse;
 var idElse;
+var stateElse;
 
 // index of the user who sent this user a mingle request
 var requestFrom = -1;
 
 var myMessages = ['info','warning','error','success', 'like', 'mingleRequest'];
 
-function hideAllMessages() {
-  var messagesHeights = new Array(); // this array will store height for each
+$(document).ready(function () {
+  
+  function hideAllMessages() {
+    var messagesHeights = new Array(); // this array will store height for each
 
-  for (i = 0; i < myMessages.length; i++) {
-    // fill array 
-    messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); 
-    // move element outside viewport
-    $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
+    for (i = 0; i < myMessages.length; i++) {
+      // fill array 
+      messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); 
+      // move element outside viewport
+      $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
+    }
   }
-}
 
-function showMessage(type, message, autoHide, hideTime) {
-  hideAllMessages();
-  $("." + type + " .msg_header").text(message);
-  $('.' + type).animate({top: "0"}, 500);
-  if (autoHide) {
-    hideTime = hideTime | 3000;
-    setTimeout(hideAllMessages, hideTime);
+  function showMessage(type, message, autoHide, hideTime) {
+    hideAllMessages();
+    $("." + type + " .msg_header").text(message);
+    $('.' + type).animate({top: "0"}, 500);
+    if (autoHide) {
+      hideTime = hideTime | 3000;
+      setTimeout(hideAllMessages, hideTime);
+    }
   }
-}
 
-function BufferLoader(context, urlList, callback) {
-  this.context = context;
-  this.urlList = urlList;
-  this.onload = callback;
-  this.bufferList = new Array();
-  this.loadCount = 0;
-}
+  function BufferLoader(context, urlList, callback) {
+    this.context = context;
+    this.urlList = urlList;
+    this.onload = callback;
+    this.bufferList = new Array();
+    this.loadCount = 0;
+  }
 
-BufferLoader.prototype.loadBuffer = function(url, index) {
-  // Load buffer asynchronously
-  var request = new XMLHttpRequest();
-  request.open("GET", url, true);
-  request.responseType = "arraybuffer";
+  BufferLoader.prototype.loadBuffer = function(url, index) {
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
 
-  var loader = this;
+    var loader = this;
 
-  request.onload = function() {
-    // Asynchronously decode the audio file data in request.response
-    loader.context.decodeAudioData(
-      request.response,
-      function(buffer) {
-        if (!buffer) {
-          alert('error decoding file data: ' + url);
-          return;
+    request.onload = function() {
+      // Asynchronously decode the audio file data in request.response
+      loader.context.decodeAudioData(
+        request.response,
+        function(buffer) {
+          if (!buffer) {
+            alert('error decoding file data: ' + url);
+            return;
+          }
+          loader.bufferList[index] = buffer;
+          if (++loader.loadCount == loader.urlList.length)
+            loader.onload(loader.bufferList);
+        },
+        function(error) {
+          console.error('decodeAudioData error', error);
         }
-        loader.bufferList[index] = buffer;
-        if (++loader.loadCount == loader.urlList.length)
-          loader.onload(loader.bufferList);
-      },
-      function(error) {
-        console.error('decodeAudioData error', error);
+      );
+    }
+
+    /*request.onerror = function(error) {
+      console.log('BufferLoader: XHR error', error);
+      debugger;
+    }*/
+    request.send();
+  };
+
+  BufferLoader.prototype.load = function() {
+    for (var i = 0; i < this.urlList.length; ++i) {
+      this.loadBuffer(this.urlList[i], i);
+    }
+  };
+
+  function loadSounds(obj, soundMap, callback) {
+    // Array-ify
+    var names = [];
+    var paths = [];
+    for (var name in soundMap) {
+      var path = soundMap[name];
+      names.push(name);
+      paths.push(path);
+    }
+    var bufferLoader = new BufferLoader(context, paths, function(bufferList) {
+      for (var i = 0; i < bufferList.length; i++) {
+        var buffer = bufferList[i];
+        var name = names[i];
+        obj[name] = buffer;
       }
-    );
+      if (callback) {
+        callback();
+      }
+    });
+    bufferLoader.load();
   }
 
-  /*request.onerror = function(error) {
-    console.log('BufferLoader: XHR error', error);
-    debugger;
-  }*/
-  request.send();
-};
+  var buffers = {};
+  var soundmap = {
+      'ir1' : './sound/ir1.wav'
+    , 'sus1' : './sound/sus_note.wav'
+    , 'yes':'./sound/yes.mp3'
+    , 'no': './sound/no.mp3'
+    , 'liked': './sound/liked.wav'
+    , 'matched': './sound/matched.mp3'
+  };
+  //, 'piano1': 'piano_note1_f_sharp.wav', 'indo1' : 'indonesian_gong.wav', 'june_o' : 'june_o.wav', 'reversegate' :'H3000-ReverseGate.mp3'};
 
-BufferLoader.prototype.load = function() {
-  for (var i = 0; i < this.urlList.length; ++i) {
-    this.loadBuffer(this.urlList[i], i);
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-};
 
-function loadSounds(obj, soundMap, callback) {
-  // Array-ify
-  var names = [];
-  var paths = [];
-  for (var name in soundMap) {
-    var path = soundMap[name];
-    names.push(name);
-    paths.push(path);
+  function noteNum2Freq(num) {
+    return Math.pow(2, (num-57) / 12) * 440;
   }
-  var bufferLoader = new BufferLoader(context, paths, function(bufferList) {
-    for (var i = 0; i < bufferList.length; i++) {
-      var buffer = bufferList[i];
-      var name = names[i];
-      obj[name] = buffer;
+
+  if (soundEnabled) {
+    try {
+      // still needed for Safari
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      // create an AudioContext
+      context = new window.AudioContext();
+      compressor = context.createDynamicsCompressor()
+      reverb = context.createConvolver();
+    } catch(e) {
+      // API not supported
+      alert('Web Audio API not supported, please use most recent Chrome (41+), FireFox(31+) or Safari (iOS 7.1+).');
     }
-    if (callback) {
-      callback();
-    }
+  }
+
+  loadSounds(buffers, soundmap, function() {
+    reverb.buffer = buffers['ir1'];
   });
-  bufferLoader.load();
-}
-
-var buffers = {};
-var soundmap = {
-    'ir1' : './sound/ir1.wav'
-  , 'sus1' : './sound/sus_note.wav'
-  , 'yes':'./sound/yes.mp3'
-  , 'no': './sound/no.mp3'
-  , 'liked': './sound/liked.wav'
-  , 'matched': './sound/matched.mp3'
-};
-//, 'piano1': 'piano_note1_f_sharp.wav', 'indo1' : 'indonesian_gong.wav', 'june_o' : 'june_o.wav', 'reversegate' :'H3000-ReverseGate.mp3'};
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function noteNum2Freq(num) {
-  return Math.pow(2, (num-57) / 12) * 440;
-}
-
-if (soundEnabled) {
-  try {
-    // still needed for Safari
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    // create an AudioContext
-    context = new window.AudioContext();
-    compressor = context.createDynamicsCompressor()
-    reverb = context.createConvolver();
-  } catch(e) {
-    // API not supported
-    alert('Web Audio API not supported, please use most recent Chrome (41+), FireFox(31+) or Safari (iOS 7.1+).');
-  }
-}
-
-loadSounds(buffers, soundmap, function() {
-  reverb.buffer = buffers['ir1'];
-});
 
 
-var playSample = function(sampleName, randomSpeed) {
-  if (buffers[sampleName]) {
-    var source = context.createBufferSource();
-    source.buffer = buffers[sampleName];
-    if (randomSpeed) {
-      source.playbackRate.value = (Math.random() - 0.5) * 0.2 + 1;
+  var playSample = function(sampleName, randomSpeed) {
+    if (buffers[sampleName]) {
+      var source = context.createBufferSource();
+      source.buffer = buffers[sampleName];
+      if (randomSpeed) {
+        source.playbackRate.value = (Math.random() - 0.5) * 0.2 + 1;
+      }
+      source.connect(compressor);
+      source.start(0);
     }
-    source.connect(compressor);
-    source.start(0);
   }
-}
 
-function ADSR() {
-    this.node = context.createGain();
-    this.node.gain.value = 0.0;
-}
+  function ADSR() {
+      this.node = context.createGain();
+      this.node.gain.value = 0.0;
+  }
 
-ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel) {
-    peakLevel = peakLevel || 1;
-    sustainlevel = sustainlevel || 0.3;
+  ADSR.prototype.noteOn = function(delay, A,D, peakLevel, sustainlevel) {
+      peakLevel = peakLevel || 1;
+      sustainlevel = sustainlevel || 0.3;
 
+      this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
+      this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
+      this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
+  }
+
+  ADSR.prototype.noteOff = function(delay, R, sustainlevel) {
+      sustainlevel = sustainlevel || 0.1;
+
+      this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime );// Release
+      this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + R);// Release
+  }
+
+  ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel) {
     this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
     this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
     this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
-}
-
-ADSR.prototype.noteOff = function(delay, R, sustainlevel) {
-    sustainlevel = sustainlevel || 0.1;
-
-    this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime );// Release
-    this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + R);// Release
-}
-
-ADSR.prototype.play = function(delay, A,D,S,R, peakLevel, sustainlevel) {
-  this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime);
-  this.node.gain.linearRampToValueAtTime(peakLevel, delay + context.currentTime + A); // Attack
-  this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D);// Decay
-  this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D + S);// sustain.
-  this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + A + D + S + R);// Release
-}
-var index = 0;
-
-function ScissorVoice(noteNum, numOsc, oscType, detune) {
-  this.output  = new ADSR();
-  this.maxGain = 1 / numOsc;
-  this.noteNum = noteNum;
-  this.frequency = noteNum2Freq(noteNum);
-  this.oscs = [];
-  this.index = index++;
-  this.time = context.currentTime;
-  for (var i = 0; i < numOsc; i++) {
-    var osc = context.createOscillator();
-    if (oscType.length === "undefined")
-      osc.type = oscType;
-    else
-      osc.type = oscType[i % oscType.length];
-    osc.frequency.value = this.frequency;
-    osc.detune.value = -detune + i * 2 * detune / numOsc ;
-    osc.start(context.currentTime);
-    osc.connect(this.output.node);
-    this.oscs.push(osc);
+    this.node.gain.linearRampToValueAtTime(sustainlevel, delay + context.currentTime + A + D + S);// sustain.
+    this.node.gain.linearRampToValueAtTime(0.0, delay + context.currentTime + A + D + S + R);// Release
   }
-}
+  var index = 0;
 
-ScissorVoice.prototype.stop = function(time) {
-  var it = this;
-  setTimeout(function() {
-    for (var i = 0; i < it.oscs.length; i++) {
-      it.oscs[i].disconnect();
+  function ScissorVoice(noteNum, numOsc, oscType, detune) {
+    this.output  = new ADSR();
+    this.maxGain = 1 / numOsc;
+    this.noteNum = noteNum;
+    this.frequency = noteNum2Freq(noteNum);
+    this.oscs = [];
+    this.index = index++;
+    this.time = context.currentTime;
+    for (var i = 0; i < numOsc; i++) {
+      var osc = context.createOscillator();
+      if (oscType.length === "undefined")
+        osc.type = oscType;
+      else
+        osc.type = oscType[i % oscType.length];
+      osc.frequency.value = this.frequency;
+      osc.detune.value = -detune + i * 2 * detune / numOsc ;
+      osc.start(context.currentTime);
+      osc.connect(this.output.node);
+      this.oscs.push(osc);
     }
-  }, Math.floor((time-context.currentTime)*1000));
-}
-
-ScissorVoice.prototype.detune = function(detune) {
-  for (var i = 0; i < this.oscs.length; i++) {
-    this.oscs[i].detune.value -= detune;
   }
-}
 
-ScissorVoice.prototype.connect = function(target) {
-  this.output.node.connect(target);
-}
-
-window.requestAnimFrame = (function() {
-  return  window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame    ||
-    window.oRequestAnimationFrame      ||
-    window.msRequestAnimationFrame     ||
-    function(callback) {
-      window.setTimeout(callback, 1000 / 60);
-    };
-})();
-
-var pentatonicScale = [0,2,4,7,9];
-var majorScale = [0,2,4,5,7,9,11,12];
-var scaleWeight = [2,1,2,1,2,1,1,2];
-var minorScale = [0,2,3,5,7,8,10,12];
-var selectedScale = majorScale;
-var selectedScaleWeight = scaleWeight;
-var baseNote = 60;
-
-function getPitchIndex(num) {
-    var weightSum = 0;
-    for (var i = 0; i < selectedScale.length; i++) {
-      weightSum += selectedScaleWeight[i];
-    }
-    var count;
-    var accWeight=0;
-    for (count = 0; count < selectedScale.length; count++) {
-      if (num <= accWeight / weightSum)
-        break;
-      accWeight += selectedScaleWeight[count];
-    }
-    return count - 1;
-}
-function Note() {
-  this.x = 0;
-  this.y = 0;
-  this.distance = 0;
-}
-
-Note.prototype.setPosition = function(x,y) {
-  this.x = parseFloat(x).toFixed(3);
-  this.y = parseFloat(y).toFixed(3);
-}
-
-function dist(x1,y1,x2,y2) {
-  return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
-}
-
-function drawCircle(ctx, x,y,r, color) {
-    ctx.beginPath();
-    ctx.fillStyle = color || '#000000';
-    ctx.arc(x,y,r, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-function drawLine(ctx, x1,y1,x2,y2, color) {
-    ctx.beginPath();
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = color || '#00FF00';
-    ctx.stroke();
-}
-
-// This segment displays the validation rule for address field.
-function textAlphanumeric(inputText) {
-  var alphaExp = /^[0-9a-zA-Z._]+$/;
-  if (inputText.match(alphaExp)) {
-    return true;
-  } else {
-    return false;
+  ScissorVoice.prototype.stop = function(time) {
+    var it = this;
+    setTimeout(function() {
+      for (var i = 0; i < it.oscs.length; i++) {
+        it.oscs[i].disconnect();
+      }
+    }, Math.floor((time-context.currentTime)*1000));
   }
-}
 
-// get/create/store UUID
-var myID = PUBNUB.db.get('session') || (function() {
+  ScissorVoice.prototype.detune = function(detune) {
+    for (var i = 0; i < this.oscs.length; i++) {
+      this.oscs[i].detune.value -= detune;
+    }
+  }
+
+  ScissorVoice.prototype.connect = function(target) {
+    this.output.node.connect(target);
+  }
+
+  window.requestAnimFrame = (function() {
+    return  window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame    ||
+      window.oRequestAnimationFrame      ||
+      window.msRequestAnimationFrame     ||
+      function(callback) {
+        window.setTimeout(callback, 1000 / 60);
+      };
+  })();
+
+  var pentatonicScale = [0,2,4,7,9];
+  var majorScale = [0,2,4,5,7,9,11,12];
+  var scaleWeight = [2,1,2,1,2,1,1,2];
+  var minorScale = [0,2,3,5,7,8,10,12];
+  var selectedScale = majorScale;
+  var selectedScaleWeight = scaleWeight;
+  var baseNote = 60;
+
+  function getPitchIndex(num) {
+      var weightSum = 0;
+      for (var i = 0; i < selectedScale.length; i++) {
+        weightSum += selectedScaleWeight[i];
+      }
+      var count;
+      var accWeight=0;
+      for (count = 0; count < selectedScale.length; count++) {
+        if (num <= accWeight / weightSum)
+          break;
+        accWeight += selectedScaleWeight[count];
+      }
+      return count - 1;
+  }
+  function Note() {
+    this.x = 0;
+    this.y = 0;
+    this.distance = 0;
+  }
+
+  Note.prototype.setPosition = function(x,y) {
+    this.x = parseFloat(x).toFixed(3);
+    this.y = parseFloat(y).toFixed(3);
+  }
+
+  function dist(x1,y1,x2,y2) {
+    return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+  }
+
+  function drawCircle(ctx, x,y,r, color) {
+      ctx.beginPath();
+      ctx.fillStyle = color || '#000000';
+      ctx.arc(x,y,r, 0, Math.PI * 2);
+      ctx.fill();
+  }
+
+  function drawLine(ctx, x1,y1,x2,y2, color) {
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = color || '#00FF00';
+      ctx.stroke();
+  }
+
+  // This segment displays the validation rule for address field.
+  function textAlphanumeric(inputText) {
+    var alphaExp = /^[0-9a-zA-Z._]+$/;
+    if (inputText.match(alphaExp)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // shows browseable list of all active users
+  function viewAll(users) {
+    $('#waiting-message').css('visibility', 'hidden');
+    $('#tableContainer').css('visibility', 'visible');
+
+    // empty the table body, then repopulate with current users
+    var oldTbody = $('#userTable').find('tbody');
+    oldTbody.empty();
+    for (index in users) {
+      var row = 
+          '<tr>' + 
+            '<td>' + 
+              users[index] + 
+            '</td>' + 
+            '<td class="text-right">' + 
+              '<button id="view' + index + 
+                          '" class="btn btn-primary shortcutButton view">' + 
+                '<i class="fas fa-eye fa-2x"></i>' + 
+              '</button> ' + 
+              '<button id="request' + index + 
+                          '" class="btn btn-danger shortcutButton request">' + 
+                '<i class="fas fa-music fa-2x"></i>' + 
+              '</button>' + 
+            '</td>' + 
+          '</tr>'
+      oldTbody.append(row);
+    }
+  }
+
+  function browse(elseIndex, elseNickname, elsePattern, elseID, elseState) {
+    NORESPONSE3--;
+    patternElse = elsePattern;
+    nicknameElse = elseNickname;
+    indexElse = elseIndex;
+    idElse = elseID;
+    stateElse = elseState;
+    $('#screenname_display').text(nicknameElse);
+
+    for (var i = 0; i < patternElse.length - 1; i++) {
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                     patternElse[i+1].x * w, patternElse[i+1].y * h);
+    }
+    if (state == 'WAIT') {
+      $('.bottom_banner2').css('visibility', 'hidden');
+      $('#bottom_banner').css('visibility', 'visible');
+      $('#top_banner').css('visibility', 'visible');
+      lastPingTimeElse = Date.now();
+      state = 'BROWSE';
+      $('#waiting-message').css('visibility', 'hidden');
+    }
+    $('#tableContainer').css('visibility', 'hidden');
+    $('#STANDBY').css('visibility', 'hidden');
+    if (stateElse == 'MINGLE') $('#mingle').addClass('red');
+    else $('#mingle').removeClass('red');
+  }
+
+  function getNewPattern(direction) {
+    state = 'WAIT';
+    NORESPONSE3++;
+
+    for (var i = 0; i < patternElse.length - 1; i++) {
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+                                     patternElse[i+1].x * w, patternElse[i+1].y * h);
+    }
+    publishMessage('performer', {
+      type: direction, 
+      index: myIndex
+    });
+
+    $('#STANDBY').css('visibility', 'visible');
+    $('#waiting-message').css('visibility', 'visible');
+  }
+
+  // Set the name of the next div
+  function setNextDivName(divName) {
+    var actualTindered =  document.getElementById('tindered');
+    actualTindered.innerHTML = "";
+    actualTindered.appendChild(document.createTextNode(divName));
+  }
+
+  window.onbeforeunload = function() {
+    if (state != "NAME") {
+      publishMessage('performer', {
+        type: 'unfollow',
+        index: myIndex
+      });
+    }
+    //return "";
+  };
+
+  function randomizeNote() {
+    for (var i = 0; i < patternSize; i++) {
+      var note = new Note();
+      note.setPosition(Math.random(), Math.random());
+      pattern[i] = note;
+    }
+
+    for (var i = 0; i < patternSize - 1; i++) {
+      pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
+                                 pattern[i+1].x * w, pattern[i+1].y * h);
+    }
+  }
+
+  function refresh() {
+    window.onbeforeunload = null;
+    showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
+    setTimeout(function() {
+      window.location.reload();
+    },3000);
+  }
+
+  function update() {
+    state = "WAIT";
+    publishMessage("performer", {
+      type: "update", 
+      index: myIndex, 
+      pattern: pattern
+    });
+    $("#waiting-message").css("visibility", "visible");
+    $("#submit_pane").css("visibility", "hidden");
+  }
+
+  function mingle() {
+    state = 'MINGLE';
+    $("#mingle_pane").css("visibility", "visible");
+    $("#like").css("visibility", "visible");
+
+    if (liked.indexOf(indexElse) == -1) $('#like').removeClass('red');
+    else $('#like').addClass('red');
+
+    $("#bottom_banner").css("visibility", "hidden");
+    $("#top_banner").css("visibility", "hidden");
+    for (var i = 0; i < pattern.length; i++) {
+      var note = new Note();
+      note.setPosition(pattern[i].x, pattern[i].y);
+      note.distance = pattern[i].distance;
+      originalPattern[i] = note;
+    }
+  }
+
+  // get/create/store UUID
+  var myID = PUBNUB.db.get('session') || (function() {
     var uuid = PUBNUB.uuid();
     PUBNUB.db.set('session', uuid);
     return uuid;
-})();
+  })();
 
-// Initialize with Publish & Subscribe Keys
-var pubnub = PUBNUB.init({
+  // Initialize with Publish & Subscribe Keys
+  var pubnub = PUBNUB.init({
     publish_key: publishKey,
     subscribe_key: subscribeKey,
     uuid: myID,
     ssl : (('https:' == document.location.protocol) ? true : false)
-});
+  });
 
-// Subscribe to a channel
-pubnub.subscribe({
+  // Subscribe to a channel
+  pubnub.subscribe({
     channel: myID + ",audience",
     message: parseMessage,
     presence: parsePresence,
@@ -357,330 +500,200 @@ pubnub.subscribe({
       refresh();
     },
     heartbeat: 15
-});
-
-// shows browseable list of all active users
-function viewAll(users) {
-  $('#waiting-message').css('visibility', 'hidden');
-  $('#tableContainer').css('visibility', 'visible');
-
-  // empty the table body, then repopulate with current users
-  var oldTbody = $('#userTable').find('tbody');
-  oldTbody.empty();
-  for (index in users) {
-    var row = 
-        '<tr>' + 
-          '<td>' + 
-            users[index] + 
-          '</td>' + 
-          '<td class="text-right">' + 
-            '<button id="view' + index + 
-                        '" class="btn btn-primary shortcutButton view">' + 
-              '<i class="fas fa-eye fa-2x"></i>' + 
-            '</button> ' + 
-            '<button id="request' + index + 
-                        '" class="btn btn-danger shortcutButton request">' + 
-              '<i class="fas fa-music fa-2x"></i>' + 
-            '</button>' + 
-          '</td>' + 
-        '</tr>'
-    oldTbody.append(row);
+  });
+  
+  function publishMessage(channel, options) {
+    if (channel == "audience") {
+      console.error("please not hack this application. :) ");
+      return;
+    }
+    pubnub.publish({
+      channel: channel,
+      message: options,
+      error: function(m) {
+        console.log("Message send failed - ["
+                    + JSON.stringify(m) + "] - Retrying in 3 seconds!");
+        setTimeout(publishMessage(channel, options), 2000);
+      }
+    });
+    if (DEBUG) {
+      console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
+    }
   }
-}
+  
+  var joinMessageSent = false;
 
-function parseMessage(message) {
-  if (DEBUG) console.log("message - received:" + JSON.stringify(message));
-  if (typeof message.nextDivName !== 'undefined') {
-    setNextDivName(message.nextDivName);
+  function parsePresence(p) {
+    if (p.action == 'join' && !joinMessageSent) {
+      console.log(p);
+      publishMessage('log', {
+        type: 'join',
+        user: 'audience',
+        timestamp: Math.floor(Date.now()),
+        data1: myID
+      });
+      joinMessageSent = true;
+    }
   }
-  else if (typeof message.type !== 'undefined') {
-    switch(message.type) {
-      case 'create-response':
-        NORESPONSE1 = false;
-        if (message.res == "s") {
-          state = "EDIT";
-          $('#initial-message').bPopup().close();
-          strScreenName = $("#screenname").val();
-          $('#screenname_display').text(strScreenName);
-          myIndex = message.index;
-          lastPingTime = Date.now();
-          $("#submit_pane").css("visibility", "visible");
-          if (message.pattern) {
-            console.log('pattern exists');
-            for (var i = 0; i < message.pattern.length; ++i) {
-              pattern[i].setPosition(message.pattern[i].x, message.pattern[i].y);
+  
+  function parseMessage(m) {
+    if (DEBUG) console.log("message - received:" + JSON.stringify(m));
+    if (typeof m.nextDivName !== 'undefined') {
+      setNextDivName(m.nextDivName);
+    }
+    else if (typeof m.type !== 'undefined') {
+      switch(m.type) {
+        case 'create-response':
+          NORESPONSE1 = false;
+          if (m.res == "s") {
+            state = "EDIT";
+            $('#initial-message').bPopup().close();
+            strScreenName = $("#screenname").val();
+            $('#screenname_display').text(strScreenName);
+            myIndex = m.index;
+            lastPingTime = Date.now();
+            $("#submit_pane").css("visibility", "visible");
+            if (m.pattern) {
+              console.log('pattern exists');
+              for (var i = 0; i < m.pattern.length; ++i) {
+                pattern[i].setPosition(m.pattern[i].x, m.pattern[i].y);
+              }
+            }
+            publishMessage('performer', {
+              type: 'update',
+              index: myIndex,
+              pattern: pattern
+            });
+          }
+          else {
+            $('#name_error_msg').text($('#screenname').val() + ' is already taken.');
+          }
+          break;
+        case 'newFollowResponse':
+          setTimeout(browse, 500, m.suggestedUser.index, 
+                     m.suggestedUser.nickname, m.suggestedUser.pattern, 
+                     m.suggestedUser.id, m.suggestedUser.state);
+          break;
+        case 'browseResponse':
+          viewAll(m.users);
+          break;
+        case 'mingleRequest':
+          showMessage('mingleRequest', 'mingle request from ' + m.nickname, false);
+          requestFrom = m.index;
+          break;
+        case 'beginMingle':
+          if (m.role == 'sender') {
+            showMessage('success',  
+                        m.nickname + 
+                        ' accepted your request! Entering mingle mode...', 
+                        true, 1000);
+          }
+          setTimeout(browse, 2000, m.index, m.nickname, m.pattern, m.id, m.state);
+          $('.bottom_banner2').css('visibility', 'hidden');
+          $('#tableContainer').css('visibility', 'hidden');
+          setTimeout(mingle, 2100);
+          break;
+        case 'mingleMove':
+          patternElse = m.pattern;
+          break;
+        case 'stopMingle':
+          showMessage('error',  
+                      nicknameElse + 
+                      ' ended the mingle session, exiting...', true, 1000);
+          setTimeout(exit, 2000);
+          break;
+        case 'likedResponse': 
+          if (m.index == myIndex) {
+            showMessage('error',  'I know! You like your tune.', true, 1000);
+          }
+          else if (liked.indexOf(m.index) == -1) {
+            showMessage('error',  m.nickname + ' likes your tune!', true, 1000);
+            playSample('liked', true);
+          }
+          else {
+            showMessage('error', 'It\'s a match! ' + m.nickname + 
+                        ' likes your tune, too!', true, 1000);
+            playSample('matched', true);
+          }
+          break;
+        case 'question':
+          if (m.text.length > 0) {
+            $("#question_content").text(m.text);
+            $("#question-message").css("visibility", "visible");
+          }
+          break;
+        case 'scale':
+          if (m.probability >= 0) {
+            if (m.probability > Math.random()) {
+              baseNote = m.baseNote;
+              selectedScale = m.scale;
             }
           }
-          publishMessage('performer', {
-            type: 'update',
-            index: myIndex,
-            pattern: pattern
-          });
-        }
-        else {
-          $('#name_error_msg').text($('#screenname').val() + ' is already taken.');
-        }
-        break;
-      case 'newFollowResponse':
-        setTimeout(browse, 500, message.suggestedUser.index, 
-                   message.suggestedUser.nickname, message.suggestedUser.pattern, 
-                   message.suggestedUser.id);
-        break;
-      case 'browseResponse':
-        viewAll(message.users);
-        break;
-      case 'mingleRequest':
-        showMessage('mingleRequest', 'mingle request from ' + message.nickname, false);
-        requestFrom = message.index;
-        break;
-      case 'beginMingle':
-        setTimeout(browse, 500, message.index, message.nickname, 
-                   message.pattern, message.id);
-        $('.bottom_banner2').css('visibility', 'hidden');
-        $('#tableContainer').css('visibility', 'hidden');
-        mingle();
-        break;
-      case 'mingleMove':
-        patternElse = message.pattern;
-        break;
-      case 'stopMingle':
-        exit();
-        break;
-      case 'likedResponse': 
-        if (message.index == myIndex) {
-          showMessage('error',  'I know! You like your tune.', true, 1000);
-        }
-        else if (liked.indexOf(message.index) == -1) {
-          showMessage('error',  message.nickname + ' likes your tune!', true, 1000);
-          playSample('liked', true);
-        }
-        else {
-          showMessage('error', 'It\'s a match! ' + message.nickname + 
-                      ' likes your tune, too!', true, 1000);
-          playSample('matched', true);
-        }
-        break;
-      case 'question':
-        if (message.text.length > 0) {
-          $("#question_content").text(message.text);
-          $("#question-message").css("visibility", "visible");
-        }
-        break;
-      case 'scale':
-        if (message.probability >= 0) {
-          if (message.probability > Math.random()) {
-            baseNote = message.baseNote;
-            selectedScale = message.scale;
+          else {
+            baseNote = m.baseNote;
+            selectedScale = m.scale;
+            showMessage("info", "The performer changed the scale.", true);
           }
-        }
-        else {
-          baseNote = message.baseNote;
-          selectedScale = message.scale;
-          showMessage("info", "The performer changed the scale.", true);
-        }
-        break;
-      case 'sound-toggle':
-        if (message.probability >= 0) {
-          if (message.probability > Math.random()) {
-            soundEnabled = message.on;
+          break;
+        case 'sound-toggle':
+          if (m.probability >= 0) {
+            if (m.probability > Math.random()) {
+              soundEnabled = m.on;
+            }
           }
-        }
-        else {
-          soundEnabled = message.on;
-        }
-        break;
-      case 'script':
-        if (message.script) {
-          if (message.probability >= 0) {
-            if (message.probability > Math.random()) {
+          else {
+            soundEnabled = m.on;
+          }
+          break;
+        case 'script':
+          if (m.script) {
+            if (m.probability >= 0) {
+              if (m.probability > Math.random()) {
+                try {
+                  eval(m.script);
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+            }
+            else {
               try {
-                eval(message.script);
+                eval(m.script);
               } catch (e) {
                 console.log(e);
               }
             }
           }
-          else {
-            try {
-              eval(message.script);
-            } catch (e) {
-              console.log(e);
-            }
+          break;
+        case 'state-response':
+          NORESPONSE2 = false;
+          soundEnabled = m.sound;
+          performerState = m.state;
+          if (performerState == "STANDBY") {
+            showMessage("warning", "STANDBY, Crowd in C is about to start.");
+            $("#STANDBY").css("visibility", "visible");
+            $("#STANDBY").css("z-index", "2");
           }
-        }
-        break;
-      case 'state-response':
-        NORESPONSE2 = false;
-        soundEnabled = message.sound;
-        performerState = message.state;
-        if (performerState == "STANDBY") {
-          showMessage("warning", "STANDBY, Crowd in C is about to start.");
-          $("#STANDBY").css("visibility", "visible");
-          $("#STANDBY").css("z-index", "2");
-        }
-        else if (performerState == "GOLIVE") {
-          hideAllMessages();
-          showMessage("success", "Let's go live!", true);
-          $("#STANDBY").css("visibility", "hidden");
-          $("#STANDBY").css("z-index", "0");
-        }
-        else if (performerState == "END") {
-          hideAllMessages();
-          showMessage("success", "This is the end. (Applause)", true);
-          $("#STANDBY").css("visibility", "hidden");
-          $("#STANDBY").css("z-index", "0");
-        }
-        break;
-      default:
-        console.log('unhandled type received: ', message.type);
+          else if (performerState == "GOLIVE") {
+            hideAllMessages();
+            showMessage("success", "Let's go live!", true);
+            $("#STANDBY").css("visibility", "hidden");
+            $("#STANDBY").css("z-index", "0");
+          }
+          else if (performerState == "END") {
+            hideAllMessages();
+            showMessage("success", "This is the end. (Applause)", true);
+            $("#STANDBY").css("visibility", "hidden");
+            $("#STANDBY").css("z-index", "0");
+          }
+          break;
+        default:
+          console.log('unhandled type received: ', m.type);
+      }
     }
+    else console.log('undefined type, message: ', JSON.stringify(m));
   }
-  else console.log('undefined type, message: ', JSON.stringify(message));
-}
-
-var joinMessageSent = false;
-
-function parsePresence(p) {
-  if (p.action == 'join' && !joinMessageSent) {
-    console.log(p);
-    publishMessage('log', {
-      type: 'join',
-      user: 'audience',
-      timestamp: Math.floor(Date.now()),
-      data1: myID
-    });
-    joinMessageSent = true;
-  }
-}
-
-function browse(elseIndex, elseNickname, elsePattern, elseID) {
-  NORESPONSE3--;
-  patternElse = elsePattern;
-  nicknameElse = elseNickname;
-  indexElse = elseIndex;
-  idElse = elseID;
-  $('#screenname_display').text(nicknameElse);
-
-  for (var i = 0; i < patternElse.length - 1; i++) {
-    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
-                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
-  }
-  if (state == 'WAIT') {
-    $('.bottom_banner2').css('visibility', 'hidden');
-    $('#bottom_banner').css('visibility', 'visible');
-    $('#top_banner').css('visibility', 'visible');
-    lastPingTimeElse = Date.now();
-    state = 'BROWSE';
-    $('#waiting-message').css('visibility', 'hidden');
-  }
-  $('#tableContainer').css('visibility', 'hidden');
-  $('#STANDBY').css('visibility', 'hidden');
-}
-
-function publishMessage(channel, options) {
-  if (channel == "audience") {
-    console.error("please not hack this application. :) ");
-    return;
-  }
-  pubnub.publish({
-    channel: channel,
-    message: options,
-    error: function(m) {
-      console.log("Message send failed - ["
-          + JSON.stringify(m) + "] - Retrying in 3 seconds!");
-      setTimeout(publishMessage(channel, options), 2000);
-    }
-  });
-  if (DEBUG) {
-    console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
-  }
-}
-
-function getNewPattern(direction) {
-  state = 'WAIT';
-  NORESPONSE3++;
   
-  for (var i = 0; i < patternElse.length - 1; i++) {
-    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
-                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
-  }
-  publishMessage('performer', {
-    type: direction, 
-    index: myIndex
-  });
-  
-  $('#STANDBY').css('visibility', 'visible');
-  $('#waiting-message').css('visibility', 'visible');
-}
-
-// Set the name of the next div
-function setNextDivName(divName) {
-  var actualTindered =  document.getElementById('tindered');
-  actualTindered.innerHTML = "";
-  actualTindered.appendChild(document.createTextNode(divName));
-}
-
-window.onbeforeunload = function() {
-  if (state != "NAME") {
-    publishMessage('performer', {
-      type: 'unfollow',
-      index: myIndex
-    });
-  }
-  //return "";
-};
-
-function randomizeNote() {
-  for (var i = 0; i < patternSize; i++) {
-    var note = new Note();
-    note.setPosition(Math.random(), Math.random());
-    pattern[i] = note;
-  }
-
-  for (var i = 0; i < patternSize - 1; i++) {
-    pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
-                               pattern[i+1].x * w, pattern[i+1].y * h);
-  }
-}
-
-function refresh() {
-  window.onbeforeunload = null;
-  showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
-  setTimeout(function() {
-    window.location.reload();
-  },3000);
-}
-
-function update() {
-  state = "WAIT";
-  publishMessage("performer", {
-    type: "update", 
-    index: myIndex, 
-    pattern: pattern
-  });
-  $("#waiting-message").css("visibility", "visible");
-  $("#submit_pane").css("visibility", "hidden");
-}
-
-function mingle() {
-  state = 'MINGLE';
-  $("#mingle_pane").css("visibility", "visible");
-  $("#like").css("visibility", "visible");
-
-  if (liked.indexOf(indexElse) == -1) $('#like').removeClass('red');
-  else $('#like').addClass('red');
-  
-  $("#bottom_banner").css("visibility", "hidden");
-  $("#top_banner").css("visibility", "hidden");
-  for (var i = 0; i < pattern.length; i++) {
-    var note = new Note();
-    note.setPosition(pattern[i].x, pattern[i].y);
-    note.distance = pattern[i].distance;
-    originalPattern[i] = note;
-  }
-}
-
-$(document).ready(function () {
   // Initially, hide them all
   hideAllMessages();
 
@@ -859,8 +872,7 @@ $(document).ready(function () {
       publishMessage('performer', {
         type: 'mingle',
         index: myIndex,
-        followIndex: this.id.slice(-1),
-        nickname: strScreenName
+        followIndex: this.id.slice(-1)
       });
     }
   });
@@ -869,39 +881,36 @@ $(document).ready(function () {
     publishMessage('performer', {
       type: 'mingle',
       index: myIndex,
-      followIndex: indexElse,
-      nickname: strScreenName
+      followIndex: indexElse
     });
   });
   
   $('#mingleYes').click(function() {
+    state = 'WAIT';
+    $('#waiting-message').css('visibility', 'visible');
+    $('#STANDBY').css('visibility', 'visibile');
+
     publishMessage('performer', {
       type: 'mingleYes',
       index: myIndex,
-      id: myID,
-      nickname: strScreenName,
-      pattern: pattern,
       sender: requestFrom
     });
     requestFrom = -1;
   });
   
   $('#mingleNo').click(function() {
-    publishMessage('performer', {
+    /*publishMessage('performer', {
       type: 'mingleNo',
       index: myIndex,
-      nickname: strScreenName,
       sender: requestFrom
-    });
+    });*/
     requestFrom = -1;
   });
   
   $('#exit').click(function() {
     publishMessage('performer', {
       type: 'exitMingle',
-      index: myIndex,
-      nickname: strScreenName,
-      id: myID
+      idElse: idElse
     });
     exit();
   });

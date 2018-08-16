@@ -188,10 +188,12 @@ function parseMessage(m) {
           followNew(m.index, 'prev');
           break;
         case 'next':
+          arrayUsers[m.index].state = 'BROWSE';
           followNew(m.index, 'next');
           break;
         case 'whereami':
-          // gives user position in queue
+          arrayUsers[m.index].state = 'BROWSE';
+          // gives user position in queue. called when exiting mingle mode
           inform(m.index)
           break;
         case 'unfollow':
@@ -218,17 +220,19 @@ function parseMessage(m) {
               index: m.followIndex,
               id: userToFollow.id,
               nickname: userToFollow.nickname,
-              pattern: userToFollow.pattern
+              pattern: userToFollow.pattern,
+              state: userToFollow.state
             }
           });
           break;
         case 'mingle':
           console.log('mingle received');
           var targetUser = arrayUsers[m.followIndex];
+          if (targetUser.state == 'MINGLE') break;
           publishMessage(targetUser.id, {
             type: 'mingleRequest',
             index: m.index,
-            nickname: m.nickname
+            nickname: arrayUsers[m.index].nickname
           });
           /*publishMessage('log', {
             type: 'stateChange',
@@ -240,27 +244,36 @@ function parseMessage(m) {
           });*/
           break;
         case 'mingleYes':
-          publishMessage(arrayUsers[m.index].id, {
-            type: 'beginMingle',
-            index: m.sender,
-            id: arrayUsers[m.sender].id,
-            nickname: arrayUsers[m.sender].nickname,
-            pattern: arrayUsers[m.sender].pattern
-          });
-          publishMessage(arrayUsers[m.sender].id, {
-            type: 'beginMingle',
-            index: m.index,
-            id: m.id,
-            nickname: m.nickname,
-            pattern: m.pattern
-          });
-          break;
-        case 'mingleNo':
+          // tells both the sender and receiver of the mingle request to enter mingle mode
+          var sender = arrayUsers[m.sender];
+          var receiver = arrayUsers[m.index];
+          sender.state = 'MINGLE';
+          receiver.state = 'MINGLE';
           
+          publishMessage(sender.id, {
+            type: 'beginMingle',
+            role: 'sender',
+            index: m.index,
+            id: receiver.id,
+            nickname: receiver.nickname,
+            pattern: receiver.pattern,
+            state: receiver.state
+          });
+          publishMessage(receiver.id, {
+            type: 'beginMingle',
+            role: 'receiver',
+            index: m.sender,
+            id: sender.id,
+            nickname: sender.nickname,
+            pattern: sender.pattern,
+            state: sender.state
+          });
           break;
+        /*case 'mingleNo':
+          
+          break;*/
         case 'exitMingle':
-          var user = arrayUsers[m.index];
-          publishMessage(arrayUsers[user.follow], {
+          publishMessage(m.idElse, {
             type: 'stopMingle'
           });
           break;
@@ -351,11 +364,11 @@ function create(userID, userNickname) {
       nickname: userNickname,
       index: index,
       pattern: '',
-      mode: 'editing',
+      state: 'EDIT',
       follow: '',
       followers: [],
       likes: [],
-      likedby: []
+      likedby: [],
     };
     arrayUsers.push(user);
     publishMessage(userID, {
@@ -422,13 +435,13 @@ function displayUser(index) {
   user.obj.find('.stats').css("display", "");
   $('#users').append(user.obj);
 }
-//TODO: browse function for initial following
+
 function update(userIndex, userPattern) {
   var user = arrayUsers[userIndex];
   if (!user) return;
   user.obj.css("background", "");
   user.pattern = userPattern;
-  user.mode = "following";
+  user.state = 'BROWSE';
 }
 
 function getUserToFollow(userIndex, direction) {
@@ -473,7 +486,8 @@ function getUserToFollow(userIndex, direction) {
         nickname: user.nickname,
         id: user.id,
         index: user.index,
-        pattern: user.pattern
+        pattern: user.pattern,
+        state: user.state
       }
     });
   }
@@ -530,7 +544,8 @@ function followNew(userIndex, direction) {
       nickname: suggested.nickname,
       id: suggested.id,
       index: suggested.index,
-      pattern: suggested.pattern
+      pattern: suggested.pattern,
+      state: suggested.state
     }
   });
   newFollow = suggested.nickname;
@@ -569,7 +584,8 @@ function inform(userIndex) {
           nickname: suggested.nickname,
           id: suggested.id,
           index: suggested.index,
-          pattern: suggested.pattern
+          pattern: suggested.pattern,
+          state: suggested.state
         }
       });
       console.log('followed -1: was following user that left (?)');
