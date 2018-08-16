@@ -88,15 +88,15 @@ size_10 {
   background: #00d9ff;
 }
 
-.responsive_font_size_3 {
+.responsive_font_3 {
   font-size: 3vw;
 }
 
-.responsive_font_size_4 {
+.responsive_font_4 {
   font-size: 4vw;
 }
 
-.responsive_font_size_5 {
+.responsive_font_5 {
   font-size: 5vw;
 }
 
@@ -275,6 +275,10 @@ table#browseList th {
 #toBrowse {
   font-size: 3vw;
   margin: 1vw;
+}
+
+#waiting-message {
+  z-index: 1;
 }
 
 .dialog-message {

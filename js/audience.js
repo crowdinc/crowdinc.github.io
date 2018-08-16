@@ -7,7 +7,7 @@ State Diagram
 
 NAME -> EDIT : create-response msg received
 EDIT -> WAIT : 'next' msg sent
-WAIT -> BROWSE : nextResponse msg received in "WAIT" state
+WAIT -> BROWSE : newFollowResponse msg received in "WAIT" state
 BROWSE -> MINGLE : user press HEART button
 MINGLE -> BROWSE : user press exit button
 BROWSE -> EDIT : user press "update" button
@@ -22,23 +22,26 @@ var soundEnabled = true;
 var context;
 var compressor;
 var reverb;
-var myIndex;
-var strScreenName;
-var indexElse;
 var w;
 var h;
 var noteSize;
+var patternSize = 5;
 
+// properties of the user's self
+var myIndex;
+var strScreenName;
 var pattern = [];
 var originalPattern = [];
+var liked = new Array();
+
+// properties of a followed user
 var patternElse = [];
-var patternSize = 5;
-var nicknameElse = "";
+var nicknameElse = '';
+var indexElse;
+var idElse;
 
 // index of the user who sent this user a mingle request
 var requestFrom = -1;
-
-var liked = new Array();
 
 var myMessages = ['info','warning','error','success', 'like', 'mingleRequest'];
 
@@ -358,7 +361,7 @@ pubnub.subscribe({
 
 // shows browseable list of all active users
 function viewAll(users) {
-  $('#STANDBY').css('visibility', 'visible');
+  $('#waiting-message').css('visibility', 'hidden');
   $('#tableContainer').css('visibility', 'visible');
 
   // empty the table body, then repopulate with current users
@@ -411,7 +414,7 @@ function parseMessage(message) {
           publishMessage('performer', {
             type: 'update',
             index: myIndex,
-            tm: pattern
+            pattern: pattern
           });
         }
         else {
@@ -420,7 +423,8 @@ function parseMessage(message) {
         break;
       case 'newFollowResponse':
         setTimeout(browse, 500, message.suggestedUser.index, 
-                   message.suggestedUser.nickname, message.suggestedUser.pattern);
+                   message.suggestedUser.nickname, message.suggestedUser.pattern, 
+                   message.suggestedUser.id);
         break;
       case 'browseResponse':
         viewAll(message.users);
@@ -430,10 +434,14 @@ function parseMessage(message) {
         requestFrom = message.index;
         break;
       case 'beginMingle':
-        setTimeout(browse, 500, message.index, message.nickname, message.pattern);
+        setTimeout(browse, 500, message.index, message.nickname, 
+                   message.pattern, message.id);
         $('.bottom_banner2').css('visibility', 'hidden');
         $('#tableContainer').css('visibility', 'hidden');
         mingle();
+        break;
+      case 'mingleMove':
+        patternElse = message.pattern;
         break;
       case 'stopMingle':
         exit();
@@ -508,7 +516,7 @@ function parseMessage(message) {
         if (performerState == "STANDBY") {
           showMessage("warning", "STANDBY, Crowd in C is about to start.");
           $("#STANDBY").css("visibility", "visible");
-          $("#STANDBY").css("z-index", "1");
+          $("#STANDBY").css("z-index", "2");
         }
         else if (performerState == "GOLIVE") {
           hideAllMessages();
@@ -545,23 +553,25 @@ function parsePresence(p) {
   }
 }
 
-function browse(elseIndex, elseNickname, elsePattern) {
+function browse(elseIndex, elseNickname, elsePattern, elseID) {
   NORESPONSE3--;
   patternElse = elsePattern;
   nicknameElse = elseNickname;
   indexElse = elseIndex;
+  idElse = elseID;
   $('#screenname_display').text(nicknameElse);
 
   for (var i = 0; i < patternElse.length - 1; i++) {
     patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
                                    patternElse[i+1].x * w, patternElse[i+1].y * h);
   }
-  if (state == "WAIT") {
-    $("#bottom_banner").css("visibility", "visible");
-    $("#top_banner").css("visibility", "visible");
+  if (state == 'WAIT') {
+    $('.bottom_banner2').css('visibility', 'hidden');
+    $('#bottom_banner').css('visibility', 'visible');
+    $('#top_banner').css('visibility', 'visible');
     lastPingTimeElse = Date.now();
-    state = "BROWSE";
-    $("#waiting-message").css("visibility", "hidden");
+    state = 'BROWSE';
+    $('#waiting-message').css('visibility', 'hidden');
   }
   $('#tableContainer').css('visibility', 'hidden');
   $('#STANDBY').css('visibility', 'hidden');
@@ -586,23 +596,6 @@ function publishMessage(channel, options) {
   }
 }
 
-function getPrevPattern() {
-  state = 'WAIT';
-  NORESPONSE3++;
-  for (var i = 0; i < patternElse.length - 1; i++) {
-    patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
-                                   patternElse[i+1].x * w, patternElse[i+1].y * h);
-  }
-  publishMessage('performer', {
-    type: 'prev', 
-    index: myIndex
-  });
-  
-  $(".bottom_banner2").css("visibility", "hidden");
-  $("#top_banner").css("visibility", "hidden");
-  $("#waiting-message").css("visibility", "visible");
-}
-
 function getNewPattern(direction) {
   state = 'WAIT';
   NORESPONSE3++;
@@ -615,10 +608,9 @@ function getNewPattern(direction) {
     type: direction, 
     index: myIndex
   });
-
-  $(".bottom_banner2").css("visibility", "hidden");
-  $("#top_banner").css("visibility", "hidden");
-  $("#waiting-message").css("visibility", "visible");
+  
+  $('#STANDBY').css('visibility', 'visible');
+  $('#waiting-message').css('visibility', 'visible');
 }
 
 // Set the name of the next div
@@ -661,13 +653,17 @@ function refresh() {
 
 function update() {
   state = "WAIT";
-  publishMessage("performer", {type: "update", index: myIndex, tm: pattern});
+  publishMessage("performer", {
+    type: "update", 
+    index: myIndex, 
+    pattern: pattern
+  });
   $("#waiting-message").css("visibility", "visible");
   $("#submit_pane").css("visibility", "hidden");
 }
 
 function mingle() {
-  state = "MINGLE";
+  state = 'MINGLE';
   $("#mingle_pane").css("visibility", "visible");
   $("#like").css("visibility", "visible");
 
@@ -833,6 +829,10 @@ $(document).ready(function () {
   });
   
   $('#viewAll').click(function() {
+    state = 'WAIT';
+    $('#waiting-message').css('visibility', 'visible');
+    $('#STANDBY').css('visibility', 'visible');
+
     publishMessage('performer', {
       type: 'viewAll',
       index: myIndex
@@ -846,6 +846,9 @@ $(document).ready(function () {
   
   $('#userTable').on('click', '.shortcutButton', function() {
     if ($(this).hasClass('view')) {
+      state = 'WAIT';
+      $('#waiting-message').css('visibility', 'visible');
+      $('#tableContainer').css('visibility', 'hidden');
       publishMessage('performer', {
         type: 'followUser',
         index: myIndex,
@@ -875,6 +878,7 @@ $(document).ready(function () {
     publishMessage('performer', {
       type: 'mingleYes',
       index: myIndex,
+      id: myID,
       nickname: strScreenName,
       pattern: pattern,
       sender: requestFrom
@@ -908,11 +912,8 @@ $(document).ready(function () {
       type: 'whereami', 
       index: myIndex
     });
-    
     $("#waiting-message").css("visibility", "visible");
     $("#mingle_pane").css("visibility", "hidden");
-    /*$("#like_button_area").css("visibility", "hidden");
-    $("#liked_button_area").css("visibility", "hidden");*/
     $('#like').css('visibility', 'hidden');
     
     for (var i = 0; i < pattern.length; i++) {
@@ -989,7 +990,6 @@ $(document).ready(function () {
     }
 
     if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
-      
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
@@ -1010,7 +1010,6 @@ $(document).ready(function () {
     }
 
     if (state == "BROWSE" || state == "MINGLE") {
-
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
@@ -1149,7 +1148,7 @@ $(document).ready(function () {
   var selectedNote = -1;
   
   $(document).bind('touchstart', function(event) {
-    if (state == "WAIT") return;
+    if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;
@@ -1203,7 +1202,7 @@ $(document).ready(function () {
       publishMessage('performer', {
         type: 'update',
         index: myIndex,
-        tm: pattern
+        pattern: pattern
       });
       if (state == 'EDIT' || state == 'MINGLE') {
         var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
@@ -1275,8 +1274,14 @@ $(document).ready(function () {
       publishMessage('performer', {
         type: 'update',
         index: myIndex,
-        tm: pattern
+        pattern: pattern
       });
+      if (state == 'MINGLE') {
+        publishMessage(idElse, {
+          type: 'mingleMove',
+          pattern: pattern
+        });
+      }
       if (state == 'EDIT' || state == 'MINGLE') {
         for (var i = 0; i < pattern.length; ++i) {
           pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);

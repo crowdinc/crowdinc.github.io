@@ -182,7 +182,7 @@ function parseMessage(m) {
           create(m.myID, m.nickname);
           break;
         case 'update':
-          update(m.index, m.tm);
+          update(m.index, m.pattern);
           break;
         case 'prev':
           followNew(m.index, 'prev');
@@ -216,6 +216,7 @@ function parseMessage(m) {
             type: 'newFollowResponse',
             suggestedUser: {
               index: m.followIndex,
+              id: userToFollow.id,
               nickname: userToFollow.nickname,
               pattern: userToFollow.pattern
             }
@@ -242,12 +243,14 @@ function parseMessage(m) {
           publishMessage(arrayUsers[m.index].id, {
             type: 'beginMingle',
             index: m.sender,
+            id: arrayUsers[m.sender].id,
             nickname: arrayUsers[m.sender].nickname,
             pattern: arrayUsers[m.sender].pattern
           });
           publishMessage(arrayUsers[m.sender].id, {
             type: 'beginMingle',
             index: m.index,
+            nickname: m.id,
             nickname: m.nickname,
             pattern: m.pattern
           });
@@ -468,6 +471,7 @@ function getUserToFollow(userIndex, direction) {
       direction: direction,
       suggestedUser: {
         nickname: user.nickname,
+        id: user.id,
         index: user.index,
         pattern: user.pattern
       }
@@ -524,6 +528,7 @@ function followNew(userIndex, direction) {
     direction: direction,
     suggestedUser: {
       nickname: suggested.nickname,
+      id: suggested.id,
       index: suggested.index,
       pattern: suggested.pattern
     }
@@ -562,6 +567,7 @@ function inform(userIndex) {
         direction: 'next',
         suggestedUser: {
           nickname: suggested.nickname,
+          id: suggested.id,
           index: suggested.index,
           pattern: suggested.pattern
         }

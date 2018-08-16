@@ -16,12 +16,8 @@
     <script src="./js/audience.js"></script>
   </head>
   <body>
-    <div id="tableContainer" class="dialog-message responsive_font_size_4">
+    <div id="tableContainer" class="dialog-message responsive_font_4">
       <table id="userTable">
-        <!--<colgroup>
-          <col span="1" style="width: 35%;">
-          <col span="1" style="width: 25%;">
-        </colgroup>-->
         <thead>
           <tr>
             <th>Click
@@ -44,7 +40,7 @@
     <div id="top_banner" class="top_banner">
       <div class="row section group height_100">
         <div class="col banner center border height_100">
-          <span class="banner_text responsive_font_size_4">
+          <span class="banner_text responsive_font_4">
             <h1 id="screenname_display">snaglee</h1>
           </span>
         </div>
@@ -59,12 +55,12 @@
     <div id="submit_pane" class="bottom_banner2">
       <div class="row section group height_100">
         <div class="col banner center border height_100">
-          <span id="randomize" class="banner_text responsive_font_size_4">
+          <span id="randomize" class="banner_text responsive_font_4">
             <i class="fas fa-dice fa-5x"></i>
           </span>
         </div>
         <div class="col banner center border height_100">
-          <span id="browse" class="banner_text responsive_font_size_4">
+          <span id="browse" class="banner_text responsive_font_4">
             <i class="far fa-check-square fa-5x"></i>
           </span>
         </div>
@@ -73,18 +69,18 @@
     <div id="mingle_pane" class="bottom_banner2">
       <div class="row section group height_100">
         <div class="col banner center border height_100">
-          <span id="like" class="banner_text responsive_font_size_4">
+          <span id="like" class="banner_text responsive_font_4">
             <i id="likeIcon" class="fas fa-heart fa-4x"></i>
           </span>
-          <!--<span id="like_button_area" class="banner_text responsive_font_size_4">
+          <!--<span id="like_button_area" class="banner_text responsive_font_4">
             <img src="./images/heart.png" class="tenpercent" id="like">
           </span>
-          <span id="liked_button_area" class="banner_text responsive_font_size_4">
+          <span id="liked_button_area" class="banner_text responsive_font_4">
             <img src="./images/heart_liked.png" class="tenpercent">
           </span>-->
         </div>
         <div class="col banner center border height_100">
-          <span id="exit" class="banner_text responsive_font_size_4">
+          <span id="exit" class="banner_text responsive_font_4">
             <i class="fas fa-sign-out-alt fa-4x"></i>
           </span>
         </div>
@@ -117,30 +113,33 @@
     <div id="initial-message" class="dialog-message">
       <div>
         <h1>Crowd in C[loud]</h1>
-        <div class="responsive_font_size_4">Please enter a nickname to participate: </div>
-        <div id="name_error_msg" class="red responsive_font_size_4"></div>
+        <div class="responsive_font_4">
+          Please enter a nickname to participate: 
+        </div>
+        <div id="name_error_msg" class="red responsive_font_4"></div>
         <div class="buttons center">
           <input type="text" name="screenname" id="screenname" value="" 
-                 class="ui-widget-content ui-corner-all responsive_font_size_4"/>
+                 class="ui-widget-content ui-corner-all responsive_font_4"/>
           <br/>
           <br/>
-          <button id="start" class="responsive_font_size_5">Start</button>
+          <button id="start" class="responsive_font_5">Start</button>
         </div>
       </div>
     </div>
     <div id="waiting-message" class="dialog-message">
       <div>
         <h1>Crowd in C[loud]</h1>
-        <div class="responsive_font_size_4">Waiting for the next tune.....</div>
-        <div class="responsive_font_size_4">If it hangs more than 10 seconds, simply refresh the page. 
-        Green dots are yours, red dots belong to other users.</div>
+        <div class="responsive_font_4">Waiting for a response...</div>
+        <div class="responsive_font_4">If it hangs more than 10 seconds, 
+          try refreshing the page. Green dots are yours, 
+          red dots belong to other users.</div>
       </div>
     </div>
     <div id="question-message" class="dialog-message">
       <div>
         <h1>Crowd in C[loud]</h1>
-        <div class="responsive_font_size_4">I have a question.</div>
-        <div class="responsive_font_size_4" id="question_content"></div>
+        <div class="responsive_font_4">I have a question.</div>
+        <div class="responsive_font_4" id="question_content"></div>
         <div style="text-align:right;font-size:10em;">
           <button id="answer_yes"><h1 style="font-size: xx-large;">Yes</h1></button>
           <button id="answer_no"><h1 style="font-size: xx-large;">No</h1></button>
