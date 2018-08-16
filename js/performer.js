@@ -250,7 +250,7 @@ function parseMessage(m) {
           publishMessage(arrayUsers[m.sender].id, {
             type: 'beginMingle',
             index: m.index,
-            nickname: m.id,
+            id: m.id,
             nickname: m.nickname,
             pattern: m.pattern
           });
