@@ -1204,6 +1204,12 @@ $(document).ready(function () {
         index: myIndex,
         pattern: pattern
       });
+      if (state == 'MINGLE') {
+        publishMessage(idElse, {
+          type: 'mingleMove',
+          pattern: pattern
+        });
+      }
       if (state == 'EDIT' || state == 'MINGLE') {
         var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
         for (var i = 0; i < pattern.length; ++i) {
