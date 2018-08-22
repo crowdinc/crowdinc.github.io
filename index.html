@@ -22,9 +22,9 @@
           <tr>
             <th>Click
               <i class="fas fa-eye"></i>
-              to jump to a user's pattern, or 
-              <i class="fas fa-music"></i>
-              to send a mingle request
+              to jump to a user's pattern 
+              <!--<i class="fas fa-music"></i>
+              to send a mingle request-->
             </th>
             <th class="text-right">
               <button id="toBrowse" class="btn btn-secondary">
@@ -39,6 +39,11 @@
     </div>
     <div id="top_banner" class="top_banner">
       <div class="row section group height_100">
+        <div class="col banner center border height_100">
+          <span id="viewAll" class="banner_text">
+            <i class="fas fa-search fa-4x"></i>
+          </span>
+        </div>
         <div class="col banner center border height_100">
           <span class="banner_text responsive_font_4">
             <h1 id="screenname_display">snaglee</h1>
@@ -89,13 +94,9 @@
     <div id="bottom_banner" class="bottom_banner2">
       <div class="row section group height_100">
         <div class="col banner center border height_100">
-          <span id="viewAll" class="banner_text">
-            <i class="fas fa-search fa-4x"></i>
-          </span>
-        </div>
-        <div class="col banner center border height_100">
           <span id="mingle" class="banner_text">
-            <i class="fas fa-music fa-4x"></i>
+            <i id="mingleIcon" class="fas fa-music fa-4x"></i>
+            <span id="mingleText" class="iconOverlay"></span>
           </span>
         </div>
         <div class="col banner center border height_100">

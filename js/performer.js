@@ -208,7 +208,7 @@ function parseMessage(m) {
             users[index] = arrayUsers[index].nickname;
           }
           publishMessage(arrayUsers[m.index].id, {
-            type: 'browseResponse',
+            type: 'viewAllResponse',
             users: users
           });
           break;
@@ -228,12 +228,19 @@ function parseMessage(m) {
         case 'mingle':
           console.log('mingle received');
           var targetUser = arrayUsers[m.followIndex];
-          if (targetUser.state == 'MINGLE') break;
-          publishMessage(targetUser.id, {
-            type: 'mingleRequest',
-            index: m.index,
-            nickname: arrayUsers[m.index].nickname
-          });
+          if (targetUser.state == 'MINGLE') {
+            publishMessage(arrayUsers[m.index].id, {
+              type: 'userBusy',
+              nickname: targetUser.nickname
+            });
+          }
+          else {
+            publishMessage(targetUser.id, {
+              type: 'mingleRequest',
+              index: m.index,
+              nickname: arrayUsers[m.index].nickname
+            });
+          }
           /*publishMessage('log', {
             type: 'stateChange',
             user: arrayUsers[m.index].nickname,
@@ -269,9 +276,11 @@ function parseMessage(m) {
             state: sender.state
           });
           break;
-        /*case 'mingleNo':
-          
-          break;*/
+        case 'mingleNo':
+          publishMessage(arrayUsers[m.sender].id, {
+            type: 'noMingle'
+          });
+          break;
         case 'exitMingle':
           publishMessage(m.idElse, {
             type: 'stopMingle'
@@ -401,14 +410,15 @@ function create(userID, userNickname) {
           foundIndex = i;
           // initiate user's interface
           publishMessage(userID, {
-            type: "create-response",
-            res: "s",
+            type: 'create-response',
+            res: 's',
             index: foundIndex,
             pattern: arrayUsers[foundIndex].pattern
           });
           var user = arrayUsers[foundIndex];
+          user.state = 'EDIT';
           user.obj.remove();
-          console.log("user exists and returned");
+          console.log('user exists and returned');
           publishMessage('log', {
             type: 'return',
             user: userNickname,
@@ -418,7 +428,10 @@ function create(userID, userNickname) {
         }
       }
       if (foundIndex == -1) {
-        publishMessage(userID, {"type": "create-response", "res": "f"});
+        publishMessage(userID, {
+          type: 'create-response', 
+          res: 'f'
+        });
         console.log("nickname conflict! (although s/he is an existing user)");
       }
       displayUser(foundIndex);
@@ -441,7 +454,6 @@ function update(userIndex, userPattern) {
   if (!user) return;
   user.obj.css("background", "");
   user.pattern = userPattern;
-  user.state = 'BROWSE';
 }
 
 function getUserToFollow(userIndex, direction) {
@@ -450,9 +462,6 @@ function getUserToFollow(userIndex, direction) {
   
   // initial assignment of follow - chooses a random user
   if (user.follow === '') {
-    /*var random1 = getRandomInt(0, arrayUsers.length - 1);
-    var random2 = getRandomInt(0, arrayUsers.length - 1);
-    var random3 = getRandomInt(0, arrayUsers.length - 1);*/
     suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
     if (suggestedIndex == userIndex) {
       // wraps around if end of queue is reached, via %

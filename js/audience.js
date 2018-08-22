@@ -336,6 +336,7 @@ $(document).ready(function () {
 
   // shows browseable list of all active users
   function viewAll(users) {
+    state = 'BROWSE';
     $('#waiting-message').css('visibility', 'hidden');
     $('#tableContainer').css('visibility', 'visible');
 
@@ -343,6 +344,9 @@ $(document).ready(function () {
     var oldTbody = $('#userTable').find('tbody');
     oldTbody.empty();
     for (index in users) {
+      if (index == myIndex) {
+        continue;
+      }
       var row = 
           '<tr>' + 
             '<td>' + 
@@ -353,10 +357,10 @@ $(document).ready(function () {
                           '" class="btn btn-primary shortcutButton view">' + 
                 '<i class="fas fa-eye fa-2x"></i>' + 
               '</button> ' + 
-              '<button id="request' + index + 
+              /*'<button id="request' + index + 
                           '" class="btn btn-danger shortcutButton request">' + 
                 '<i class="fas fa-music fa-2x"></i>' + 
-              '</button>' + 
+              '</button>' + */
             '</td>' + 
           '</tr>'
       oldTbody.append(row);
@@ -386,8 +390,8 @@ $(document).ready(function () {
     }
     $('#tableContainer').css('visibility', 'hidden');
     $('#STANDBY').css('visibility', 'hidden');
-    if (stateElse == 'MINGLE') $('#mingle').addClass('red');
-    else $('#mingle').removeClass('red');
+    if (stateElse == 'MINGLE') $('#mingle').addClass('dimmed');
+    else $('#mingle').removeClass('dimmed');
   }
 
   function getNewPattern(direction) {
@@ -574,12 +578,52 @@ $(document).ready(function () {
                      m.suggestedUser.nickname, m.suggestedUser.pattern, 
                      m.suggestedUser.id, m.suggestedUser.state);
           break;
-        case 'browseResponse':
+        case 'viewAllResponse':
+          state = 'VIEWALL';
           viewAll(m.users);
+          break;
+        case 'queryState':
+          publishMessage(m.id, {
+            type: 'respondState',
+            state: state
+          });
+          break;
+        case 'respondState':
+          // either display busy message or send a mingle request and display
+          // pending request message
+          stateElse = m.state;
+          if (stateElse == 'MINGLE') {
+            showMessage('error', nicknameElse + 
+                        ' is already mingling, try again later!', true, 1000);
+            $('#mingle').addClass('dimmed');
+          }
+          else {
+            $('#mingle').removeClass('dimmed');
+            publishMessage('performer', {
+              type: 'mingle',
+              index: myIndex,
+              followIndex: indexElse
+            });
+            $('#mingle').addClass('clicked');
+            $('#mingleIcon').css('opacity', '0.2');
+            $('#mingleText').append('pending request to ' + nicknameElse);
+          }
           break;
         case 'mingleRequest':
           showMessage('mingleRequest', 'mingle request from ' + m.nickname, false);
           requestFrom = m.index;
+          break;
+        case 'userBusy':
+          if (nicknameElse == m.nickname && 
+              !($('#mingle').hasClass('dimmed'))) {
+            // dim mingle area, make sure there's no pending request
+            // as the request was denied
+            $('#mingle').addClass('dimmed');
+            $('#mingleText').empty();
+            $('#mingle').removeClass('clicked');
+          }
+          showMessage('error', m.nickname + 
+                      ' is already mingling, try again later!', true, 1000);
           break;
         case 'beginMingle':
           if (m.role == 'sender') {
@@ -592,6 +636,11 @@ $(document).ready(function () {
           $('.bottom_banner2').css('visibility', 'hidden');
           $('#tableContainer').css('visibility', 'hidden');
           setTimeout(mingle, 2100);
+          
+          // reactivate the mingle button
+          $('#mingle').removeClass('clicked');
+          $('#mingleText').empty();
+          $('#mingleIcon').css('opacity', '1');
           break;
         case 'mingleMove':
           patternElse = m.pattern;
@@ -601,6 +650,12 @@ $(document).ready(function () {
                       nicknameElse + 
                       ' ended the mingle session, exiting...', true, 1000);
           setTimeout(exit, 2000);
+          break;
+        case 'noMingle':
+          // reactivate the mingle button
+          $('#mingle').removeClass('clicked');
+          $('#mingleText').empty();
+          $('#mingleIcon').css('opacity', '1');
           break;
         case 'likedResponse': 
           if (m.index == myIndex) {
@@ -853,11 +908,14 @@ $(document).ready(function () {
   });
   
   $('#toBrowse').click(function() {
+    state = 'BROWSE';
     $('#STANDBY').css('visibility', 'hidden');
     $('#tableContainer').css('visibility', 'hidden');
   });
   
+  // handles clicks on the list of all users
   $('#userTable').on('click', '.shortcutButton', function() {
+    // user clicks an eye icon
     if ($(this).hasClass('view')) {
       state = 'WAIT';
       $('#waiting-message').css('visibility', 'visible');
@@ -868,21 +926,58 @@ $(document).ready(function () {
         followIndex: this.id.slice(-1)
       });
     }
-    else if ($(this).hasClass('request')) {
+    // user clicks a music icon
+    /*else if ($(this).hasClass('request')) {
       publishMessage('performer', {
         type: 'mingle',
         index: myIndex,
         followIndex: this.id.slice(-1)
       });
-    }
+      $('#mingle').addClass('clicked');
+      $('#mingleIcon').css('opacity', '0.2');
+      $('#mingleText').append('pending request to ' + nicknameElse);
+    }*/
   });
   
   $('#mingle').click(function() {
+    if ($('#mingle').hasClass('dimmed')) {
+      publishMessage(idElse, {
+        type: 'queryState',
+        id: myID
+      });
+      return;
+    }
     publishMessage('performer', {
       type: 'mingle',
       index: myIndex,
       followIndex: indexElse
     });
+    $('#mingle').addClass('clicked');
+    $('#mingleIcon').css('opacity', '0.2');
+    $('#mingleText').append('pending request to ' + nicknameElse);
+    /*publishMessage(idElse, {
+      type: 'queryState',
+      id: myID
+    });*/
+    /*if ($('#mingle').parent().hasClass('dimmed')) {
+      showMessage('error', nicknameElse + 
+                  ' is already mingling, try again later!', true, 1000);
+      publishMessage('performer', {
+        type: 'mingle',
+        index: myIndex,
+        followIndex: indexElse
+      });
+    }*/
+    /*else if (!($('#mingle').hasClass('clicked'))) {
+      $('#mingle').addClass('clicked');
+      $('#mingleIcon').css('opacity', '0.2');
+      $('#mingleText').append('pending request to ' + nicknameElse);
+      publishMessage('performer', {
+        type: 'mingle',
+        index: myIndex,
+        followIndex: indexElse
+      });
+    }*/
   });
   
   $('#mingleYes').click(function() {
@@ -899,11 +994,11 @@ $(document).ready(function () {
   });
   
   $('#mingleNo').click(function() {
-    /*publishMessage('performer', {
+    publishMessage('performer', {
       type: 'mingleNo',
       index: myIndex,
       sender: requestFrom
-    });*/
+    });
     requestFrom = -1;
   });
   
@@ -960,12 +1055,12 @@ $(document).ready(function () {
     canvas.height = window.innerHeight * 0.9;
     w = canvas.width;
     h = canvas.height;
-    noteSize = Math.min(w,h)/12;
+    noteSize = Math.min(w, h) / 12;
 
     randomizeNote();
 
     // Add eventlistener to canvas
-    canvas.addEventListener('touchmove',touchHandler, false);
+    canvas.addEventListener('touchmove', touchHandler, false);
     canvas.addEventListener('mousemove', mouseHandler, false);
 
     draw();
@@ -974,7 +1069,7 @@ $(document).ready(function () {
   init();
   
   function draw() {
-    canvas = $("#patternCanvas")[0];
+    canvas = $('#patternCanvas')[0];
     var ctx = canvas.getContext('2d');
 
     // Clear the canvas
