@@ -41,8 +41,9 @@ var indexElse;
 var idElse;
 var stateElse;
 
-// index of the user who sent this user a mingle request
-var requestFrom = -1;
+// index of who this user has sent/received mingle requests to/from
+var requestTo = -1;
+var requestsFrom = [];
 
 var myMessages = ['info','warning','error','success', 'like', 'mingleRequest'];
 
@@ -336,26 +337,52 @@ $(document).ready(function () {
 
   // shows browseable list of all active users
   function viewAll(users) {
-    state = 'BROWSE';
+    state = 'VIEWALL';
     $('#waiting-message').css('visibility', 'hidden');
-    $('#tableContainer').css('visibility', 'visible');
+    $('#viewTableContainer').css('visibility', 'visible');
 
-    // empty the table body, then repopulate with current users
-    var oldTbody = $('#userTable').find('tbody');
-    oldTbody.empty();
+    $('#requestsBody').empty();
+    $('#usersBody').empty();
+    
     for (index in users) {
+      // don't display yourself
       if (index == myIndex) {
         continue;
       }
-      var row = 
+      // pending request from this user
+      else if (requestsFrom.includes(parseInt(index))) {
+        var row = 
+            '<tr>' + 
+              '<td>' + 
+                users[index] + 
+              '</td>' + 
+              '<td colspan="2" class="text-right">' + 
+                '<button id="accept' + index + '" class="response accept btn btn-xl btn-success">' +
+                  'Accept' + 
+                '</button>' +
+                '<button id="ignore' + index + '" class="response ignore btn btn-info">' +
+                  'Ignore' + 
+                '</button>' +
+              '</td>' +
+              '<td class="text-right">' +
+                '<button id="view' + index + '" class="btn btn-primary shortcutButton view">' + 
+                  '<i class="fas fa-eye responsive_font_4"></i>' + 
+                '</button> ' + 
+              '</td>' + 
+            '</tr>'
+        $('#requestsBody').append(row);
+      }
+      // all other users
+      else {
+        var row = 
           '<tr>' + 
-            '<td>' + 
+            '<td colspan="3">' + 
               users[index] + 
             '</td>' + 
             '<td class="text-right">' + 
               '<button id="view' + index + 
                           '" class="btn btn-primary shortcutButton view">' + 
-                '<i class="fas fa-eye fa-2x"></i>' + 
+                '<i class="fas fa-eye responsive_font_4"></i>' + 
               '</button> ' + 
               /*'<button id="request' + index + 
                           '" class="btn btn-danger shortcutButton request">' + 
@@ -363,7 +390,8 @@ $(document).ready(function () {
               '</button>' + */
             '</td>' + 
           '</tr>'
-      oldTbody.append(row);
+        $('#usersBody').append(row);
+      }
     }
   }
 
@@ -388,7 +416,7 @@ $(document).ready(function () {
       state = 'BROWSE';
       $('#waiting-message').css('visibility', 'hidden');
     }
-    $('#tableContainer').css('visibility', 'hidden');
+    $('#viewTableContainer').css('visibility', 'hidden');
     $('#STANDBY').css('visibility', 'hidden');
     if (stateElse == 'MINGLE') $('#mingle').addClass('dimmed');
     else $('#mingle').removeClass('dimmed');
@@ -425,6 +453,21 @@ $(document).ready(function () {
         index: myIndex
       });
     }
+    if (requestTo != -1) {
+      publishMessage('performer', {
+        type: 'cancelRequest',
+        index: myIndex,
+        targetIndex: requestTo
+      });
+    }
+    if (requestsFrom.length) {
+      for (i in requestsFrom) {
+        publishMessage('performer', {
+          type: 'mingleNo',
+          sender: requestsFrom[i]
+        });
+      }
+    }
     //return "";
   };
 
@@ -442,7 +485,7 @@ $(document).ready(function () {
   }
 
   function refresh() {
-    window.onbeforeunload = null;
+    //window.onbeforeunload = null;
     showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
     setTimeout(function() {
       window.location.reload();
@@ -579,7 +622,6 @@ $(document).ready(function () {
                      m.suggestedUser.id, m.suggestedUser.state);
           break;
         case 'viewAllResponse':
-          state = 'VIEWALL';
           viewAll(m.users);
           break;
         case 'queryState':
@@ -599,6 +641,7 @@ $(document).ready(function () {
           }
           else {
             $('#mingle').removeClass('dimmed');
+            requestTo = indexElse;
             publishMessage('performer', {
               type: 'mingle',
               index: myIndex,
@@ -606,12 +649,53 @@ $(document).ready(function () {
             });
             $('#mingle').addClass('clicked');
             $('#mingleIcon').css('opacity', '0.2');
-            $('#mingleText').append('pending request to ' + nicknameElse);
+            $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+                                   ' - press here to cancel');
           }
           break;
         case 'mingleRequest':
-          showMessage('mingleRequest', 'mingle request from ' + m.nickname, false);
-          requestFrom = m.index;
+          if (state != 'VIEWALL') {
+            showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
+                        true, 2000);
+          }
+          // add this request to the list of pending requests
+          var row = 
+              '<tr>' + 
+                '<td>' + 
+                  m.nickname + 
+                '</td>' + 
+                '<td colspan="2" class="text-right">' + 
+                  '<button id="accept' + m.index + 
+                  '" class="response accept btn btn-xl btn-success">' +
+                  'Accept' + 
+                  '</button>' +
+                  '<button id="ignore' + m.index + 
+                  '" class="response ignore btn btn-info">' +
+                  'Ignore' + 
+                  '</button>' +
+                '</td>' +
+                '<td class="text-right">' +
+                  '<button id="view' + m.index + 
+                  '" class="btn btn-primary shortcutButton view">' + 
+                    '<i class="fas fa-eye responsive_font_4"></i>' + 
+                  '</button> ' + 
+                '</td>' + 
+              '</tr>'
+          $('#requestsBody').append(row);
+          
+          requestsFrom.push(m.index);
+          break;
+        case 'cancelRequest':
+          // removes request from list of pending requests
+          $('#requestsTable td').filter(function() { 
+            return $(this).text() === m.nickname; 
+          }).parent().remove();
+          
+          // hides mingle request header
+          hideAllMessages();
+          
+          // clears flag
+          requestsFrom.splice(requestsFrom.indexOf(m.index), 1);
           break;
         case 'userBusy':
           if (nicknameElse == m.nickname && 
@@ -627,6 +711,7 @@ $(document).ready(function () {
           break;
         case 'beginMingle':
           if (m.role == 'sender') {
+            requestTo = -1;
             showMessage('success',  
                         m.nickname + 
                         ' accepted your request! Entering mingle mode...', 
@@ -634,7 +719,7 @@ $(document).ready(function () {
           }
           setTimeout(browse, 2000, m.index, m.nickname, m.pattern, m.id, m.state);
           $('.bottom_banner2').css('visibility', 'hidden');
-          $('#tableContainer').css('visibility', 'hidden');
+          $('#viewTableContainer').css('visibility', 'hidden');
           setTimeout(mingle, 2100);
           
           // reactivate the mingle button
@@ -907,19 +992,19 @@ $(document).ready(function () {
     });
   });
   
-  $('#toBrowse').click(function() {
+  $('#browseFromView').click(function() {
     state = 'BROWSE';
     $('#STANDBY').css('visibility', 'hidden');
-    $('#tableContainer').css('visibility', 'hidden');
+    $('#viewTableContainer').css('visibility', 'hidden');
   });
   
   // handles clicks on the list of all users
-  $('#userTable').on('click', '.shortcutButton', function() {
+  $('#usersTable').on('click', '.shortcutButton', function() {
     // user clicks an eye icon
     if ($(this).hasClass('view')) {
       state = 'WAIT';
       $('#waiting-message').css('visibility', 'visible');
-      $('#tableContainer').css('visibility', 'hidden');
+      $('#viewTableContainer').css('visibility', 'hidden');
       publishMessage('performer', {
         type: 'followUser',
         index: myIndex,
@@ -939,67 +1024,118 @@ $(document).ready(function () {
     }*/
   });
   
+  $('#viewRequests').click(function() {
+    $('#STANDBY').css('visibility', 'visible');
+    $('#requestTableContainer').css('visibility', 'visible');
+  });
+  
+  $('#browseFromRequests').click(function() {
+    $('#STANDBY').css('visibility', 'hidden');
+    $('#requestTableContainer').css('visibility', 'hidden');
+  });
+  
+  $('#requestsTable').on('click', '.response', function() {
+    // user accepts a request
+    if ($(this).hasClass('accept')) {
+      if (requestTo != -1) {
+        publishMessage('performer', {
+          type: 'cancelRequest',
+          index: myIndex,
+          targetIndex: requestTo
+        });
+        requestTo = -1;
+      }
+      state = 'WAIT';
+      $('#waiting-message').css('visibility', 'visible');
+      $('#requestTableContainer').css('visibility', 'hidden');
+
+      publishMessage('performer', {
+        type: 'mingleYes',
+        index: myIndex,
+        sender: this.id.slice(-1)
+      });
+      
+      $(this).parent().parent().remove();
+    }
+    // user ignores a request
+    else if ($(this).hasClass('ignore')) {
+      // removes request from list of pending requests
+      $(this).parent().parent().remove();
+      
+      publishMessage('performer', {
+        type: 'mingleNo',
+        sender: this.id.slice(-1)
+      });
+    }
+  });
+  
   $('#mingle').click(function() {
     if ($('#mingle').hasClass('dimmed')) {
       publishMessage(idElse, {
         type: 'queryState',
         id: myID
       });
-      return;
     }
-    publishMessage('performer', {
-      type: 'mingle',
-      index: myIndex,
-      followIndex: indexElse
-    });
-    $('#mingle').addClass('clicked');
-    $('#mingleIcon').css('opacity', '0.2');
-    $('#mingleText').append('pending request to ' + nicknameElse);
-    /*publishMessage(idElse, {
-      type: 'queryState',
-      id: myID
-    });*/
-    /*if ($('#mingle').parent().hasClass('dimmed')) {
-      showMessage('error', nicknameElse + 
-                  ' is already mingling, try again later!', true, 1000);
+    else if ($('#mingle').hasClass('clicked')) {
+      publishMessage('performer', {
+        type: 'cancelRequest',
+        index: myIndex,
+        targetIndex: requestTo
+      });
+      requestTo = -1;
+      $('#mingle').removeClass('clicked');
+      $('#mingleIcon').css('opacity', '1');
+      $('#mingleText').empty();
+    }
+    else {
+      requestTo = indexElse;
       publishMessage('performer', {
         type: 'mingle',
         index: myIndex,
         followIndex: indexElse
       });
-    }*/
-    /*else if (!($('#mingle').hasClass('clicked'))) {
       $('#mingle').addClass('clicked');
       $('#mingleIcon').css('opacity', '0.2');
-      $('#mingleText').append('pending request to ' + nicknameElse);
-      publishMessage('performer', {
-        type: 'mingle',
-        index: myIndex,
-        followIndex: indexElse
-      });
-    }*/
+      $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+                              ' - press here to cancel');
+    }
   });
   
   $('#mingleYes').click(function() {
+    if (requestTo != -1) {
+      publishMessage('performer', {
+        type: 'cancelRequest',
+        index: myIndex,
+        targetIndex: requestTo
+      });
+      requestTo = -1;
+    }
     state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
     $('#STANDBY').css('visibility', 'visibile');
 
+    var senderIndex = requestsFrom[requestsFrom.length - 1];
     publishMessage('performer', {
       type: 'mingleYes',
       index: myIndex,
-      sender: requestFrom
+      sender: senderIndex
     });
-    requestFrom = -1;
+    requestsFrom.splice(requestsFrom.indexOf(senderIndex), 1);
   });
   
   $('#mingleNo').click(function() {
+    var senderIndex = requestsFrom[requestsFrom.length - 1];
+    
+    /*$('#requestTable td').filter(function() { 
+      return $(this).id === m.nickname; 
+    }).parent().remove();*/
+    
+    
     publishMessage('performer', {
       type: 'mingleNo',
-      index: myIndex,
-      sender: requestFrom
+      sender: senderIndex
     });
-    requestFrom = -1;
+    requestsFrom.splice(requestsFrom.indexOf(senderIndex), 1);
   });
   
   $('#exit').click(function() {

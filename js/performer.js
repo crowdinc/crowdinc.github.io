@@ -286,6 +286,13 @@ function parseMessage(m) {
             type: 'stopMingle'
           });
           break;
+          
+        case 'cancelRequest':
+          publishMessage(arrayUsers[m.targetIndex].id, {
+            type: 'cancelRequest',
+            index: m.index,
+            nickname: arrayUsers[m.index].nickname
+          });
         case 'liked':
           liked(m.index, m.likedindex);
           break;

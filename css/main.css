@@ -197,28 +197,16 @@ table {
 }
 
 tr {
-  border: 1px solid black;
+  border-top: 1px solid black;
 }
 
-#tableContainer {
-  overflow-y: scroll;
-  z-index: 1;
+#mainTableHeader {
+  border-top: 0px solid black;
+  border-bottom: 2px solid black;
 }
 
-table#browseList {
-  visibility: hidden;
-  /*height: 100%;*/
-}
-
-table#browseList tr:nth-child(even) {
-  background-color: #eee;
-}
-table#browseList tr:nth-child(odd) {
-  background-color: #fff;
-}
-table#browseList th {
-  color: white;
-  background-color: black;
+#browseFromView {
+  margin: 2px;
 }
 
 /*  GROUPING  */
@@ -290,17 +278,20 @@ table#browseList th {
 }
 */
 
-#tableContainer {
+.tableContainer {
   visibility: hidden;
+  overflow-y: scroll;
+  z-index: 1;
 }
 
 .shortcutButton {
   margin: 1vw;
 }
 
-#toBrowse {
-  font-size: 3vw;
-  margin: 1vw;
+.accept, .ignore {
+  /*width: 48%;*/
+  margin-left: 3vw;
+  text-align: center;
 }
 
 #waiting-message {
@@ -309,12 +300,12 @@ table#browseList th {
 
 .dialog-message {
   font-family: Courier New;
-  width: 70%;
-  max-width: 70%;
+  width: 80%;
+  max-width: 80%;
   max-height: 60%;
   position: absolute;
   top: 20%;
-  left: 15%;
+  left: 10%;
   margin: 20px;
   padding: 5px 20px 13px 20px;
   border-radius: 10px;
