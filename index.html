@@ -51,29 +51,14 @@
         <tbody id="usersBody"></tbody>
       </table>
     </div>
-    <!--<div id="requestTableContainer" class="tableContainer 
-                                           dialog-message responsive_font_4">
-      <table id="requestTable">
-        <thead>
-          <tr>
-            <th>Pending</th>
-            <th>requests:</th>
-            <th class="text-right">
-              <button id="browseFromRequests" class="btn btn-secondary">
-                Back to <br/>browse
-                <i class="fas fa-sign-out-alt"></i>
-              </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="requestsBody"></tbody>
-      </table>
-    </div>-->
     <div id="top_banner" class="top_banner">
       <div class="row section group height_100">
         <div class="col banner center border height_100">
           <span id="viewAll" class="banner_text">
-            <i class="fas fa-search fa-4x"></i>
+            <span class="fa-stack fa-3x">
+              <i class="fas fa-search fa-stack-2x"></i>
+              <i id="notifyDot" class="fas fa-circle fa-stack-1x red"></i>
+            </span>
           </span>
         </div>
         <div class="col banner center border height_100">
@@ -180,6 +165,7 @@
       </div>
     </div>
     <div id="STANDBY" class="fullscreenblock"></div>
+    <div id="screenBlock" class="fullscreenblock"></div>
     <div class="info message">
       <h1 class="msg_header">FYI, something just happened!</h1>
     </div>

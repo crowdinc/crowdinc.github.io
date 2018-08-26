@@ -109,7 +109,7 @@ $(document).ready(function() {
   });
   $('#end').click(function() {
     console.log('end');
-    state = "END";
+    state = 'END';
     soundEnabled = false;
     respondState();
     publishMessage('log', {
@@ -404,8 +404,11 @@ function create(userID, userNickname) {
   else {
     // duplicate nickname
     if (arrayUUIDs.indexOf(userID) == -1) {
-      publishMessage(userID, {type: "create-response", res: "f"});
-      console.log("nickname conflict!");
+      publishMessage(userID, {
+        type: 'create-response', 
+        res: 'f'
+      });
+      console.log('nickname conflict!');
     }
     // disconnected user returning with same name
     else {
