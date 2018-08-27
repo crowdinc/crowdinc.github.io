@@ -41,11 +41,13 @@ var indexElse;
 var idElse;
 var stateElse;
 
-// index of who this user has sent/received mingle requests to/from
+// information about who this user has sent/received mingle requests to/from
 var requestTo = -1;
 var requestsFrom = [];
+var currentRequestID = '';
+var currentRequestNickname = '';
 
-var myMessages = ['info','warning','error','success', 'like', 'mingleRequest'];
+var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'];
 
 $(document).ready(function () {
   
@@ -62,8 +64,8 @@ $(document).ready(function () {
 
   function showMessage(type, message, autoHide, hideTime) {
     hideAllMessages();
-    $("." + type + " .msg_header").text(message);
-    $('.' + type).animate({top: "0"}, 500);
+    $('.' + type + ' .msg_header').text(message);
+    $('.' + type).animate({top: '0'}, 500);
     if (autoHide) {
       hideTime = hideTime | 3000;
       setTimeout(hideAllMessages, hideTime);
@@ -81,8 +83,8 @@ $(document).ready(function () {
   BufferLoader.prototype.loadBuffer = function(url, index) {
     // Load buffer asynchronously
     var request = new XMLHttpRequest();
-    request.open("GET", url, true);
-    request.responseType = "arraybuffer";
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
 
     var loader = this;
 
@@ -104,11 +106,6 @@ $(document).ready(function () {
         }
       );
     }
-
-    /*request.onerror = function(error) {
-      console.log('BufferLoader: XHR error', error);
-      debugger;
-    }*/
     request.send();
   };
 
@@ -647,6 +644,7 @@ $(document).ready(function () {
           viewAll(m.users);
           break;
         case 'queryState':
+          // the user is trying to send a request
           publishMessage(m.id, {
             type: 'respondState',
             state: state
@@ -678,13 +676,17 @@ $(document).ready(function () {
         case 'mingleRequest':
           if (state != 'VIEWALL') {
             showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
-                        true, 2000);
-            $('#notifyDot').css('visibility', 'visible');
+                        true, 1500);
+            if (state != 'EDIT') {
+              $('#notifyDot').css('visibility', 'visible');
+            }
           }
           // add this request to the list of pending requests
           addRequestRow(m.nickname, m.index);
           
           requestsFrom.push(m.index);
+          currentRequestID = m.id;
+          currentRequestNickname = m.nickname;
           
           // removes user from list of other users
           removeUserRow(m.nickname);
@@ -1079,7 +1081,8 @@ $(document).ready(function () {
     if ($('#mingle').hasClass('dimmed')) {
       publishMessage(idElse, {
         type: 'queryState',
-        id: myID
+        id: myID,
+        nickname: currentRequestNickname
       });
     }
     else if ($('#mingle').hasClass('clicked')) {
@@ -1121,6 +1124,7 @@ $(document).ready(function () {
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visibile');
 
+    // sender should be the most recent entry in requestsFrom
     var senderIndex = requestsFrom[requestsFrom.length - 1];
     publishMessage('performer', {
       type: 'mingleYes',

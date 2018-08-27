@@ -238,7 +238,8 @@ function parseMessage(m) {
             publishMessage(targetUser.id, {
               type: 'mingleRequest',
               index: m.index,
-              nickname: arrayUsers[m.index].nickname
+              nickname: arrayUsers[m.index].nickname,
+              id: arrayUsers[m.index].id
             });
           }
           /*publishMessage('log', {
