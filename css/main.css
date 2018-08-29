@@ -112,15 +112,6 @@ h1,h2,h3,h4 {
 	min-width: 90px;
 }
 
-/*.col:first-child { margin-left: 0; }
-
-  //COLUMN SETUP  
-.col {
-	display: block;
-	float:left;
-}*/
-
-
 .top_banner {
 	position: fixed;
 	width: 100%;
@@ -246,6 +237,18 @@ tr {
   -webkit-box-sizing: border-box;
 }
 
+.halfWidth {
+  max-width: 50%!important;
+}
+
+.thirdWidth {
+  max-width: 33.333%!important;
+}
+
+.quarterWidth {
+  max-width: 25%!important;
+}
+
 #notifyDot {
   visibility: hidden;
   padding-left: 1vw;
@@ -258,7 +261,7 @@ tr {
   /*position: absolute;*/
   text-align: center;
   color: red;
-  font-size: 200%;
+  font-size: 2vmin;
   font-weight: 600;
 }
 

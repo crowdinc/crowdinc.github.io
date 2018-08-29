@@ -1,5 +1,5 @@
 window.onbeforeunload = function() {
-  //return "";
+  //return '';
   /*publishMessage('log', {
     type: 'total refresh',
     user: 'performer'
@@ -8,7 +8,7 @@ window.onbeforeunload = function() {
 
 var DEBUG = false;
 var soundEnabled = false;
-var state = "STANDBY"; // STANDBY, GOLIVE, END
+var state = 'STANDBY'; // STANDBY, GOLIVE, END
 var STOPWORKING = false;
 var arrayUUIDs = [];
 var arrayUniqueNicknames = [];
@@ -75,7 +75,7 @@ $(document).ready(function() {
   });
   $('#standby').click(function() {
     console.log('standby');
-    state = "STANDBY";
+    state = 'STANDBY';
     soundEnabled = false;
     respondState();
     publishMessage('log', {
@@ -150,7 +150,7 @@ $(document).ready(function() {
       data1: '"' + selectedText + '"'
     });
   };
-  var map = {"Shift-Enter": livecode};
+  var map = {'Shift-Enter': livecode};
   editor.addKeyMap(map);
   
   // checks if another performer is present
@@ -164,7 +164,7 @@ $(document).ready(function() {
 function parseMessage(m) {
   if (STOPWORKING) return;
   try {
-    if (DEBUG) console.log("message received: " + JSON.stringify(m));
+    if (DEBUG) console.log('message received: ' + JSON.stringify(m));
     if (typeof m.type !== 'undefined') {
       if (typeof m.index !== 'undefined') {
         if (arrayUsers[m.index] == 'undefined') {
@@ -346,23 +346,33 @@ function performanceStatus(message) {
 }
 
 function respondState(userID){
-  if (userID)
-    publishMessage(userID, {type:"state-response", sound:soundEnabled, state:state});
-  else
-    publishMessage("audience", {type:"state-response", sound:soundEnabled, state:state});
+  if (userID) {
+    publishMessage(userID, {
+      type: 'state-response', 
+      sound: soundEnabled, 
+      state: state
+    });
+  }
+  else {
+    publishMessage('audience', {
+      type: 'state-response', 
+      sound: soundEnabled, 
+      state: state
+    });
+  }
 }
 
 // central message sending function
 function publishMessage(channel, options){
   if (STOPWORKING) {
-    alert("Can't publish when another performer is active");
+    alert('Can\'t publish when another performer is active');
     return;
   }
   pubnub.publish({
     channel: channel,
     message: options
   });
-  if (DEBUG) console.log("sent a message to channel (" + channel + ") : " + 
+  if (DEBUG) console.log('sent a message to channel (' + channel + ') : ' + 
                          JSON.stringify(options));
 }
 
@@ -443,7 +453,7 @@ function create(userID, userNickname) {
           type: 'create-response', 
           res: 'f'
         });
-        console.log("nickname conflict! (although s/he is an existing user)");
+        console.log('nickname conflict! (although s/he is an existing user)');
       }
       displayUser(foundIndex);
     }
@@ -454,16 +464,16 @@ function displayUser(index) {
   var user = arrayUsers[index];
   var divStr = divTemplate.replace(/\[index\]/g,user.index).replace(/\[nickname\]/g,user.nickname);
   var newDiv = $('<div/>').html(divStr).contents();
-  newDiv.find('.stats').css("display", "none");
+  newDiv.find('.stats').css('display', 'none');
   user.obj = newDiv;
-  user.obj.find('.stats').css("display", "");
+  user.obj.find('.stats').css('display', '');
   $('#users').append(user.obj);
 }
 
 function update(userIndex, userPattern) {
   var user = arrayUsers[userIndex];
   if (!user) return;
-  user.obj.css("background", "");
+  user.obj.css('background', '');
   user.pattern = userPattern;
 }
 
