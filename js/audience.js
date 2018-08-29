@@ -677,7 +677,7 @@ $(document).ready(function () {
           if (state != 'VIEWALL') {
             showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
                         true, 1500);
-            if (state != 'EDIT') {
+            if (state == 'EDIT' || state == 'VIEWALL') {
               $('#notifyDot').css('visibility', 'visible');
             }
           }

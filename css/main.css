@@ -252,8 +252,8 @@ tr {
 #notifyDot {
   visibility: hidden;
   padding-left: 1vw;
-  margin-left: 3.5vw;
-  margin-bottom: 3vh;
+  margin-left: 40%;
+  margin-bottom: 60%;
 }
 
 #mingleText {
@@ -261,7 +261,7 @@ tr {
   /*position: absolute;*/
   text-align: center;
   color: red;
-  font-size: 2vmin;
+  font-size: 2.8vmin;
   font-weight: 600;
 }
 
