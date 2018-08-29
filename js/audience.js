@@ -1,16 +1,16 @@
-var state = "NAME"; // it is either NAME, EDIT, WAIT, BROWSE, MINGLE
+var state = 'NAME'; // it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 var DEBUG = false;
-var performerState = "STANDBY";
+var performerState = 'STANDBY';
 /*
 
   State Diagram
 
   NAME -> EDIT : create-response msg received
   EDIT -> WAIT : 'next' msg sent
-  WAIT -> BROWSE : newFollowResponse msg received in "WAIT" state
+  WAIT -> BROWSE : newFollowResponse msg received in 'WAIT' state
   BROWSE -> MINGLE : user press HEART button
   MINGLE -> BROWSE : user press exit button
-  BROWSE -> EDIT : user press "update" button
+  BROWSE -> EDIT : user press 'update' button
 
   */
 
@@ -32,7 +32,7 @@ var myIndex;
 var strScreenName;
 var pattern = [];
 var originalPattern = [];
-var liked = new Array();
+var liked = [];
 
 // properties of a followed user
 var patternElse = [];
@@ -52,7 +52,7 @@ var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'
 $(document).ready(function () {
   
   function hideAllMessages() {
-    var messagesHeights = new Array(); // this array will store height for each
+    var messagesHeights = []; // this array will store height for each
 
     for (i = 0; i < myMessages.length; i++) {
       // fill array 
@@ -76,7 +76,7 @@ $(document).ready(function () {
     this.context = context;
     this.urlList = urlList;
     this.onload = callback;
-    this.bufferList = new Array();
+    this.bufferList = [];
     this.loadCount = 0;
   }
 
@@ -227,7 +227,7 @@ $(document).ready(function () {
     this.time = context.currentTime;
     for (var i = 0; i < numOsc; i++) {
       var osc = context.createOscillator();
-      if (oscType.length === "undefined")
+      if (oscType.length === 'undefined')
         osc.type = oscType;
       else
         osc.type = oscType[i % oscType.length];
@@ -459,14 +459,14 @@ $(document).ready(function () {
   }
 
   // Set the name of the next div
-  function setNextDivName(divName) {
+  /*function setNextDivName(divName) {
     var actualTindered =  document.getElementById('tindered');
-    actualTindered.innerHTML = "";
+    actualTindered.innerHTML = '';
     actualTindered.appendChild(document.createTextNode(divName));
-  }
+  }*/
 
   window.onbeforeunload = function() {
-    if (state != "NAME") {
+    if (state != 'NAME') {
       publishMessage('performer', {
         type: 'unfollow',
         index: myIndex
@@ -487,7 +487,7 @@ $(document).ready(function () {
         });
       }
     }
-    //return "";
+    //return '';
   };
 
   function randomizeNote() {
@@ -505,33 +505,33 @@ $(document).ready(function () {
 
   function refresh() {
     //window.onbeforeunload = null;
-    showMessage("info", "This page will be refreshed in 3 seconds...", true, 2500);
+    showMessage('info', 'This page will be refreshed in 3 seconds...', true, 2500);
     setTimeout(function() {
       window.location.reload();
     },3000);
   }
 
   function update() {
-    state = "WAIT";
-    publishMessage("performer", {
-      type: "update", 
+    state = 'WAIT';
+    publishMessage('performer', {
+      type: 'update', 
       index: myIndex, 
       pattern: pattern
     });
-    $("#waiting-message").css("visibility", "visible");
-    $("#submit_pane").css("visibility", "hidden");
+    $('#waiting-message').css('visibility', 'visible');
+    $('#submit_pane').css('visibility', 'hidden');
   }
 
   function mingle() {
     state = 'MINGLE';
-    $("#mingle_pane").css("visibility", "visible");
-    $("#like").css("visibility", "visible");
+    $('#mingle_pane').css('visibility', 'visible');
+    $('#like').css('visibility', 'visible');
 
     if (liked.indexOf(indexElse) == -1) $('#like').removeClass('red');
     else $('#like').addClass('red');
 
-    $("#bottom_banner").css("visibility", "hidden");
-    $("#top_banner").css("visibility", "hidden");
+    $('#bottom_banner').css('visibility', 'hidden');
+    $('#top_banner').css('visibility', 'hidden');
     for (var i = 0; i < pattern.length; i++) {
       var note = new Note();
       note.setPosition(pattern[i].x, pattern[i].y);
@@ -557,7 +557,7 @@ $(document).ready(function () {
 
   // Subscribe to a channel
   pubnub.subscribe({
-    channel: myID + ",audience",
+    channel: myID + ',audience',
     message: parseMessage,
     presence: parsePresence,
     error: function (error) {
@@ -569,21 +569,21 @@ $(document).ready(function () {
   });
   
   function publishMessage(channel, options) {
-    if (channel == "audience") {
-      console.error("please not hack this application. :) ");
+    if (channel == 'audience') {
+      console.error('please not hack this application. :) ');
       return;
     }
     pubnub.publish({
       channel: channel,
       message: options,
       error: function(m) {
-        console.log("Message send failed - ["
-                    + JSON.stringify(m) + "] - Retrying in 3 seconds!");
+        console.log('Message send failed - ['
+                    + JSON.stringify(m) + '] - Retrying in 3 seconds!');
         setTimeout(publishMessage(channel, options), 2000);
       }
     });
     if (DEBUG) {
-      console.log("sent a message to channel ("+channel+") : " + JSON.stringify(options));
+      console.log('sent a message to channel ('+channel+') : ' + JSON.stringify(options));
     }
   }
   
@@ -603,22 +603,22 @@ $(document).ready(function () {
   }
   
   function parseMessage(m) {
-    if (DEBUG) console.log("message - received:" + JSON.stringify(m));
-    if (typeof m.nextDivName !== 'undefined') {
+    if (DEBUG) console.log('message - received:' + JSON.stringify(m));
+    /*if (typeof m.nextDivName !== 'undefined') {
       setNextDivName(m.nextDivName);
-    }
+    }*/
     else if (typeof m.type !== 'undefined') {
       switch(m.type) {
         case 'create-response':
           NORESPONSE1 = false;
-          if (m.res == "s") {
-            state = "EDIT";
+          if (m.res == 's') {
+            state = 'EDIT';
             $('#initial-message').bPopup().close();
-            strScreenName = $("#screenname").val();
+            strScreenName = $('#screenname').val();
             $('#screenname_display').text(strScreenName);
             myIndex = m.index;
             lastPingTime = Date.now();
-            $("#submit_pane").css("visibility", "visible");
+            $('#submit_pane').css('visibility', 'visible');
             if (m.pattern) {
               console.log('pattern exists');
               for (var i = 0; i < m.pattern.length; ++i) {
@@ -772,8 +772,8 @@ $(document).ready(function () {
           break;
         case 'question':
           if (m.text.length > 0) {
-            $("#question_content").text(m.text);
-            $("#question-message").css("visibility", "visible");
+            $('#question_content').text(m.text);
+            $('#question-message').css('visibility', 'visible');
           }
           break;
         case 'scale':
@@ -786,7 +786,7 @@ $(document).ready(function () {
           else {
             baseNote = m.baseNote;
             selectedScale = m.scale;
-            showMessage("info", "The performer changed the scale.", true);
+            showMessage('info', 'The performer changed the scale.', true);
           }
           break;
         case 'sound-toggle':
@@ -823,22 +823,22 @@ $(document).ready(function () {
           NORESPONSE2 = false;
           soundEnabled = m.sound;
           performerState = m.state;
-          if (performerState == "STANDBY") {
-            showMessage("warning", "STANDBY, Crowd in C is about to start.");
-            $("#STANDBY").css("visibility", "visible");
-            $("#STANDBY").css("z-index", "2");
+          if (performerState == 'STANDBY') {
+            showMessage('warning', 'STANDBY, Crowd in C is about to start.');
+            $('#STANDBY').css('visibility', 'visible');
+            $('#STANDBY').css('z-index', '2');
           }
-          else if (performerState == "GOLIVE") {
+          else if (performerState == 'GOLIVE') {
             hideAllMessages();
-            showMessage("success", "Let's go live!", true);
-            $("#STANDBY").css("visibility", "hidden");
-            $("#STANDBY").css("z-index", "0");
+            showMessage('success', 'Let\'s go live!', true);
+            $('#STANDBY').css('visibility', 'hidden');
+            $('#STANDBY').css('z-index', '0');
           }
-          else if (performerState == "END") {
+          else if (performerState == 'END') {
             hideAllMessages();
-            showMessage("success", "This is the end. (Applause)", true);
-            $("#STANDBY").css("visibility", "hidden");
-            $("#STANDBY").css("z-index", "0");
+            showMessage('success', 'This is the end. (Applause)', true);
+            $('#STANDBY').css('visibility', 'hidden');
+            $('#STANDBY').css('z-index', '0');
           }
           break;
         default:
@@ -856,37 +856,37 @@ $(document).ready(function () {
     $(this).animate({top: -$(this).outerHeight()}, 500);
   });
 
-  $("#question-message").css("visibility", "hidden");
+  $('#question-message').css('visibility', 'hidden');
 
-  $("#waiting-message").css("visibility", "hidden");
+  $('#waiting-message').css('visibility', 'hidden');
 
   $('#answer_yes').button().click(function() {
     playSample('yes', true);
-    $("#question-message").css("visibility","hidden");
+    $('#question-message').css('visibility','hidden');
     publishMessage('log', {
       type: 'questionAnswer',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      data1: $("#question_content").text(),
+      data1: $('#question_content').text(),
       data2: 'yes'
     });
   })
 
   $('#answer_no').button().click(function() {
     playSample('no', true);
-    $("#question-message").css("visibility","hidden");
+    $('#question-message').css('visibility','hidden');
     publishMessage('log', {
       type: 'questionAnswer',
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
-      data1: $("#question_content").text(),
+      data1: $('#question_content').text(),
       data2: 'no'
     });
   });
 
-  $(".tenpercent").each(function() {
+  $('.tenpercent').each(function() {
     var height =  window.innerHeight * 0.08; // Max width for the image
-    $(this).css("height", height);
+    $(this).css('height', height);
   });
 
   NORESPONSE2 = true;
@@ -894,7 +894,10 @@ $(document).ready(function () {
   (function loopPublish2() {
     setTimeout(function() {
       if (NORESPONSE2) {
-        publishMessage("performer", {type:"state", myID:myID});
+        publishMessage('performer', {
+          type: 'state', 
+          id: myID
+        });
         loopPublish2();
       }
     }, 3000);
@@ -902,31 +905,39 @@ $(document).ready(function () {
 
   // this is moved here to support iOS : http://stackoverflow.com/questions/12517000/no-sound-on-ios-6-web-audio-api
 
-  $("#start").button().css({margin:'5px'}).click(function() {
+  $('#start').button().css({margin:'5px'}).click(function() {
     context.resume();
-    $("#name_error_msg").text("");
+    $('#name_error_msg').text('');
 
-    strScreenName = $("#screenname").val();
+    strScreenName = $('#screenname').val();
     if (strScreenName.length > 12) {
-      $("#name_error_msg").text("screen name is too long");
+      $('#name_error_msg').text('screen name is too long');
       return;
     }
 
     if (textAlphanumeric(strScreenName) == false) {
-      $("#name_error_msg").text("Please, use only letters and numbers for the screen name. ");
+      $('#name_error_msg').text('Please, use only letters and numbers for the screen name. ');
       return;
     }
     NORESPONSE1 = true;
-    publishMessage("performer", {"type":"create", "myID": myID, "nickname": strScreenName});
+    publishMessage('performer', {
+      type:'create', 
+      id: myID, 
+      nickname: strScreenName
+    });
     (function loopPublish1() {
       setTimeout(function() {
         if (NORESPONSE1) {
-          publishMessage("performer", {"type":"create", "myID":myID, "nickname": strScreenName});
+          publishMessage('performer', {
+            type: 'create', 
+            id: myID, 
+            nickname: strScreenName
+          });
           loopPublish1();
         }
       }, 3000);
     })();
-    $("#name_error_msg").text("Waiting for response...");
+    $('#name_error_msg').text('Waiting for response...');
     
     if (soundEnabled) {
       var masterGain = context.createGain();
@@ -972,10 +983,10 @@ $(document).ready(function () {
   });
   
   $('#modify').click(function() {
-    state = "EDIT";
-    $("#submit_pane").css("visibility", "visible");
-    $("#bottom_banner").css("visibility", "hidden");
-    $("#top_banner").css("visibility", "hidden");
+    state = 'EDIT';
+    $('#submit_pane').css('visibility', 'visible');
+    $('#bottom_banner').css('visibility', 'hidden');
+    $('#top_banner').css('visibility', 'hidden');
     publishMessage('log', {
       type: 'stateChange',
       user: strScreenName,
@@ -1159,8 +1170,8 @@ $(document).ready(function () {
       type: 'whereami', 
       index: myIndex
     });
-    $("#waiting-message").css("visibility", "visible");
-    $("#mingle_pane").css("visibility", "hidden");
+    $('#waiting-message').css('visibility', 'visible');
+    $('#mingle_pane').css('visibility', 'hidden');
     $('#like').css('visibility', 'hidden');
     
     for (var i = 0; i < pattern.length; i++) {
@@ -1192,7 +1203,7 @@ $(document).ready(function () {
 
 
   function init() {
-    canvas = $("#patternCanvas")[0];
+    canvas = $('#patternCanvas')[0];
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight * 0.9;
@@ -1222,7 +1233,7 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == "EDIT" || state == "MINGLE" || state == "BROWSE" || state == "WAIT") {
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'BROWSE' || state == 'WAIT') {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -1236,7 +1247,7 @@ $(document).ready(function () {
        }
     }
 
-    if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
@@ -1256,7 +1267,7 @@ $(document).ready(function () {
       }
     }
 
-    if (state == "BROWSE" || state == "MINGLE") {
+    if (state == 'BROWSE' || state == 'MINGLE') {
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
@@ -1279,15 +1290,15 @@ $(document).ready(function () {
 
   var animate = function() {
     window.requestAnimFrame(animate);
-    if (state == "NAME")
+    if (state == 'NAME')
       return;
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
-    var oscType = ["sine","sine","triangle","triangle","sawtooth","square","triangle","sawtooth","square" ];
+    var oscType = ['sine','sine','triangle','triangle','sawtooth','square','triangle','sawtooth','square' ];
     var detune = 20;
     var maxNumOsc = oscType.length;
 
-    if (state == "EDIT" || state == "MINGLE" || state == "WAIT") {
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
       progress = (currentTime - lastPingTime ) / interval;
       if (playBarNote < 0 && lastPingTime + interval < currentTime) {
         playBarNote++;
@@ -1335,9 +1346,9 @@ $(document).ready(function () {
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
-    } // end of if (state == "EDIT" || state == "MINGLE") {
+    } // end of if (state == 'EDIT' || state == 'MINGLE') {
 
-    if (state == "BROWSE" || state == "MINGLE") {
+    if (state == 'BROWSE' || state == 'MINGLE') {
       
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
@@ -1386,7 +1397,7 @@ $(document).ready(function () {
                             intervalInSec*0.1,voice.maxGain*2.0,voice.maxGain );
         }
       }
-    } // end of if (state == "EDIT" || state == "MINGLE") {
+    } // end of if (state == 'EDIT' || state == 'MINGLE') {
     draw();
   };
 
@@ -1474,7 +1485,7 @@ $(document).ready(function () {
   });
   
   $(document).mousedown(function(e) {
-    if (state == "WAIT") return;
+    if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
     var minDistance = 100000;
     var tempNoteID = -1;

@@ -179,7 +179,7 @@ function parseMessage(m) {
           })
           break;
         case 'create':
-          create(m.myID, m.nickname);
+          create(m.id, m.nickname);
           break;
         case 'update':
           update(m.index, m.pattern);
@@ -200,7 +200,7 @@ function parseMessage(m) {
           unfollow(m.index);
           break;
         case 'state':
-          respondState(m.myID);
+          respondState(m.id);
           break;
         case 'viewAll':
           var users = {};
@@ -339,7 +339,7 @@ function performanceStatus(message) {
       var user_disconected = arrayUUIDs.indexOf(message.uuid);
       if (user_disconected != -1) {
         var divDisconnected = document.getElementById(user_disconected);
-        divDisconnected.style.background = "grey";
+        divDisconnected.style.background = 'grey';
       }
     }
   }

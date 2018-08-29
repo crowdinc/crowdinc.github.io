@@ -192,13 +192,19 @@ h1,h2,h3,h4 {
   height: 100%;
   vertical-align: middle;
 }
-
+  
 table {
   width: 100%;
 }
 
 tr {
   border-top: 1px solid black;
+}
+
+#viewTableContainer {
+  visibility: hidden;
+  overflow-y: scroll;
+  z-index: 1;
 }
 
 #mainTableHeader {
@@ -247,8 +253,9 @@ tr {
   margin-bottom: 3vh;
 }
 
-.iconOverlay {
-  margin-top: top: 50%;
+#mingleText {
+  /*margin-top: top: 50%;*/
+  /*position: absolute;*/
   text-align: center;
   color: red;
   font-size: 200%;
@@ -259,7 +266,7 @@ tr {
   z-index: -1;
   position: absolute;
   left: 40%;
-  bottom: 3.3vh;
+  top: 3vh;
 }
 
 .height_50 {
@@ -277,19 +284,6 @@ tr {
 
 .dimmed {
   opacity: 0.2;
-}
-
-/*
-#mingleText {
-  display: block;
-  margin-top: -4vh
-}
-*/
-
-.tableContainer {
-  visibility: hidden;
-  overflow-y: scroll;
-  z-index: 1;
 }
 
 .shortcutButton {
