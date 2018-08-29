@@ -32,7 +32,7 @@ var myIndex;
 var strScreenName;
 var pattern = [];
 var originalPattern = [];
-var liked = [];
+var myLikes = [];
 
 // properties of a followed user
 var patternElse = [];
@@ -428,11 +428,16 @@ $(document).ready(function () {
                                      patternElse[i+1].x * w, patternElse[i+1].y * h);
     }
     if (state == 'WAIT') {
+      $('#top_banner').css('visibility', 'visible');
       $('.bottom_banner2').css('visibility', 'hidden');
       $('#bottom_banner').css('visibility', 'visible');
-      $('#top_banner').css('visibility', 'visible');
+      
+      if (myLikes.includes(indexElse)) $('#like').addClass('red');
+      else $('#like').removeClass('red');
+      
       lastPingTimeElse = Date.now();
       state = 'BROWSE';
+      $('#waiting-message').css('visibility', 'hidden');
       $('#waiting-message').css('visibility', 'hidden');
     }
     $('#viewTableContainer').css('visibility', 'hidden');
@@ -457,13 +462,6 @@ $(document).ready(function () {
     $('#screenBlock').css('visibility', 'visible');
     $('#waiting-message').css('visibility', 'visible');
   }
-
-  // Set the name of the next div
-  /*function setNextDivName(divName) {
-    var actualTindered =  document.getElementById('tindered');
-    actualTindered.innerHTML = '';
-    actualTindered.appendChild(document.createTextNode(divName));
-  }*/
 
   window.onbeforeunload = function() {
     if (state != 'NAME') {
@@ -525,10 +523,6 @@ $(document).ready(function () {
   function mingle() {
     state = 'MINGLE';
     $('#mingle_pane').css('visibility', 'visible');
-    $('#like').css('visibility', 'visible');
-
-    if (liked.indexOf(indexElse) == -1) $('#like').removeClass('red');
-    else $('#like').addClass('red');
 
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
@@ -625,6 +619,8 @@ $(document).ready(function () {
                 pattern[i].setPosition(m.pattern[i].x, m.pattern[i].y);
               }
             }
+            if (m.likes) myLikes = m.likes;
+            
             publishMessage('performer', {
               type: 'update',
               index: myIndex,
@@ -760,7 +756,7 @@ $(document).ready(function () {
           if (m.index == myIndex) {
             showMessage('error',  'I know! You like your tune.', true, 1000);
           }
-          else if (liked.indexOf(m.index) == -1) {
+          else if (!myLikes.includes(m.index)) {
             showMessage('error',  m.nickname + ' likes your tune!', true, 1000);
             playSample('liked', true);
           }
@@ -1002,7 +998,7 @@ $(document).ready(function () {
       index: myIndex, 
       likedindex: indexElse
     });
-    liked.push(indexElse);
+    myLikes.push(indexElse);
     $('#like').addClass('red');
   });
   
@@ -1172,7 +1168,6 @@ $(document).ready(function () {
     });
     $('#waiting-message').css('visibility', 'visible');
     $('#mingle_pane').css('visibility', 'hidden');
-    $('#like').css('visibility', 'hidden');
     
     for (var i = 0; i < pattern.length; i++) {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);

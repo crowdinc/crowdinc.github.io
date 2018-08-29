@@ -383,7 +383,6 @@ function getRandomInt (min, max) {
 function create(userID, userNickname) {
   // if the nickname doesn't exist yet
   if (arrayUniqueNicknames.indexOf(userNickname) == -1) {
-    
     var index = arrayUniqueNicknames.push(userNickname) - 1;
     arrayUUIDs.push(userID);
     var user = {
@@ -429,14 +428,16 @@ function create(userID, userNickname) {
         if (userID.trim() === arrayUsers[i].id && 
             userNickname === arrayUsers[i].nickname) {
           foundIndex = i;
+          var user = arrayUsers[foundIndex];
           // initiate user's interface
           publishMessage(userID, {
             type: 'create-response',
             res: 's',
             index: foundIndex,
-            pattern: arrayUsers[foundIndex].pattern
+            likes: user.likes,
+            pattern: user.pattern
           });
-          var user = arrayUsers[foundIndex];
+          
           user.state = 'EDIT';
           user.obj.remove();
           console.log('user exists and returned');
