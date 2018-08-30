@@ -367,11 +367,11 @@ $(document).ready(function () {
           '</td>' + 
           '<td colspan="2" class="text-right">' + 
             '<button id="accept' + index + 
-            '" class="response accept btn btn-xl btn-success">' +
+            '" class="response accept btn btn-lg btn-success">' +
               'Accept' + 
             '</button>' +
             '<button id="ignore' + index + 
-            '" class="response ignore btn btn-info">' +
+            '" class="response ignore btn btn-lg btn-info">' +
               'Ignore' + 
             '</button>' +
           '</td>' +
@@ -1168,6 +1168,7 @@ $(document).ready(function () {
     });
     $('#waiting-message').css('visibility', 'visible');
     $('#mingle_pane').css('visibility', 'hidden');
+    $('#mingle').removeClass('dimmed');
     
     for (var i = 0; i < pattern.length; i++) {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
