@@ -1,3 +1,5 @@
+// possible issue - performer interface doesn't record when users enter 'WAIT' state, could accidentally allow requests to busy users to go through?
+
 window.onbeforeunload = function() {
   //return '';
   /*publishMessage('log', {
@@ -242,14 +244,6 @@ function parseMessage(m) {
               id: arrayUsers[m.index].id
             });
           }
-          /*publishMessage('log', {
-            type: 'stateChange',
-            user: arrayUsers[m.index].nickname,
-            timestamp: Math.floor(Date.now()),
-            data1: 'BROWSE',
-            data2: 'MINGLE',
-            data3: m.nickname
-          });*/
           break;
         case 'mingleYes':
           // tells both the sender and receiver of the mingle request to enter mingle mode

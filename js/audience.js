@@ -1,3 +1,10 @@
+/*
+TODO:
+Send statechange to WAIT when next or prev is pressed
+Handle jumping to a user statechange
+More testing and debugging of mingle log messages
+*/
+
 var state = 'NAME'; // it is either NAME, EDIT, WAIT, BROWSE, MINGLE
 var DEBUG = false;
 var performerState = 'STANDBY';
@@ -6,9 +13,10 @@ var performerState = 'STANDBY';
   State Diagram
 
   NAME -> EDIT : create-response msg received
-  EDIT -> WAIT : 'next' msg sent
+  EDIT -> WAIT : 'next'/'prev' msg sent
   WAIT -> BROWSE : newFollowResponse msg received in 'WAIT' state
-  BROWSE -> MINGLE : user press HEART button
+  BROWSE -> WAIT : user accepts a mingle request
+  WAIT -> MINGLE : 'beginMingle' message received
   MINGLE -> BROWSE : user press exit button
   BROWSE -> EDIT : user press 'update' button
 
@@ -338,6 +346,13 @@ $(document).ready(function () {
     $('#waiting-message').css('visibility', 'hidden');
     $('#viewTableContainer').css('visibility', 'visible');
     $('#notifyDot').css('visibility', 'hidden');
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: 'WAIT',
+      data2: 'VIEWALL'
+    });
 
     $('#requestsBody').empty();
     $('#usersBody').empty();
@@ -439,6 +454,13 @@ $(document).ready(function () {
       state = 'BROWSE';
       $('#waiting-message').css('visibility', 'hidden');
       $('#waiting-message').css('visibility', 'hidden');
+      publishMessage('log', {
+        type: 'stateChange',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: 'WAIT',
+        data2: 'BROWSE'
+      });
     }
     $('#viewTableContainer').css('visibility', 'hidden');
     $('#screenBlock').css('visibility', 'hidden');
@@ -521,17 +543,29 @@ $(document).ready(function () {
   }
 
   function mingle() {
+    /*to handle users entering mingle from any other state - 
+    could vary based on when their request is accepted*/
+    var prevState = state;
+    
     state = 'MINGLE';
     $('#mingle_pane').css('visibility', 'visible');
-
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
+    
     for (var i = 0; i < pattern.length; i++) {
       var note = new Note();
       note.setPosition(pattern[i].x, pattern[i].y);
       note.distance = pattern[i].distance;
       originalPattern[i] = note;
     }
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: prevState,
+      data2: 'MINGLE',
+      data3: nicknameElse
+    });
   }
 
   // get/create/store UUID
@@ -673,7 +707,7 @@ $(document).ready(function () {
           if (state != 'VIEWALL') {
             showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
                         true, 1500);
-            if (state == 'EDIT' || state == 'VIEWALL') {
+            if (state == 'BROWSE' || state == 'VIEWALL') {
               $('#notifyDot').css('visibility', 'visible');
             }
           }
@@ -956,7 +990,7 @@ $(document).ready(function () {
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
       data1: 'EDIT',
-      data2: 'BROWSE'
+      data2: 'WAIT'
     });
     getNewPattern('next');
   });
@@ -993,6 +1027,7 @@ $(document).ready(function () {
   });
   
   $('#like').click(function() {
+    if ($('#like').hasClass('red')) return;
     publishMessage('performer', {
       type: 'liked', 
       index: myIndex, 
@@ -1006,10 +1041,16 @@ $(document).ready(function () {
     state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visible');
-
     publishMessage('performer', {
       type: 'viewAll',
       index: myIndex
+    });
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: 'BROWSE',
+      data2: 'WAIT'
     });
   });
   
@@ -1017,6 +1058,13 @@ $(document).ready(function () {
     state = 'BROWSE';
     $('#screenBlock').css('visibility', 'hidden');
     $('#viewTableContainer').css('visibility', 'hidden');
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: 'VIEWALL',
+      data2: 'BROWSE'
+    });
   });
   
   $('#screenBlock').click(function() {
@@ -1040,6 +1088,9 @@ $(document).ready(function () {
   });
   
   $('#requestsTable').on('click', '.response', function() {
+    // gets sender's nickname by removing 'AcceptIgnore ' from grandparent text
+    var nicknameFrom = $(this).parent().parent().text().slice(0, -13);
+    
     // user accepts a request
     if ($(this).hasClass('accept')) {
       if (requestTo != -1) {
@@ -1053,11 +1104,23 @@ $(document).ready(function () {
       state = 'WAIT';
       $('#waiting-message').css('visibility', 'visible');
       $('#requestTableContainer').css('visibility', 'hidden');
-
       publishMessage('performer', {
         type: 'mingleYes',
         index: myIndex,
         sender: this.id.slice(-1)
+      });
+      publishMessage('log', {
+        type: 'stateChange',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: 'VIEWALL',
+        data2: 'WAIT'
+      });
+      publishMessage('log', {
+        type: 'acceptRequest',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: nicknameFrom
       });
       
       // removes sender from list
@@ -1065,14 +1128,12 @@ $(document).ready(function () {
     }
     // user ignores a request
     else if ($(this).hasClass('ignore')) {
-      // gets nickname by removing 'AcceptIgnore ' from grandparent text
-      var nickname = $(this).parent().parent().text().slice(0, -13);
       // last digit of element id
       var index = this.id.slice(-1);
       
       // moves user from 'pending requests' to 'other users'
-      removeRequestRow(nickname);
-      addUserRow(nickname, index);
+      removeRequestRow(nicknameFrom);
+      addUserRow(nicknameFrom, index);
       
       publishMessage('performer', {
         type: 'mingleNo',
@@ -1081,6 +1142,12 @@ $(document).ready(function () {
       
       // removes sender from list
       requestsFrom.splice(requestsFrom.indexOf(this.id.slice(-1)), 1);
+      publishMessage('log', {
+        type: 'ignoreRequest',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: nicknameFrom
+      });
     }
   });
   
@@ -1102,6 +1169,12 @@ $(document).ready(function () {
       $('#mingle').removeClass('clicked');
       $('#mingleIcon').css('opacity', '1');
       $('#mingleText').empty();
+      publishMessage('log', {
+        type: 'cancelRequest',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: $('#mingleText').text().slice(19, -23)
+      });
     }
     else {
       requestTo = indexElse;
@@ -1114,6 +1187,12 @@ $(document).ready(function () {
       $('#mingleIcon').css('opacity', '0.2');
       $('#mingleText').empty().append('pending request to ' + nicknameElse + 
                               ' - press here to cancel');
+      publishMessage('log', {
+        type: 'sendRequest',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: nicknameElse
+      });
     }
   });
   
@@ -1127,9 +1206,19 @@ $(document).ready(function () {
       });
       requestTo = -1;
     }
+    // users can accept a mingle request from multiple states
+    var prevState = state;
+    
     state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visibile');
+    publishMessage('log', {
+      type: 'stateChange',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: prevState,
+      data2: 'WAIT'
+    });
 
     // sender should be the most recent entry in requestsFrom
     var senderIndex = requestsFrom[requestsFrom.length - 1];
@@ -1139,6 +1228,12 @@ $(document).ready(function () {
       sender: senderIndex
     });
     requestsFrom.splice(requestsFrom.indexOf(senderIndex), 1);
+    publishMessage('log', {
+      type: 'acceptRequest',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: $('#requestHeader').text().slice(20)
+    });
   });
   
   $('#mingleNo').click(function() {
@@ -1150,6 +1245,12 @@ $(document).ready(function () {
       sender: senderIndex
     });
     requestsFrom.splice(requestsFrom.indexOf(senderIndex), 1);
+    publishMessage('log', {
+      type: 'ignoreRequest',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: $('#requestHeader').text().slice(20)
+    });
   });
   
   $('#exit').click(function() {
@@ -1180,7 +1281,7 @@ $(document).ready(function () {
       user: strScreenName,
       timestamp: Math.floor(Date.now()),
       data1: 'MINGLE',
-      data2: 'BROWSE',
+      data2: 'WAIT',
       data3: nicknameElse
     });
   }
