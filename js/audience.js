@@ -58,13 +58,13 @@ var currentRequestNickname = '';
 var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'];
 
 $(document).ready(function () {
-  
+
   function hideAllMessages() {
     var messagesHeights = []; // this array will store height for each
 
     for (i = 0; i < myMessages.length; i++) {
-      // fill array 
-      messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); 
+      // fill array
+      messagesHeights[i] = $('.' + myMessages[i]).outerHeight();
       // move element outside viewport
       $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
     }
@@ -356,7 +356,7 @@ $(document).ready(function () {
 
     $('#requestsBody').empty();
     $('#usersBody').empty();
-    
+
     for (index in users) {
       // don't display yourself
       if (index == myIndex) {
@@ -375,60 +375,60 @@ $(document).ready(function () {
 
   // adds a row to list of pending requests
   function addRequestRow(nickname, index) {
-    var row = 
-        '<tr>' + 
-          '<td>' + 
-            nickname + 
-          '</td>' + 
-          '<td colspan="2" class="text-right">' + 
-            '<button id="accept' + index + 
+    var row =
+        '<tr>' +
+          '<td>' +
+            nickname +
+          '</td>' +
+          '<td colspan="2" class="text-right">' +
+            '<button id="accept' + index +
             '" class="response accept btn btn-lg btn-success">' +
-              'Accept' + 
+              'Accept' +
             '</button>' +
-            '<button id="ignore' + index + 
+            '<button id="ignore' + index +
             '" class="response ignore btn btn-lg btn-info">' +
-              'Ignore' + 
+              'Ignore' +
             '</button>' +
           '</td>' +
           '<td class="text-right">' +
-            '<button id="view' + index + 
-            '" class="btn btn-primary shortcutButton view">' + 
-              '<i class="fas fa-eye responsive_font_4"></i>' + 
-            '</button> ' + 
-          '</td>' + 
+            '<button id="view' + index +
+            '" class="btn btn-primary shortcutButton view">' +
+              '<i class="fas fa-eye responsive_font_4"></i>' +
+            '</button> ' +
+          '</td>' +
         '</tr>'
     $('#requestsBody').append(row);
   }
-  
+
   // adds a row to list of other users
   function addUserRow(nickname, index) {
-    var row = 
-        '<tr>' + 
-          '<td colspan="3">' + 
-            nickname + 
-          '</td>' + 
-          '<td class="text-right">' + 
-            '<button id="view' + index + 
-            '" class="btn btn-primary shortcutButton view">' + 
-              '<i class="fas fa-eye responsive_font_4"></i>' + 
-            '</button> ' + 
-          '</td>' + 
+    var row =
+        '<tr>' +
+          '<td colspan="3">' +
+            nickname +
+          '</td>' +
+          '<td class="text-right">' +
+            '<button id="view' + index +
+            '" class="btn btn-primary shortcutButton view">' +
+              '<i class="fas fa-eye responsive_font_4"></i>' +
+            '</button> ' +
+          '</td>' +
         '</tr>'
     $('#usersBody').append(row);
   }
-  
+
   function removeRequestRow(nickname) {
-    $('#requestsTable td').filter(function() { 
-      return $(this).text() === nickname; 
+    $('#requestsTable td').filter(function() {
+      return $(this).text() === nickname;
     }).parent().remove();
   }
-  
+
   function removeUserRow(nickname) {
-    $('#usersTable td').filter(function() { 
-      return $(this).text() === nickname; 
+    $('#usersTable td').filter(function() {
+      return $(this).text() === nickname;
     }).parent().remove();
   }
-  
+
   function browse(elseIndex, elseNickname, elsePattern, elseID, elseState) {
     NORESPONSE3--;
     patternElse = elsePattern;
@@ -439,17 +439,17 @@ $(document).ready(function () {
     $('#screenname_display').text(nicknameElse);
 
     for (var i = 0; i < patternElse.length - 1; i++) {
-      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h,
                                      patternElse[i+1].x * w, patternElse[i+1].y * h);
     }
     if (state == 'WAIT') {
       $('#top_banner').css('visibility', 'visible');
       $('.bottom_banner2').css('visibility', 'hidden');
       $('#bottom_banner').css('visibility', 'visible');
-      
+
       if (myLikes.includes(indexElse)) $('#like').addClass('red');
       else $('#like').removeClass('red');
-      
+
       lastPingTimeElse = Date.now();
       state = 'BROWSE';
       $('#waiting-message').css('visibility', 'hidden');
@@ -473,11 +473,11 @@ $(document).ready(function () {
     NORESPONSE3++;
 
     for (var i = 0; i < patternElse.length - 1; i++) {
-      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h,
                                      patternElse[i+1].x * w, patternElse[i+1].y * h);
     }
     publishMessage('performer', {
-      type: direction, 
+      type: direction,
       index: myIndex
     });
 
@@ -485,7 +485,10 @@ $(document).ready(function () {
     $('#waiting-message').css('visibility', 'visible');
   }
 
-  window.onbeforeunload = function() {
+    window.onbeforeunload = function() {
+      return 'Do you want to leave the page?';
+    };
+  window.onunload = function() {
     if (state != 'NAME') {
       publishMessage('performer', {
         type: 'unfollow',
@@ -518,7 +521,7 @@ $(document).ready(function () {
     }
 
     for (var i = 0; i < patternSize - 1; i++) {
-      pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
+      pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h,
                                  pattern[i+1].x * w, pattern[i+1].y * h);
     }
   }
@@ -534,8 +537,8 @@ $(document).ready(function () {
   function update() {
     state = 'WAIT';
     publishMessage('performer', {
-      type: 'update', 
-      index: myIndex, 
+      type: 'update',
+      index: myIndex,
       pattern: pattern
     });
     $('#waiting-message').css('visibility', 'visible');
@@ -543,15 +546,15 @@ $(document).ready(function () {
   }
 
   function mingle() {
-    /*to handle users entering mingle from any other state - 
+    /*to handle users entering mingle from any other state -
     could vary based on when their request is accepted*/
     var prevState = state;
-    
+
     state = 'MINGLE';
     $('#mingle_pane').css('visibility', 'visible');
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
-    
+
     for (var i = 0; i < pattern.length; i++) {
       var note = new Note();
       note.setPosition(pattern[i].x, pattern[i].y);
@@ -595,7 +598,7 @@ $(document).ready(function () {
     },
     heartbeat: 15
   });
-  
+
   function publishMessage(channel, options) {
     if (channel == 'audience') {
       console.error('please not hack this application. :) ');
@@ -614,7 +617,7 @@ $(document).ready(function () {
       console.log('sent a message to channel ('+channel+') : ' + JSON.stringify(options));
     }
   }
-  
+
   var joinMessageSent = false;
 
   function parsePresence(p) {
@@ -629,7 +632,7 @@ $(document).ready(function () {
       joinMessageSent = true;
     }
   }
-  
+
   function parseMessage(m) {
     if (DEBUG) console.log('message - received:' + JSON.stringify(m));
     /*if (typeof m.nextDivName !== 'undefined') {
@@ -654,7 +657,7 @@ $(document).ready(function () {
               }
             }
             if (m.likes) myLikes = m.likes;
-            
+
             publishMessage('performer', {
               type: 'update',
               index: myIndex,
@@ -666,8 +669,8 @@ $(document).ready(function () {
           }
           break;
         case 'newFollowResponse':
-          setTimeout(browse, 500, m.suggestedUser.index, 
-                     m.suggestedUser.nickname, m.suggestedUser.pattern, 
+          setTimeout(browse, 500, m.suggestedUser.index,
+                     m.suggestedUser.nickname, m.suggestedUser.pattern,
                      m.suggestedUser.id, m.suggestedUser.state);
           break;
         case 'viewAllResponse':
@@ -685,7 +688,7 @@ $(document).ready(function () {
           // pending request message
           stateElse = m.state;
           if (stateElse == 'MINGLE') {
-            showMessage('error', nicknameElse + 
+            showMessage('error', nicknameElse +
                         ' is already mingling, try again later!', true, 1000);
             $('#mingle').addClass('dimmed');
           }
@@ -699,13 +702,13 @@ $(document).ready(function () {
             });
             $('#mingle').addClass('clicked');
             $('#mingleIcon').css('opacity', '0.2');
-            $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+            $('#mingleText').empty().append('pending request to ' + nicknameElse +
                                    ' - press here to cancel');
           }
           break;
         case 'mingleRequest':
           if (state != 'VIEWALL') {
-            showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
+            showMessage('mingleRequest', 'mingle request from ' + m.nickname,
                         true, 1500);
             if (state == 'BROWSE' || state == 'VIEWALL') {
               $('#notifyDot').css('visibility', 'visible');
@@ -713,11 +716,11 @@ $(document).ready(function () {
           }
           // add this request to the list of pending requests
           addRequestRow(m.nickname, m.index);
-          
+
           requestsFrom.push(m.index);
           currentRequestID = m.id;
           currentRequestNickname = m.nickname;
-          
+
           // removes user from list of other users
           removeUserRow(m.nickname);
           break;
@@ -731,16 +734,16 @@ $(document).ready(function () {
           }
           else {
             $('#notifyDot').css('visibility', 'hidden');
-            
+
             // hides mingle request header
             hideAllMessages();
           }
-          
+
           // clears flag
           requestsFrom.splice(requestsFrom.indexOf(m.index), 1);
           break;
         case 'userBusy':
-          if (nicknameElse == m.nickname && 
+          if (nicknameElse == m.nickname &&
               !($('#mingle').hasClass('dimmed'))) {
             // dim mingle area, make sure there's no pending request
             // as the request was denied
@@ -748,15 +751,15 @@ $(document).ready(function () {
             $('#mingleText').empty();
             $('#mingle').removeClass('clicked');
           }
-          showMessage('error', m.nickname + 
+          showMessage('error', m.nickname +
                       ' is already mingling, try again later!', true, 1000);
           break;
         case 'beginMingle':
           if (m.role == 'sender') {
             requestTo = -1;
-            showMessage('success',  
-                        m.nickname + 
-                        ' accepted your request! Entering mingle mode...', 
+            showMessage('success',
+                        m.nickname +
+                        ' accepted your request! Entering mingle mode...',
                         true, 1000);
           }
           // jump user to the target pattern
@@ -765,7 +768,7 @@ $(document).ready(function () {
           $('#viewTableContainer').css('visibility', 'hidden');
           // begin mingle
           setTimeout(mingle, 2100);
-          
+
           // reactivate the mingle button
           $('#mingle').removeClass('clicked');
           $('#mingleText').empty();
@@ -775,8 +778,8 @@ $(document).ready(function () {
           patternElse = m.pattern;
           break;
         case 'stopMingle':
-          showMessage('error',  
-                      nicknameElse + 
+          showMessage('error',
+                      nicknameElse +
                       ' ended the mingle session, exiting...', true, 1000);
           setTimeout(exit, 2000);
           break;
@@ -786,7 +789,7 @@ $(document).ready(function () {
           $('#mingleText').empty();
           $('#mingleIcon').css('opacity', '1');
           break;
-        case 'likedResponse': 
+        case 'likedResponse':
           if (m.index == myIndex) {
             showMessage('error',  'I know! You like your tune.', true, 1000);
           }
@@ -795,7 +798,7 @@ $(document).ready(function () {
             playSample('liked', true);
           }
           else {
-            showMessage('error', 'It\'s a match! ' + m.nickname + 
+            showMessage('error', 'It\'s a match! ' + m.nickname +
                         ' likes your tune, too!', true, 1000);
             playSample('matched', true);
           }
@@ -877,7 +880,7 @@ $(document).ready(function () {
     }
     else console.log('undefined type, message: ', JSON.stringify(m));
   }
-  
+
   // Initially, hide them all
   hideAllMessages();
 
@@ -925,7 +928,7 @@ $(document).ready(function () {
     setTimeout(function() {
       if (NORESPONSE2) {
         publishMessage('performer', {
-          type: 'state', 
+          type: 'state',
           id: myID
         });
         loopPublish2();
@@ -951,16 +954,16 @@ $(document).ready(function () {
     }
     NORESPONSE1 = true;
     publishMessage('performer', {
-      type:'create', 
-      id: myID, 
+      type:'create',
+      id: myID,
       nickname: strScreenName
     });
     (function loopPublish1() {
       setTimeout(function() {
         if (NORESPONSE1) {
           publishMessage('performer', {
-            type: 'create', 
-            id: myID, 
+            type: 'create',
+            id: myID,
             nickname: strScreenName
           });
           loopPublish1();
@@ -968,7 +971,7 @@ $(document).ready(function () {
       }, 3000);
     })();
     $('#name_error_msg').text('Waiting for response...');
-    
+
     if (soundEnabled) {
       var masterGain = context.createGain();
       masterGain.gain.value = 0.7;
@@ -981,9 +984,9 @@ $(document).ready(function () {
     testOsc.connect(compressor);
     testOsc.start(0);
     testOsc.stop(context.currentTime + 0.3);
-    
+
   });
-  
+
   $('#browse').click(function() {
     publishMessage('log', {
       type: 'stateChange',
@@ -998,11 +1001,11 @@ $(document).ready(function () {
   $('#nextPattern').click(function() {
     getNewPattern('next');
   });
-  
+
   $('#prevPattern').click(function() {
     getNewPattern('prev');
   });
-  
+
   $('#randomize').click(function() {
     randomizeNote();
     publishMessage('log', {
@@ -1011,7 +1014,7 @@ $(document).ready(function () {
       timestamp: Math.floor(Date.now())
     });
   });
-  
+
   $('#modify').click(function() {
     state = 'EDIT';
     $('#submit_pane').css('visibility', 'visible');
@@ -1025,18 +1028,18 @@ $(document).ready(function () {
       data2: 'EDIT'
     });
   });
-  
+
   $('#like').click(function() {
     if ($('#like').hasClass('red')) return;
     publishMessage('performer', {
-      type: 'liked', 
-      index: myIndex, 
+      type: 'liked',
+      index: myIndex,
       likedindex: indexElse
     });
     myLikes.push(indexElse);
     $('#like').addClass('red');
   });
-  
+
   $('#viewAll').click(function() {
     state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
@@ -1053,7 +1056,7 @@ $(document).ready(function () {
       data2: 'WAIT'
     });
   });
-  
+
   $('#browseFromView').click(function() {
     state = 'BROWSE';
     $('#screenBlock').css('visibility', 'hidden');
@@ -1066,7 +1069,7 @@ $(document).ready(function () {
       data2: 'BROWSE'
     });
   });
-  
+
   $('#screenBlock').click(function() {
     if (state == 'VIEWALL') {
       state = 'BROWSE';
@@ -1074,7 +1077,7 @@ $(document).ready(function () {
       $('#viewTableContainer').css('visibility', 'hidden');
     }
   });
-  
+
   // user clicks an eye icon
   $('#usersTable').on('click', '.view', function() {
     state = 'WAIT';
@@ -1086,11 +1089,11 @@ $(document).ready(function () {
       followIndex: this.id.slice(-1)
     });
   });
-  
+
   $('#requestsTable').on('click', '.response', function() {
     // gets sender's nickname by removing 'AcceptIgnore ' from grandparent text
     var nicknameFrom = $(this).parent().parent().text().slice(0, -13);
-    
+
     // user accepts a request
     if ($(this).hasClass('accept')) {
       if (requestTo != -1) {
@@ -1122,7 +1125,7 @@ $(document).ready(function () {
         timestamp: Math.floor(Date.now()),
         data1: nicknameFrom
       });
-      
+
       // removes sender from list
       requestsFrom.splice(requestsFrom.indexOf(this.id.slice(-1)), 1);
     }
@@ -1130,16 +1133,16 @@ $(document).ready(function () {
     else if ($(this).hasClass('ignore')) {
       // last digit of element id
       var index = this.id.slice(-1);
-      
+
       // moves user from 'pending requests' to 'other users'
       removeRequestRow(nicknameFrom);
       addUserRow(nicknameFrom, index);
-      
+
       publishMessage('performer', {
         type: 'mingleNo',
         sender: this.id.slice(-1)
       });
-      
+
       // removes sender from list
       requestsFrom.splice(requestsFrom.indexOf(this.id.slice(-1)), 1);
       publishMessage('log', {
@@ -1150,7 +1153,7 @@ $(document).ready(function () {
       });
     }
   });
-  
+
   $('#mingle').click(function() {
     if ($('#mingle').hasClass('dimmed')) {
       publishMessage(idElse, {
@@ -1185,7 +1188,7 @@ $(document).ready(function () {
       });
       $('#mingle').addClass('clicked');
       $('#mingleIcon').css('opacity', '0.2');
-      $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+      $('#mingleText').empty().append('pending request to ' + nicknameElse +
                               ' - press here to cancel');
       publishMessage('log', {
         type: 'sendRequest',
@@ -1195,7 +1198,7 @@ $(document).ready(function () {
       });
     }
   });
-  
+
   $('#mingleYes').click(function() {
     $('#notifyDot').css('visibility', 'hidden');
     if (requestTo != -1) {
@@ -1208,7 +1211,7 @@ $(document).ready(function () {
     }
     // users can accept a mingle request from multiple states
     var prevState = state;
-    
+
     state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visibile');
@@ -1235,11 +1238,11 @@ $(document).ready(function () {
       data1: $('#requestHeader').text().slice(20)
     });
   });
-  
+
   $('#mingleNo').click(function() {
     $('#notifyDot').css('visibility', 'hidden');
     var senderIndex = requestsFrom[requestsFrom.length - 1];
-    
+
     publishMessage('performer', {
       type: 'mingleNo',
       sender: senderIndex
@@ -1252,7 +1255,7 @@ $(document).ready(function () {
       data1: $('#requestHeader').text().slice(20)
     });
   });
-  
+
   $('#exit').click(function() {
     publishMessage('performer', {
       type: 'exitMingle',
@@ -1260,17 +1263,17 @@ $(document).ready(function () {
     });
     exit();
   });
-  
+
   function exit() {
     state = 'WAIT';
     publishMessage('performer', {
-      type: 'whereami', 
+      type: 'whereami',
       index: myIndex
     });
     $('#waiting-message').css('visibility', 'visible');
     $('#mingle_pane').css('visibility', 'hidden');
     $('#mingle').removeClass('dimmed');
-    
+
     for (var i = 0; i < pattern.length; i++) {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
       pattern[i].distance = originalPattern[i].distance;
@@ -1285,7 +1288,7 @@ $(document).ready(function () {
       data3: nicknameElse
     });
   }
-  
+
   var playBarNote = -1;
   var playBarNoteElse = -1;
   var intervalBetweenPattern = 1000;
@@ -1318,7 +1321,7 @@ $(document).ready(function () {
   }
 
   init();
-  
+
   function draw() {
     canvas = $('#patternCanvas')[0];
     var ctx = canvas.getContext('2d');
@@ -1348,18 +1351,18 @@ $(document).ready(function () {
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
-          drawLine(ctx,pattern[i].x * w, pattern[i].y * h, 
+          drawLine(ctx,pattern[i].x * w, pattern[i].y * h,
                    pattern[i+1].x * w, pattern[i+1].y * h, '#57bd72');
         }
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize/3, '#57bd72');
       }
 
       if (playBarNote >= 0) {
-        var playBarCircleX = pattern[playBarNote].x * (1-progress) + 
+        var playBarCircleX = pattern[playBarNote].x * (1-progress) +
             pattern[playBarNote+1].x * (progress);
-        var playBarCircleY = pattern[playBarNote].y * (1-progress) + 
+        var playBarCircleY = pattern[playBarNote].y * (1-progress) +
             pattern[playBarNote+1].y * (progress);
-          
+
         drawCircle(ctx, playBarCircleX * w, playBarCircleY * h, noteSize/2 , '#fdff85');
       }
     }
@@ -1368,16 +1371,16 @@ $(document).ready(function () {
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
-          drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h, 
+          drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h,
                    patternElse[i+1].x * w, patternElse[i+1].y * h, '#d16970');
         }
         drawCircle(ctx, patternElse[i].x * w, patternElse[i].y * h, noteSize/3, '#d16970');
       }
-      
+
       if (playBarNoteElse >= 0) {
-        var playBarCircleX = patternElse[playBarNoteElse].x * 
+        var playBarCircleX = patternElse[playBarNoteElse].x *
             (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
-        var playBarCircleY = patternElse[playBarNoteElse].y * 
+        var playBarCircleY = patternElse[playBarNoteElse].y *
             (1-progressElse) + patternElse[playBarNoteElse+1].y * (progressElse);
 
         drawCircle(ctx,playBarCircleX * w, playBarCircleY * h, noteSize/2, '#fdff85');
@@ -1409,11 +1412,11 @@ $(document).ready(function () {
           var numDetune = Math.floor(pattern[playBarNote].x * detune );
           var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1,intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1,intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
@@ -1435,18 +1438,18 @@ $(document).ready(function () {
         }
         intervalInSec = interval/1000;
         if (soundEnabled) {
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
     } // end of if (state == 'EDIT' || state == 'MINGLE') {
 
     if (state == 'BROWSE' || state == 'MINGLE') {
-      
+
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
         playBarNoteElse++;
@@ -1459,11 +1462,11 @@ $(document).ready(function () {
           var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune);
           var pitchIndex = getPitchIndex(1 - patternElse[playBarNoteElse].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] +
                                          octave * 12,numOsc,oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
@@ -1486,7 +1489,7 @@ $(document).ready(function () {
         }
         intervalInSec = interval/1000;
         if (soundEnabled) {
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
@@ -1499,9 +1502,9 @@ $(document).ready(function () {
   };
 
   animate();
-  
+
   var selectedNote = -1;
-  
+
   $(document).bind('touchstart', function(event) {
     if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
@@ -1521,7 +1524,7 @@ $(document).ready(function () {
       selectedNote = tempNoteID;
     }
   });
-  
+
   function touchHandler() {
     //Assume only one touch/only process one touch even if there's more
     var e = event.targetTouches[0];
@@ -1580,7 +1583,7 @@ $(document).ready(function () {
       }
     }
   });
-  
+
   $(document).mousedown(function(e) {
     if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
@@ -1599,7 +1602,7 @@ $(document).ready(function () {
       selectedNote = tempNoteID;
     }
   });
-  
+
   function mouseHandler(e) {
     if (selectedNote < 0)
       return;
@@ -1648,7 +1651,7 @@ $(document).ready(function () {
           pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
         }
         var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
-        
+
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
