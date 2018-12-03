@@ -148,7 +148,6 @@ $(document).ready(function () {
   var buffers = {};
   var soundmap = {
       'ir1' : './sound/ir1.wav'
-    , 'sus1' : './sound/sus_note.wav'
     , 'yes':'./sound/yes.mp3'
     , 'no': './sound/no.mp3'
     , 'liked': './sound/liked.wav'
@@ -584,7 +583,7 @@ $(document).ready(function () {
     state = 'MINGLE';
     setTimeout(function(){
     showMessage('success',
-                "You are now mingling with "+nickname +". Start moving your green dots and "+nickname +" will see your change in real time.",
+                "You are now mingling with "+nickname +". Start moving your green dots and "+nickname +" will see your change in real time, and vice versa.",
                 true, 8000);
               },2000);
     $('#mingle_pane').css('visibility', 'visible');
@@ -834,7 +833,7 @@ $(document).ready(function () {
           }
           else if (!myLikes.includes(m.index)) {
             showMessage('error',  m.nickname + ' likes your tune!', true, 1000);
-            playSample('liked', true);
+            playSample('liked', false);
           }
           else {
             showMessage('error', 'It\'s a match! ' + m.nickname +
