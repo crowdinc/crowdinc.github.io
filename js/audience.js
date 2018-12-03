@@ -485,10 +485,7 @@ $(document).ready(function () {
     $('#waiting-message').css('visibility', 'visible');
   }
 
-    window.onbeforeunload = function() {
-      return 'Do you want to leave the page?';
-    };
-  window.onunload = function() {
+  function userleft(){
     if (state != 'NAME') {
       publishMessage('performer', {
         type: 'unfollow',
@@ -510,8 +507,45 @@ $(document).ready(function () {
         });
       }
     }
-    //return '';
-  };
+  }
+
+  window.addEventListener('unload', function(e) {
+
+
+    userleft();
+
+    publishMessage('log', {
+      type: 'leavePage2',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: state,
+      data2: 'EXIT',
+      data3: ""
+    });
+    console.log("message");
+});
+
+  window.addEventListener('beforeunload', function(e) {
+  //     return "Are you sure you want to leave this page?";
+  //   };
+  // window.onunload = function() {
+  //   alert("onunloadrunning");
+  //   console("onunloadrunning");
+
+
+      publishMessage('log', {
+        type: 'leavePage',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: state,
+        data2: 'EXIT',
+        data3: ""
+      });
+
+
+
+    return "Are you sure you want to leave this page?";
+  });
 
   function randomizeNote() {
     for (var i = 0; i < patternSize; i++) {
@@ -700,16 +734,17 @@ $(document).ready(function () {
               index: myIndex,
               followIndex: indexElse
             });
-            $('#mingle').addClass('clicked');
+            $('#mingle').addClass('kill');
             $('#mingleIcon').css('opacity', '0.2');
+//            $('mingle').css("display", "none");
             $('#mingleText').empty().append('pending request to ' + nicknameElse +
                                    ' - press here to cancel');
           }
           break;
         case 'mingleRequest':
           if (state != 'VIEWALL') {
-            showMessage('mingleRequest', 'mingle request from ' + m.nickname,
-                        true, 1500);
+            showMessage('mingleRequest', 'Mingle request from ' + m.nickname,
+                        true, 3000);
             if (state == 'BROWSE' || state == 'VIEWALL') {
               $('#notifyDot').css('visibility', 'visible');
             }
@@ -749,7 +784,7 @@ $(document).ready(function () {
             // as the request was denied
             $('#mingle').addClass('dimmed');
             $('#mingleText').empty();
-            $('#mingle').removeClass('clicked');
+            $('#mingle').removeClass('kill');
           }
           showMessage('error', m.nickname +
                       ' is already mingling, try again later!', true, 1000);
@@ -770,7 +805,7 @@ $(document).ready(function () {
           setTimeout(mingle, 2100);
 
           // reactivate the mingle button
-          $('#mingle').removeClass('clicked');
+          $('#mingle').removeClass('kill');
           $('#mingleText').empty();
           $('#mingleIcon').css('opacity', '1');
           break;
@@ -785,7 +820,7 @@ $(document).ready(function () {
           break;
         case 'noMingle':
           // reactivate the mingle button
-          $('#mingle').removeClass('clicked');
+          $('#mingle').removeClass('kill');
           $('#mingleText').empty();
           $('#mingleIcon').css('opacity', '1');
           break;
@@ -944,7 +979,7 @@ $(document).ready(function () {
 
     strScreenName = $('#screenname').val();
     if (strScreenName.length > 12) {
-      $('#name_error_msg').text('screen name is too long');
+      $('#name_error_msg').text('screen name is too long. (up to )');
       return;
     }
 
@@ -1154,7 +1189,7 @@ $(document).ready(function () {
     }
   });
 
-  $('#mingle').click(function() {
+  $('.mingle_toggle').click(function() {
     if ($('#mingle').hasClass('dimmed')) {
       publishMessage(idElse, {
         type: 'queryState',
@@ -1162,14 +1197,14 @@ $(document).ready(function () {
         nickname: currentRequestNickname
       });
     }
-    else if ($('#mingle').hasClass('clicked')) {
+    else if ($('#mingle').hasClass('kill')) {
       publishMessage('performer', {
         type: 'cancelRequest',
         index: myIndex,
         targetIndex: requestTo
       });
       requestTo = -1;
-      $('#mingle').removeClass('clicked');
+      $('#mingle').removeClass('kill');
       $('#mingleIcon').css('opacity', '1');
       $('#mingleText').empty();
       publishMessage('log', {
@@ -1186,7 +1221,7 @@ $(document).ready(function () {
         index: myIndex,
         followIndex: indexElse
       });
-      $('#mingle').addClass('clicked');
+      $('#mingle').addClass('kill');
       $('#mingleIcon').css('opacity', '0.2');
       $('#mingleText').empty().append('pending request to ' + nicknameElse +
                               ' - press here to cancel');
@@ -1333,7 +1368,8 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'BROWSE' || state == 'WAIT') {
+    // drawing the background
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'BROWSE' || state == 'WAIT' || state =='VIEWALL') {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -1346,8 +1382,8 @@ $(document).ready(function () {
          ctx.fill();
        }
     }
-
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
+    // drawing my own pattern
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT' ) {
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
@@ -1366,8 +1402,8 @@ $(document).ready(function () {
         drawCircle(ctx, playBarCircleX * w, playBarCircleY * h, noteSize/2 , '#fdff85');
       }
     }
-
-    if (state == 'BROWSE' || state == 'MINGLE') {
+    // drawing someone else's pattern
+    if (state == 'BROWSE' || state == 'MINGLE'|| state =='VIEWALL') {
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
@@ -1398,6 +1434,7 @@ $(document).ready(function () {
     var detune = 20;
     var maxNumOsc = oscType.length;
 
+    // play my own pattern
     if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
       progress = (currentTime - lastPingTime ) / interval;
       if (playBarNote < 0 && lastPingTime + interval < currentTime) {
@@ -1448,7 +1485,8 @@ $(document).ready(function () {
       }
     } // end of if (state == 'EDIT' || state == 'MINGLE') {
 
-    if (state == 'BROWSE' || state == 'MINGLE') {
+  // play someone else's pattern
+    if (state == 'BROWSE' || state == 'MINGLE'|| state =='VIEWALL') {
 
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {

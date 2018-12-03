@@ -63,7 +63,7 @@ $(document).ready(function() {
     else {
       publishMessage('audience', {
         type: 'script',
-        script: "showMessage('" + $("#chat").val() + "','" + 
+        script: "showMessage('" + $("#chat").val() + "','" +
           newChatVal + "', true, 2000)"
       });
       event.preventDefault();
@@ -100,7 +100,7 @@ $(document).ready(function() {
     // refreshes all users' pages
     console.log('refresh');
     publishMessage('audience', {
-      type: 'script', 
+      type: 'script',
       script: 'refresh()'
     });
     publishMessage('log', {
@@ -154,7 +154,7 @@ $(document).ready(function() {
   };
   var map = {'Shift-Enter': livecode};
   editor.addKeyMap(map);
-  
+
   // checks if another performer is present
   publishMessage('performer', {
     type: 'amialone',
@@ -251,7 +251,7 @@ function parseMessage(m) {
           var receiver = arrayUsers[m.index];
           sender.state = 'MINGLE';
           receiver.state = 'MINGLE';
-          
+
           publishMessage(sender.id, {
             type: 'beginMingle',
             role: 'sender',
@@ -281,7 +281,7 @@ function parseMessage(m) {
             type: 'stopMingle'
           });
           break;
-          
+
         case 'cancelRequest':
           publishMessage(arrayUsers[m.targetIndex].id, {
             type: 'cancelRequest',
@@ -342,15 +342,15 @@ function performanceStatus(message) {
 function respondState(userID){
   if (userID) {
     publishMessage(userID, {
-      type: 'state-response', 
-      sound: soundEnabled, 
+      type: 'state-response',
+      sound: soundEnabled,
       state: state
     });
   }
   else {
     publishMessage('audience', {
-      type: 'state-response', 
-      sound: soundEnabled, 
+      type: 'state-response',
+      sound: soundEnabled,
       state: state
     });
   }
@@ -366,7 +366,7 @@ function publishMessage(channel, options){
     channel: channel,
     message: options
   });
-  if (DEBUG) console.log('sent a message to channel (' + channel + ') : ' + 
+  if (DEBUG) console.log('sent a message to channel (' + channel + ') : ' +
                          JSON.stringify(options));
 }
 
@@ -403,13 +403,13 @@ function create(userID, userNickname) {
       timestamp: Math.floor(Date.now())
     });
   }
-  
+
   // if the nickname already exists
   else {
     // duplicate nickname
     if (arrayUUIDs.indexOf(userID) == -1) {
       publishMessage(userID, {
-        type: 'create-response', 
+        type: 'create-response',
         res: 'f'
       });
       console.log('nickname conflict!');
@@ -419,7 +419,7 @@ function create(userID, userNickname) {
       var foundIndex = -1;
       for (var i = 0; i < arrayUsers.length; i++) {
         // find user's index in array
-        if (userID.trim() === arrayUsers[i].id && 
+        if (userID.trim() === arrayUsers[i].id &&
             userNickname === arrayUsers[i].nickname) {
           foundIndex = i;
           var user = arrayUsers[foundIndex];
@@ -431,7 +431,7 @@ function create(userID, userNickname) {
             likes: user.likes,
             pattern: user.pattern
           });
-          
+
           user.state = 'EDIT';
           user.obj.remove();
           console.log('user exists and returned');
@@ -445,7 +445,7 @@ function create(userID, userNickname) {
       }
       if (foundIndex == -1) {
         publishMessage(userID, {
-          type: 'create-response', 
+          type: 'create-response',
           res: 'f'
         });
         console.log('nickname conflict! (although s/he is an existing user)');
@@ -475,7 +475,7 @@ function update(userIndex, userPattern) {
 function getUserToFollow(userIndex, direction) {
   var user = arrayUsers[userIndex];
   var suggestedIndex = -1;
-  
+
   // initial assignment of follow - chooses a random user
   if (user.follow === '') {
     suggestedIndex = getRandomInt(0, arrayUsers.length - 1);
@@ -539,14 +539,14 @@ function followNew(userIndex, direction) {
   var previousFollow = '';
   // defaults to following self
   var newFollow = user.nickname;;
-  
+
   // if user is following someone
   if (user.follow !== '') {
     previousFollow = arrayUsers[user.follow].nickname;
     unfollow(userIndex);
   }
   else previousFollow = 'N/A';
-  
+
   var suggested = arrayUsers[suggestedIndex];
 
   // follow
@@ -574,7 +574,7 @@ function followNew(userIndex, direction) {
     }
   });
   newFollow = suggested.nickname;
-  
+
   publishMessage('log', {
     type: 'newFollow',
     user: arrayUsers[userIndex].nickname,
@@ -593,7 +593,7 @@ function getRandomInt(min, max) {
 function inform(userIndex) {
   var user = arrayUsers[userIndex];
   if (!user) return;
-  
+
   if (user.follow !== '') {
     var followed = user.follow;
     if (arrayUsers.indexOf(followed) == -1) {
@@ -633,7 +633,7 @@ function liked(likerIndex, likedIndex) {
   var likerUser = arrayUsers[likerIndex];
   if (!likedUser || !likerUser) return;
   likerUser.obj.css('background', '');
-  
+
   // liked hasn't been hearted by this user yet
   if (likedUser.likedby.indexOf(likerIndex) == -1) {
     likedUser.likedby.push(likerIndex);
@@ -644,7 +644,7 @@ function liked(likerIndex, likedIndex) {
       index: likerUser.index
     });
   }
-  
+
   // if liker hasn't hearted liked's tune in the past
   if (likerUser.likes.indexOf(likedIndex) == -1) {
     likerUser.likes.push(likedIndex);
@@ -664,7 +664,7 @@ function liked(likerIndex, likedIndex) {
       });
     }
   }
-  
+
   // update most liked if necessary
   if (likedUser.likedby.length > likesMostLiked) {
     indexMostLiked = likedUser.index;
@@ -679,21 +679,3 @@ function liked(likerIndex, likedIndex) {
     data1: likedUser.nickname
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
