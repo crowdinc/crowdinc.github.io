@@ -274,6 +274,10 @@ tr {
   font-weight: 600;
 }
 
+#question_content{
+	font-family: sans-serif!important;
+}
+
 #mingleIcon {
   z-index: -1;
   /* position: absolute;

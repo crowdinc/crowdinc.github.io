@@ -533,17 +533,14 @@ $(document).ready(function () {
   //   console("onunloadrunning");
 
 
-      publishMessage('log', {
-        type: 'leavePage',
-        user: strScreenName,
-        timestamp: Math.floor(Date.now()),
-        data1: state,
-        data2: 'EXIT',
-        data3: ""
-      });
-
-
-
+    publishMessage('log', {
+      type: 'leavePage',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: state,
+      data2: 'EXIT',
+      data3: ""
+    });
     return "Are you sure you want to leave this page?";
   });
 
@@ -579,12 +576,17 @@ $(document).ready(function () {
     $('#submit_pane').css('visibility', 'hidden');
   }
 
-  function mingle() {
+  function mingle(nickname) {
     /*to handle users entering mingle from any other state -
     could vary based on when their request is accepted*/
     var prevState = state;
 
     state = 'MINGLE';
+    setTimeout(function(){
+    showMessage('success',
+                "You are now mingling with "+nickname +". Start moving your green dots and "+nickname +" will see your change in real time.",
+                true, 8000);
+              },2000);
     $('#mingle_pane').css('visibility', 'visible');
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
@@ -802,7 +804,9 @@ $(document).ready(function () {
           $('.bottom_banner2').css('visibility', 'hidden');
           $('#viewTableContainer').css('visibility', 'hidden');
           // begin mingle
-          setTimeout(mingle, 2100);
+          setTimeout(function(){
+            mingle(m.nickname)
+            }, 2100);
 
           // reactivate the mingle button
           $('#mingle').removeClass('kill');
@@ -1430,7 +1434,7 @@ $(document).ready(function () {
       return;
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
-    var oscType = ['sine','sine','triangle','triangle','sawtooth','square','triangle','sawtooth','square' ];
+    var oscType = ['sine','sine','triangle','sawtooth','square'];
     var detune = 20;
     var maxNumOsc = oscType.length;
 

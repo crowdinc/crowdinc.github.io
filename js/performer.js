@@ -6,6 +6,7 @@ window.onbeforeunload = function() {
     type: 'total refresh',
     user: 'performer'
   });*/
+  return "are you sure?";
 };
 
 var DEBUG = false;
@@ -51,7 +52,8 @@ pubnub.subscribe({
 
 $(document).ready(function() {
   divUsers = $('#users');
-  $('#broadcast').click(function() {
+
+  var broadcast = function() {
     var newChatVal = $('#chat_message').val().replace(/'/g, "\\'")
     if ($('#chat').val() == 'question') {
       publishMessage('audience', {
@@ -74,7 +76,12 @@ $(document).ready(function() {
       timestamp: Math.floor(Date.now()),
       data1: '"' + $('#chat_message').val().replace(/"/g, '""') + '"'
     });
-  });
+  };
+  $('#chat_message').keypress(function(e){
+    if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13))
+      broadcast();
+  })
+  $('#broadcast').click(broadcast);
   $('#standby').click(function() {
     console.log('standby');
     state = 'STANDBY';
