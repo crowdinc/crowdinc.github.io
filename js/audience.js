@@ -688,7 +688,7 @@ $(document).ready(function () {
             },3000);
             setTimeout(function(){
               showMessage('info', 'Once you are done with your melody, you can submit it and see what other people did! You can ak come back and EDIT your melody!', true, 4000);
-            },10000);
+            },12000);
 
             $('#initial-message').bPopup().close();
             strScreenName = $('#screenname').val();
