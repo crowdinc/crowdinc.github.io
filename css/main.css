@@ -258,6 +258,12 @@ tr {
   max-width: 25%!important;
 }
 
+
+.ex-high{
+  background:yellow;
+  color:black!important;
+}
+
 #notifyDot {
   visibility: hidden;
   padding-left: 1vw;

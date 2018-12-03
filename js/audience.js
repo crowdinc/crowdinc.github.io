@@ -72,7 +72,9 @@ $(document).ready(function () {
 
   function showMessage(type, message, autoHide, hideTime) {
     hideAllMessages();
-    $('.' + type + ' .msg_header').text(message);
+    var new_message = message.replace(/\'/g, "\'")
+
+    $('.' + type + ' .msg_header').text(new_message);
     $('.' + type).animate({top: '0'}, 500);
     if (autoHide) {
       hideTime = hideTime | 3000;
@@ -613,6 +615,8 @@ $(document).ready(function () {
     return uuid;
   })();
 
+  strScreenName = $('#screenname').val(PUBNUB.db.get('strScreenName'));
+
   // Initialize with Publish & Subscribe Keys
   var pubnub = PUBNUB.init({
     publish_key: publishKey,
@@ -679,9 +683,18 @@ $(document).ready(function () {
           NORESPONSE1 = false;
           if (m.res == 's') {
             state = 'EDIT';
+            setTimeout(function(){
+              showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizotanl axis)', true, 6000);
+            },3000);
+            setTimeout(function(){
+              showMessage('info', 'Once you are done with your melody, you can submit it and see what other people did! You can ak come back and EDIT your melody!', true, 4000);
+            },10000);
+
             $('#initial-message').bPopup().close();
             strScreenName = $('#screenname').val();
             $('#screenname_display').text(strScreenName);
+            PUBNUB.db.set('strScreenName', strScreenName);
+
             myIndex = m.index;
             lastPingTime = Date.now();
             $('#submit_pane').css('visibility', 'visible');

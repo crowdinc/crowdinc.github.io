@@ -55,6 +55,7 @@ $(document).ready(function() {
 
   var broadcast = function() {
     var newChatVal = $('#chat_message').val().replace(/'/g, "\\'")
+    $('#chat_message').val("");
     if ($('#chat').val() == 'question') {
       publishMessage('audience', {
         type: 'question',
@@ -66,7 +67,7 @@ $(document).ready(function() {
       publishMessage('audience', {
         type: 'script',
         script: "showMessage('" + $("#chat").val() + "','" +
-          newChatVal + "', true, 2000)"
+          newChatVal + "', true, 3000)"
       });
       event.preventDefault();
     }
@@ -131,26 +132,61 @@ $(document).ready(function() {
   var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     lineNumbers: false,
     styleActiveLine: true,
-    matchBrackets: true
+    matchBrackets: true,
+    mode:{name: "javascript", json: true}
   });
   $('#resizable').resizable();
   $('#resizable').draggable();
   var livecode = function(cm) {
-    var selectedText = cm.getDoc().getSelection();
+    var doc = cm.getDoc();
+    var selectedText = doc.getSelection();
     if (selectedText.length > 0) {
       console.log(selectedText);
       publishMessage('audience', {
         type: 'script',
         script: selectedText
       });
+
+      _.defer(function(){
+        var start = doc.getCursor("anchor");
+        var end = doc.getCursor("head");
+        if(start.line > end.line || (start.line == end.line && start.ch > end.ch)){
+          var temp = start;
+          start = end;
+          end = temp;
+        }
+        var obj = doc.markText(start,end,{className:"ex-high"});
+        setTimeout(function(){
+          _.defer(function(){
+            obj.clear();
+          });
+        },300);
+      });
+
+
     }
     else {
-      selectedText = cm.getDoc().getLine(cm.getDoc().getCursor().line);
+      selectedText = doc.getLine(cm.getDoc().getCursor().line);
       console.log(selectedText);
       publishMessage('audience', {
         type: 'script',
         script: selectedText
       });
+
+      try {
+           _.defer(function(){
+             var start = doc.getCursor();
+             var obj = doc.markText({line:start.line, ch:0},{line:start.line, ch:selectedText.length},{className:"ex-high"});
+             setTimeout(function(){
+               _.defer(function(){
+                 obj.clear();
+               });
+             },300);
+           });
+       } catch (e) {
+           alert(e.message);
+           console.error(e);
+       }
     }
     publishMessage('log', {
       type: 'codeSnippet',
