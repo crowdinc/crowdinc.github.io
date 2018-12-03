@@ -83,20 +83,17 @@ baseNote=60;
 selectedScale=[0]
 selectedScale = majorScale;
 selectedScale = minorScale;
-
-selectedScale = majorScale;
-baseNote=62;
-
 selectedScale = [0,4,7,11]
-baseNote=60;
-selectedScale = majorScale;
-selectedScale = minorScale;
-
 if(Math.random()<0.4)
 {
 soundEnabled=false;
 }
   baseNote -=12;
+
+setTimeout(function(){
+  alert("this is fade out. wait a bit");
+  soundEnabled=false;
+}, Math.random()*10000);
 
 
 baseNote = 60
@@ -221,7 +218,6 @@ handle=setInterval(function(){
 }, 2000);
 
 
-setTimeout(function(){alert(“this is fade out. wait a bit”); soundEnabled=false;}, Math.random()*10000);
 
 
 baseNote=60;selectedScale=[0];
