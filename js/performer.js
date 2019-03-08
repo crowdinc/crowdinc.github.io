@@ -440,11 +440,11 @@ function create(userID, userNickname) {
       index: index
     });
     displayUser(index);
-    publishMessage('log', {
+    /*publishMessage('log', {
       type: 'create',
       user: userNickname,
       timestamp: Math.floor(Date.now())
-    });
+    });*/
   }
 
   // if the nickname already exists

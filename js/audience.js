@@ -58,6 +58,41 @@ var currentRequestNickname = '';
 var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'];
 
 $(document).ready(function () {
+  function changeState(oldState, newState, moreData) {
+    if (moreData) {
+      publishMessage('log', {
+        type: 'stateChange',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: state,
+        data2: newState,
+        data3: moreData
+      });
+    }
+    else {
+      publishMessage('log', {
+        type: 'stateChange',
+        user: strScreenName,
+        timestamp: Math.floor(Date.now()),
+        data1: state,
+        data2: newState
+      });
+    }
+    state = newState;
+  }
+  
+  function trimPattern() {
+    // for some reason this is the only deep clone by value method that works here
+    var patternCopy = JSON.parse(JSON.stringify(pattern));
+    for (var i = 0; i < Object.keys(patternCopy).length; ++i) {
+      delete patternCopy[i].distance;
+      // no longer logging distance property
+      //pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
+    }
+    var patternStr = '"' + JSON.stringify(patternCopy).replace(/"/g, '""') + '"';
+    return patternStr;
+  }
+  
 
   function hideAllMessages() {
     var messagesHeights = []; // this array will store height for each
@@ -343,17 +378,10 @@ $(document).ready(function () {
 
   // shows browseable list of all active users
   function viewAll(users) {
-    state = 'VIEWALL';
+    changeState(state, 'VIEWALL');
     $('#waiting-message').css('visibility', 'hidden');
     $('#viewTableContainer').css('visibility', 'visible');
     $('#notifyDot').css('visibility', 'hidden');
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'WAIT',
-      data2: 'VIEWALL'
-    });
 
     $('#requestsBody').empty();
     $('#usersBody').empty();
@@ -452,16 +480,9 @@ $(document).ready(function () {
       else $('#like').removeClass('red');
 
       lastPingTimeElse = Date.now();
-      state = 'BROWSE';
+      changeState(state, 'BROWSE');
       $('#waiting-message').css('visibility', 'hidden');
       $('#waiting-message').css('visibility', 'hidden');
-      publishMessage('log', {
-        type: 'stateChange',
-        user: strScreenName,
-        timestamp: Math.floor(Date.now()),
-        data1: 'WAIT',
-        data2: 'BROWSE'
-      });
     }
     $('#viewTableContainer').css('visibility', 'hidden');
     $('#screenBlock').css('visibility', 'hidden');
@@ -470,7 +491,8 @@ $(document).ready(function () {
   }
 
   function getNewPattern(direction) {
-    state = 'WAIT';
+    
+    changeState(state, 'WAIT');
     NORESPONSE3++;
 
     for (var i = 0; i < patternElse.length - 1; i++) {
@@ -481,7 +503,7 @@ $(document).ready(function () {
       type: direction,
       index: myIndex
     });
-
+    
     $('#screenBlock').css('visibility', 'visible');
     $('#waiting-message').css('visibility', 'visible');
   }
@@ -567,7 +589,7 @@ $(document).ready(function () {
   }
 
   function update() {
-    state = 'WAIT';
+    changeState(state, 'WAIT');
     publishMessage('performer', {
       type: 'update',
       index: myIndex,
@@ -581,8 +603,9 @@ $(document).ready(function () {
     /*to handle users entering mingle from any other state -
     could vary based on when their request is accepted*/
     var prevState = state;
+    
+    changeState(prevState, 'MINGLE', nicknameElse);
 
-    state = 'MINGLE';
     setTimeout(function(){
     showMessage('success',
                 "You are now mingling with "+nickname +". Start moving your green dots and "+nickname +" will see your change in real time, and vice versa.",
@@ -598,14 +621,6 @@ $(document).ready(function () {
       note.distance = pattern[i].distance;
       originalPattern[i] = note;
     }
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: prevState,
-      data2: 'MINGLE',
-      data3: nicknameElse
-    });
   }
 
   // get/create/store UUID
@@ -682,7 +697,7 @@ $(document).ready(function () {
         case 'create-response':
           NORESPONSE1 = false;
           if (m.res == 's') {
-            state = 'EDIT';
+            changeState(state, 'EDIT');
             setTimeout(function(){
               showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizotanl axis)', true, 5000);
             },3000);
@@ -710,6 +725,15 @@ $(document).ready(function () {
               type: 'update',
               index: myIndex,
               pattern: pattern
+            });
+            
+            var patternStr = trimPattern();
+            
+            publishMessage('log', {
+              type: 'create',
+              user: strScreenName,
+              timestamp: Math.floor(Date.now()),
+              data1: patternStr
             });
           }
           else {
@@ -1039,13 +1063,6 @@ $(document).ready(function () {
   });
 
   $('#browse').click(function() {
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'EDIT',
-      data2: 'WAIT'
-    });
     getNewPattern('next');
   });
 
@@ -1067,17 +1084,10 @@ $(document).ready(function () {
   });
 
   $('#modify').click(function() {
-    state = 'EDIT';
+    changeState(state, 'EDIT');
     $('#submit_pane').css('visibility', 'visible');
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'BROWSE',
-      data2: 'EDIT'
-    });
   });
 
   $('#like').click(function() {
@@ -1092,38 +1102,24 @@ $(document).ready(function () {
   });
 
   $('#viewAll').click(function() {
-    state = 'WAIT';
+    changeState(state, 'WAIT');
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visible');
     publishMessage('performer', {
       type: 'viewAll',
       index: myIndex
     });
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'BROWSE',
-      data2: 'WAIT'
-    });
   });
 
   $('#browseFromView').click(function() {
-    state = 'BROWSE';
+    changeState(state, 'BROWSE');
     $('#screenBlock').css('visibility', 'hidden');
     $('#viewTableContainer').css('visibility', 'hidden');
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'VIEWALL',
-      data2: 'BROWSE'
-    });
   });
 
   $('#screenBlock').click(function() {
     if (state == 'VIEWALL') {
-      state = 'BROWSE';
+      changeState(state, 'BROWSE');
       $('#screenBlock').css('visibility', 'hidden');
       $('#viewTableContainer').css('visibility', 'hidden');
     }
@@ -1131,7 +1127,7 @@ $(document).ready(function () {
 
   // user clicks an eye icon
   $('#usersTable').on('click', '.view', function() {
-    state = 'WAIT';
+    changeState(state, 'WAIT');
     $('#waiting-message').css('visibility', 'visible');
     $('#viewTableContainer').css('visibility', 'hidden');
     publishMessage('performer', {
@@ -1155,20 +1151,13 @@ $(document).ready(function () {
         });
         requestTo = -1;
       }
-      state = 'WAIT';
+      changeState(state, 'WAIT');
       $('#waiting-message').css('visibility', 'visible');
       $('#requestTableContainer').css('visibility', 'hidden');
       publishMessage('performer', {
         type: 'mingleYes',
         index: myIndex,
         sender: this.id.slice(-1)
-      });
-      publishMessage('log', {
-        type: 'stateChange',
-        user: strScreenName,
-        timestamp: Math.floor(Date.now()),
-        data1: 'VIEWALL',
-        data2: 'WAIT'
       });
       publishMessage('log', {
         type: 'acceptRequest',
@@ -1262,17 +1251,10 @@ $(document).ready(function () {
     }
     // users can accept a mingle request from multiple states
     var prevState = state;
+    changeState(prevState, 'WAIT');
 
-    state = 'WAIT';
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visibile');
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: prevState,
-      data2: 'WAIT'
-    });
 
     // sender should be the most recent entry in requestsFrom
     var senderIndex = requestsFrom[requestsFrom.length - 1];
@@ -1316,7 +1298,7 @@ $(document).ready(function () {
   });
 
   function exit() {
-    state = 'WAIT';
+    changeState(state, 'WAIT');
     publishMessage('performer', {
       type: 'whereami',
       index: myIndex
@@ -1329,15 +1311,6 @@ $(document).ready(function () {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
       pattern[i].distance = originalPattern[i].distance;
     }
-
-    publishMessage('log', {
-      type: 'stateChange',
-      user: strScreenName,
-      timestamp: Math.floor(Date.now()),
-      data1: 'MINGLE',
-      data2: 'WAIT',
-      data3: nicknameElse
-    });
   }
 
   var playBarNote = -1;
@@ -1623,10 +1596,7 @@ $(document).ready(function () {
         });
       }
       if (state == 'EDIT' || state == 'MINGLE') {
-        var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
-        for (var i = 0; i < pattern.length; ++i) {
-          pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
-        }
+        var patternStr = trimPattern();
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
@@ -1701,10 +1671,7 @@ $(document).ready(function () {
         });
       }
       if (state == 'EDIT' || state == 'MINGLE') {
-        for (var i = 0; i < pattern.length; ++i) {
-          pattern[i].distance = parseFloat(pattern[i].distance).toFixed(3);
-        }
-        var patternStr = '"' + JSON.stringify(pattern).replace(/"/g, '""') + '"';
+        var patternStr = trimPattern();
 
         publishMessage('log', {
           type: 'noteMove',
