@@ -58,7 +58,6 @@ var currentRequestNickname = '';
 var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'];
 
 $(document).ready(function () {
-  
   function changeState(oldState, newState, moreData) {
     if (moreData) {
       publishMessage('log', {
@@ -94,12 +93,13 @@ $(document).ready(function () {
     return patternStr;
   }
   
+
   function hideAllMessages() {
     var messagesHeights = []; // this array will store height for each
 
     for (i = 0; i < myMessages.length; i++) {
-      // fill array 
-      messagesHeights[i] = $('.' + myMessages[i]).outerHeight(); 
+      // fill array
+      messagesHeights[i] = $('.' + myMessages[i]).outerHeight();
       // move element outside viewport
       $('.'+myMessages[i]).animate({top:-messagesHeights[i]}, 500);
     }
@@ -107,7 +107,9 @@ $(document).ready(function () {
 
   function showMessage(type, message, autoHide, hideTime) {
     hideAllMessages();
-    $('.' + type + ' .msg_header').text(message);
+    var new_message = message.replace(/\'/g, "\'")
+
+    $('.' + type + ' .msg_header').text(new_message);
     $('.' + type).animate({top: '0'}, 500);
     if (autoHide) {
       hideTime = hideTime | 3000;
@@ -183,7 +185,6 @@ $(document).ready(function () {
   var buffers = {};
   var soundmap = {
       'ir1' : './sound/ir1.wav'
-    , 'sus1' : './sound/sus_note.wav'
     , 'yes':'./sound/yes.mp3'
     , 'no': './sound/no.mp3'
     , 'liked': './sound/liked.wav'
@@ -384,7 +385,7 @@ $(document).ready(function () {
 
     $('#requestsBody').empty();
     $('#usersBody').empty();
-    
+
     for (index in users) {
       // don't display yourself
       if (index == myIndex) {
@@ -403,60 +404,60 @@ $(document).ready(function () {
 
   // adds a row to list of pending requests
   function addRequestRow(nickname, index) {
-    var row = 
-        '<tr>' + 
-          '<td>' + 
-            nickname + 
-          '</td>' + 
-          '<td colspan="2" class="text-right">' + 
-            '<button id="accept' + index + 
+    var row =
+        '<tr>' +
+          '<td>' +
+            nickname +
+          '</td>' +
+          '<td colspan="2" class="text-right">' +
+            '<button id="accept' + index +
             '" class="response accept btn btn-lg btn-success">' +
-              'Accept' + 
+              'Accept' +
             '</button>' +
-            '<button id="ignore' + index + 
+            '<button id="ignore' + index +
             '" class="response ignore btn btn-lg btn-info">' +
-              'Ignore' + 
+              'Ignore' +
             '</button>' +
           '</td>' +
           '<td class="text-right">' +
-            '<button id="view' + index + 
-            '" class="btn btn-primary shortcutButton view">' + 
-              '<i class="fas fa-eye responsive_font_4"></i>' + 
-            '</button> ' + 
-          '</td>' + 
+            '<button id="view' + index +
+            '" class="btn btn-primary shortcutButton view">' +
+              '<i class="fas fa-eye responsive_font_4"></i>' +
+            '</button> ' +
+          '</td>' +
         '</tr>'
     $('#requestsBody').append(row);
   }
-  
+
   // adds a row to list of other users
   function addUserRow(nickname, index) {
-    var row = 
-        '<tr>' + 
-          '<td colspan="3">' + 
-            nickname + 
-          '</td>' + 
-          '<td class="text-right">' + 
-            '<button id="view' + index + 
-            '" class="btn btn-primary shortcutButton view">' + 
-              '<i class="fas fa-eye responsive_font_4"></i>' + 
-            '</button> ' + 
-          '</td>' + 
+    var row =
+        '<tr>' +
+          '<td colspan="3">' +
+            nickname +
+          '</td>' +
+          '<td class="text-right">' +
+            '<button id="view' + index +
+            '" class="btn btn-primary shortcutButton view">' +
+              '<i class="fas fa-eye responsive_font_4"></i>' +
+            '</button> ' +
+          '</td>' +
         '</tr>'
     $('#usersBody').append(row);
   }
-  
+
   function removeRequestRow(nickname) {
-    $('#requestsTable td').filter(function() { 
-      return $(this).text() === nickname; 
+    $('#requestsTable td').filter(function() {
+      return $(this).text() === nickname;
     }).parent().remove();
   }
-  
+
   function removeUserRow(nickname) {
-    $('#usersTable td').filter(function() { 
-      return $(this).text() === nickname; 
+    $('#usersTable td').filter(function() {
+      return $(this).text() === nickname;
     }).parent().remove();
   }
-  
+
   function browse(elseIndex, elseNickname, elsePattern, elseID, elseState) {
     NORESPONSE3--;
     patternElse = elsePattern;
@@ -467,17 +468,17 @@ $(document).ready(function () {
     $('#screenname_display').text(nicknameElse);
 
     for (var i = 0; i < patternElse.length - 1; i++) {
-      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h,
                                      patternElse[i+1].x * w, patternElse[i+1].y * h);
     }
     if (state == 'WAIT') {
       $('#top_banner').css('visibility', 'visible');
       $('.bottom_banner2').css('visibility', 'hidden');
       $('#bottom_banner').css('visibility', 'visible');
-      
+
       if (myLikes.includes(indexElse)) $('#like').addClass('red');
       else $('#like').removeClass('red');
-      
+
       lastPingTimeElse = Date.now();
       changeState(state, 'BROWSE');
       $('#waiting-message').css('visibility', 'hidden');
@@ -495,11 +496,11 @@ $(document).ready(function () {
     NORESPONSE3++;
 
     for (var i = 0; i < patternElse.length - 1; i++) {
-      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h, 
+      patternElse[i].distance = dist(patternElse[i].x * w, patternElse[i].y * h,
                                      patternElse[i+1].x * w, patternElse[i+1].y * h);
     }
     publishMessage('performer', {
-      type: direction, 
+      type: direction,
       index: myIndex
     });
     
@@ -507,7 +508,7 @@ $(document).ready(function () {
     $('#waiting-message').css('visibility', 'visible');
   }
 
-  window.onbeforeunload = function() {
+  function userleft(){
     if (state != 'NAME') {
       publishMessage('performer', {
         type: 'unfollow',
@@ -529,8 +530,42 @@ $(document).ready(function () {
         });
       }
     }
-    //return '';
-  };
+  }
+
+  window.addEventListener('unload', function(e) {
+
+
+    userleft();
+
+    publishMessage('log', {
+      type: 'leavePage2',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: state,
+      data2: 'EXIT',
+      data3: ""
+    });
+    console.log("message");
+});
+
+  window.addEventListener('beforeunload', function(e) {
+  //     return "Are you sure you want to leave this page?";
+  //   };
+  // window.onunload = function() {
+  //   alert("onunloadrunning");
+  //   console("onunloadrunning");
+
+
+    publishMessage('log', {
+      type: 'leavePage',
+      user: strScreenName,
+      timestamp: Math.floor(Date.now()),
+      data1: state,
+      data2: 'EXIT',
+      data3: ""
+    });
+    return "Are you sure you want to leave this page?";
+  });
 
   function randomizeNote() {
     for (var i = 0; i < patternSize; i++) {
@@ -540,7 +575,7 @@ $(document).ready(function () {
     }
 
     for (var i = 0; i < patternSize - 1; i++) {
-      pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h, 
+      pattern[i].distance = dist(pattern[i].x * w, pattern[i].y * h,
                                  pattern[i+1].x * w, pattern[i+1].y * h);
     }
   }
@@ -556,24 +591,30 @@ $(document).ready(function () {
   function update() {
     changeState(state, 'WAIT');
     publishMessage('performer', {
-      type: 'update', 
-      index: myIndex, 
+      type: 'update',
+      index: myIndex,
       pattern: pattern
     });
     $('#waiting-message').css('visibility', 'visible');
     $('#submit_pane').css('visibility', 'hidden');
   }
 
-  function mingle() {
-    /*to handle users entering mingle from any other state - 
+  function mingle(nickname) {
+    /*to handle users entering mingle from any other state -
     could vary based on when their request is accepted*/
     var prevState = state;
     
     changeState(prevState, 'MINGLE', nicknameElse);
+
+    setTimeout(function(){
+    showMessage('success',
+                "You are now mingling with "+nickname +". Start moving your green dots and "+nickname +" will see your change in real time, and vice versa.",
+                true, 8000);
+              },2000);
     $('#mingle_pane').css('visibility', 'visible');
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
-    
+
     for (var i = 0; i < pattern.length; i++) {
       var note = new Note();
       note.setPosition(pattern[i].x, pattern[i].y);
@@ -588,6 +629,8 @@ $(document).ready(function () {
     PUBNUB.db.set('session', uuid);
     return uuid;
   })();
+
+  strScreenName = $('#screenname').val(PUBNUB.db.get('strScreenName'));
 
   // Initialize with Publish & Subscribe Keys
   var pubnub = PUBNUB.init({
@@ -609,7 +652,7 @@ $(document).ready(function () {
     },
     heartbeat: 15
   });
-  
+
   function publishMessage(channel, options) {
     if (channel == 'audience') {
       console.error('please not hack this application. :) ');
@@ -628,7 +671,7 @@ $(document).ready(function () {
       console.log('sent a message to channel ('+channel+') : ' + JSON.stringify(options));
     }
   }
-  
+
   var joinMessageSent = false;
 
   function parsePresence(p) {
@@ -643,7 +686,7 @@ $(document).ready(function () {
       joinMessageSent = true;
     }
   }
-  
+
   function parseMessage(m) {
     if (DEBUG) console.log('message - received:' + JSON.stringify(m));
     /*if (typeof m.nextDivName !== 'undefined') {
@@ -655,9 +698,18 @@ $(document).ready(function () {
           NORESPONSE1 = false;
           if (m.res == 's') {
             changeState(state, 'EDIT');
+            setTimeout(function(){
+              showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizotanl axis)', true, 5000);
+            },3000);
+            setTimeout(function(){
+              showMessage('info', 'Once you are done with your melody, you can submit it and see what other people did! You can ak come back and EDIT your melody!', true, 4000);
+            },12000);
+
             $('#initial-message').bPopup().close();
             strScreenName = $('#screenname').val();
             $('#screenname_display').text(strScreenName);
+            PUBNUB.db.set('strScreenName', strScreenName);
+
             myIndex = m.index;
             lastPingTime = Date.now();
             $('#submit_pane').css('visibility', 'visible');
@@ -668,7 +720,7 @@ $(document).ready(function () {
               }
             }
             if (m.likes) myLikes = m.likes;
-            
+
             publishMessage('performer', {
               type: 'update',
               index: myIndex,
@@ -689,8 +741,8 @@ $(document).ready(function () {
           }
           break;
         case 'newFollowResponse':
-          setTimeout(browse, 500, m.suggestedUser.index, 
-                     m.suggestedUser.nickname, m.suggestedUser.pattern, 
+          setTimeout(browse, 500, m.suggestedUser.index,
+                     m.suggestedUser.nickname, m.suggestedUser.pattern,
                      m.suggestedUser.id, m.suggestedUser.state);
           break;
         case 'viewAllResponse':
@@ -708,7 +760,7 @@ $(document).ready(function () {
           // pending request message
           stateElse = m.state;
           if (stateElse == 'MINGLE') {
-            showMessage('error', nicknameElse + 
+            showMessage('error', nicknameElse +
                         ' is already mingling, try again later!', true, 1000);
             $('#mingle').addClass('dimmed');
           }
@@ -720,27 +772,28 @@ $(document).ready(function () {
               index: myIndex,
               followIndex: indexElse
             });
-            $('#mingle').addClass('clicked');
+            $('#mingle').addClass('kill');
             $('#mingleIcon').css('opacity', '0.2');
-            $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+//            $('mingle').css("display", "none");
+            $('#mingleText').empty().append('pending request to ' + nicknameElse +
                                    ' - press here to cancel');
           }
           break;
         case 'mingleRequest':
           if (state != 'VIEWALL') {
-            showMessage('mingleRequest', 'mingle request from ' + m.nickname, 
-                        true, 1500);
+            showMessage('mingleRequest', 'Mingle request from ' + m.nickname,
+                        true, 3000);
             if (state == 'BROWSE' || state == 'VIEWALL') {
               $('#notifyDot').css('visibility', 'visible');
             }
           }
           // add this request to the list of pending requests
           addRequestRow(m.nickname, m.index);
-          
+
           requestsFrom.push(m.index);
           currentRequestID = m.id;
           currentRequestNickname = m.nickname;
-          
+
           // removes user from list of other users
           removeUserRow(m.nickname);
           break;
@@ -754,32 +807,32 @@ $(document).ready(function () {
           }
           else {
             $('#notifyDot').css('visibility', 'hidden');
-            
+
             // hides mingle request header
             hideAllMessages();
           }
-          
+
           // clears flag
           requestsFrom.splice(requestsFrom.indexOf(m.index), 1);
           break;
         case 'userBusy':
-          if (nicknameElse == m.nickname && 
+          if (nicknameElse == m.nickname &&
               !($('#mingle').hasClass('dimmed'))) {
             // dim mingle area, make sure there's no pending request
             // as the request was denied
             $('#mingle').addClass('dimmed');
             $('#mingleText').empty();
-            $('#mingle').removeClass('clicked');
+            $('#mingle').removeClass('kill');
           }
-          showMessage('error', m.nickname + 
+          showMessage('error', m.nickname +
                       ' is already mingling, try again later!', true, 1000);
           break;
         case 'beginMingle':
           if (m.role == 'sender') {
             requestTo = -1;
-            showMessage('success',  
-                        m.nickname + 
-                        ' accepted your request! Entering mingle mode...', 
+            showMessage('success',
+                        m.nickname +
+                        ' accepted your request! Entering mingle mode...',
                         true, 1000);
           }
           // jump user to the target pattern
@@ -787,10 +840,12 @@ $(document).ready(function () {
           $('.bottom_banner2').css('visibility', 'hidden');
           $('#viewTableContainer').css('visibility', 'hidden');
           // begin mingle
-          setTimeout(mingle, 2100);
-          
+          setTimeout(function(){
+            mingle(m.nickname)
+            }, 2100);
+
           // reactivate the mingle button
-          $('#mingle').removeClass('clicked');
+          $('#mingle').removeClass('kill');
           $('#mingleText').empty();
           $('#mingleIcon').css('opacity', '1');
           break;
@@ -798,27 +853,27 @@ $(document).ready(function () {
           patternElse = m.pattern;
           break;
         case 'stopMingle':
-          showMessage('error',  
-                      nicknameElse + 
+          showMessage('error',
+                      nicknameElse +
                       ' ended the mingle session, exiting...', true, 1000);
           setTimeout(exit, 2000);
           break;
         case 'noMingle':
           // reactivate the mingle button
-          $('#mingle').removeClass('clicked');
+          $('#mingle').removeClass('kill');
           $('#mingleText').empty();
           $('#mingleIcon').css('opacity', '1');
           break;
-        case 'likedResponse': 
+        case 'likedResponse':
           if (m.index == myIndex) {
             showMessage('error',  'I know! You like your tune.', true, 1000);
           }
           else if (!myLikes.includes(m.index)) {
             showMessage('error',  m.nickname + ' likes your tune!', true, 1000);
-            playSample('liked', true);
+            playSample('liked', false);
           }
           else {
-            showMessage('error', 'It\'s a match! ' + m.nickname + 
+            showMessage('error', 'It\'s a match! ' + m.nickname +
                         ' likes your tune, too!', true, 1000);
             playSample('matched', true);
           }
@@ -900,7 +955,7 @@ $(document).ready(function () {
     }
     else console.log('undefined type, message: ', JSON.stringify(m));
   }
-  
+
   // Initially, hide them all
   hideAllMessages();
 
@@ -948,7 +1003,7 @@ $(document).ready(function () {
     setTimeout(function() {
       if (NORESPONSE2) {
         publishMessage('performer', {
-          type: 'state', 
+          type: 'state',
           id: myID
         });
         loopPublish2();
@@ -964,7 +1019,7 @@ $(document).ready(function () {
 
     strScreenName = $('#screenname').val();
     if (strScreenName.length > 12) {
-      $('#name_error_msg').text('screen name is too long');
+      $('#name_error_msg').text('screen name is too long. (up to )');
       return;
     }
 
@@ -974,16 +1029,16 @@ $(document).ready(function () {
     }
     NORESPONSE1 = true;
     publishMessage('performer', {
-      type:'create', 
-      id: myID, 
+      type:'create',
+      id: myID,
       nickname: strScreenName
     });
     (function loopPublish1() {
       setTimeout(function() {
         if (NORESPONSE1) {
           publishMessage('performer', {
-            type: 'create', 
-            id: myID, 
+            type: 'create',
+            id: myID,
             nickname: strScreenName
           });
           loopPublish1();
@@ -991,7 +1046,7 @@ $(document).ready(function () {
       }, 3000);
     })();
     $('#name_error_msg').text('Waiting for response...');
-    
+
     if (soundEnabled) {
       var masterGain = context.createGain();
       masterGain.gain.value = 0.7;
@@ -1004,9 +1059,9 @@ $(document).ready(function () {
     testOsc.connect(compressor);
     testOsc.start(0);
     testOsc.stop(context.currentTime + 0.3);
-    
+
   });
-  
+
   $('#browse').click(function() {
     getNewPattern('next');
   });
@@ -1014,11 +1069,11 @@ $(document).ready(function () {
   $('#nextPattern').click(function() {
     getNewPattern('next');
   });
-  
+
   $('#prevPattern').click(function() {
     getNewPattern('prev');
   });
-  
+
   $('#randomize').click(function() {
     randomizeNote();
     publishMessage('log', {
@@ -1027,25 +1082,25 @@ $(document).ready(function () {
       timestamp: Math.floor(Date.now())
     });
   });
-  
+
   $('#modify').click(function() {
     changeState(state, 'EDIT');
     $('#submit_pane').css('visibility', 'visible');
     $('#bottom_banner').css('visibility', 'hidden');
     $('#top_banner').css('visibility', 'hidden');
   });
-  
+
   $('#like').click(function() {
     if ($('#like').hasClass('red')) return;
     publishMessage('performer', {
-      type: 'liked', 
-      index: myIndex, 
+      type: 'liked',
+      index: myIndex,
       likedindex: indexElse
     });
     myLikes.push(indexElse);
     $('#like').addClass('red');
   });
-  
+
   $('#viewAll').click(function() {
     changeState(state, 'WAIT');
     $('#waiting-message').css('visibility', 'visible');
@@ -1055,13 +1110,13 @@ $(document).ready(function () {
       index: myIndex
     });
   });
-  
+
   $('#browseFromView').click(function() {
     changeState(state, 'BROWSE');
     $('#screenBlock').css('visibility', 'hidden');
     $('#viewTableContainer').css('visibility', 'hidden');
   });
-  
+
   $('#screenBlock').click(function() {
     if (state == 'VIEWALL') {
       changeState(state, 'BROWSE');
@@ -1069,7 +1124,7 @@ $(document).ready(function () {
       $('#viewTableContainer').css('visibility', 'hidden');
     }
   });
-  
+
   // user clicks an eye icon
   $('#usersTable').on('click', '.view', function() {
     changeState(state, 'WAIT');
@@ -1081,11 +1136,11 @@ $(document).ready(function () {
       followIndex: this.id.slice(-1)
     });
   });
-  
+
   $('#requestsTable').on('click', '.response', function() {
     // gets sender's nickname by removing 'AcceptIgnore ' from grandparent text
     var nicknameFrom = $(this).parent().parent().text().slice(0, -13);
-    
+
     // user accepts a request
     if ($(this).hasClass('accept')) {
       if (requestTo != -1) {
@@ -1110,7 +1165,7 @@ $(document).ready(function () {
         timestamp: Math.floor(Date.now()),
         data1: nicknameFrom
       });
-      
+
       // removes sender from list
       requestsFrom.splice(requestsFrom.indexOf(this.id.slice(-1)), 1);
     }
@@ -1118,16 +1173,16 @@ $(document).ready(function () {
     else if ($(this).hasClass('ignore')) {
       // last digit of element id
       var index = this.id.slice(-1);
-      
+
       // moves user from 'pending requests' to 'other users'
       removeRequestRow(nicknameFrom);
       addUserRow(nicknameFrom, index);
-      
+
       publishMessage('performer', {
         type: 'mingleNo',
         sender: this.id.slice(-1)
       });
-      
+
       // removes sender from list
       requestsFrom.splice(requestsFrom.indexOf(this.id.slice(-1)), 1);
       publishMessage('log', {
@@ -1138,8 +1193,8 @@ $(document).ready(function () {
       });
     }
   });
-  
-  $('#mingle').click(function() {
+
+  $('.mingle_toggle').click(function() {
     if ($('#mingle').hasClass('dimmed')) {
       publishMessage(idElse, {
         type: 'queryState',
@@ -1147,14 +1202,14 @@ $(document).ready(function () {
         nickname: currentRequestNickname
       });
     }
-    else if ($('#mingle').hasClass('clicked')) {
+    else if ($('#mingle').hasClass('kill')) {
       publishMessage('performer', {
         type: 'cancelRequest',
         index: myIndex,
         targetIndex: requestTo
       });
       requestTo = -1;
-      $('#mingle').removeClass('clicked');
+      $('#mingle').removeClass('kill');
       $('#mingleIcon').css('opacity', '1');
       $('#mingleText').empty();
       publishMessage('log', {
@@ -1171,9 +1226,9 @@ $(document).ready(function () {
         index: myIndex,
         followIndex: indexElse
       });
-      $('#mingle').addClass('clicked');
+      $('#mingle').addClass('kill');
       $('#mingleIcon').css('opacity', '0.2');
-      $('#mingleText').empty().append('pending request to ' + nicknameElse + 
+      $('#mingleText').empty().append('pending request to ' + nicknameElse +
                               ' - press here to cancel');
       publishMessage('log', {
         type: 'sendRequest',
@@ -1183,7 +1238,7 @@ $(document).ready(function () {
       });
     }
   });
-  
+
   $('#mingleYes').click(function() {
     $('#notifyDot').css('visibility', 'hidden');
     if (requestTo != -1) {
@@ -1196,8 +1251,8 @@ $(document).ready(function () {
     }
     // users can accept a mingle request from multiple states
     var prevState = state;
-    
     changeState(prevState, 'WAIT');
+
     $('#waiting-message').css('visibility', 'visible');
     $('#screenBlock').css('visibility', 'visibile');
 
@@ -1216,11 +1271,11 @@ $(document).ready(function () {
       data1: $('#requestHeader').text().slice(20)
     });
   });
-  
+
   $('#mingleNo').click(function() {
     $('#notifyDot').css('visibility', 'hidden');
     var senderIndex = requestsFrom[requestsFrom.length - 1];
-    
+
     publishMessage('performer', {
       type: 'mingleNo',
       sender: senderIndex
@@ -1233,7 +1288,7 @@ $(document).ready(function () {
       data1: $('#requestHeader').text().slice(20)
     });
   });
-  
+
   $('#exit').click(function() {
     publishMessage('performer', {
       type: 'exitMingle',
@@ -1241,23 +1296,23 @@ $(document).ready(function () {
     });
     exit();
   });
-  
+
   function exit() {
     changeState(state, 'WAIT');
     publishMessage('performer', {
-      type: 'whereami', 
+      type: 'whereami',
       index: myIndex
     });
     $('#waiting-message').css('visibility', 'visible');
     $('#mingle_pane').css('visibility', 'hidden');
     $('#mingle').removeClass('dimmed');
-    
+
     for (var i = 0; i < pattern.length; i++) {
       pattern[i].setPosition(originalPattern[i].x, originalPattern[i].y);
       pattern[i].distance = originalPattern[i].distance;
     }
   }
-  
+
   var playBarNote = -1;
   var playBarNoteElse = -1;
   var intervalBetweenPattern = 1000;
@@ -1290,7 +1345,7 @@ $(document).ready(function () {
   }
 
   init();
-  
+
   function draw() {
     canvas = $('#patternCanvas')[0];
     var ctx = canvas.getContext('2d');
@@ -1302,7 +1357,8 @@ $(document).ready(function () {
       weightSum += selectedScaleWeight[i];
     }
     var accHeight = 0;
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'BROWSE' || state == 'WAIT') {
+    // drawing the background
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'BROWSE' || state == 'WAIT' || state =='VIEWALL') {
        for (var i = 0; i < selectedScale.length; i++) {
          ctx.beginPath();
          var height = h * selectedScaleWeight[selectedScale.length - i - 1] / weightSum;
@@ -1315,41 +1371,41 @@ $(document).ready(function () {
          ctx.fill();
        }
     }
-
-    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
+    // drawing my own pattern
+    if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT' ) {
       for (var i = 0; i < patternSize; i++) {
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize, '#83eb9f');
         if (i < patternSize-1) {
-          drawLine(ctx,pattern[i].x * w, pattern[i].y * h, 
+          drawLine(ctx,pattern[i].x * w, pattern[i].y * h,
                    pattern[i+1].x * w, pattern[i+1].y * h, '#57bd72');
         }
         drawCircle(ctx,pattern[i].x * w, pattern[i].y * h, noteSize/3, '#57bd72');
       }
 
       if (playBarNote >= 0) {
-        var playBarCircleX = pattern[playBarNote].x * (1-progress) + 
+        var playBarCircleX = pattern[playBarNote].x * (1-progress) +
             pattern[playBarNote+1].x * (progress);
-        var playBarCircleY = pattern[playBarNote].y * (1-progress) + 
+        var playBarCircleY = pattern[playBarNote].y * (1-progress) +
             pattern[playBarNote+1].y * (progress);
-          
+
         drawCircle(ctx, playBarCircleX * w, playBarCircleY * h, noteSize/2 , '#fdff85');
       }
     }
-
-    if (state == 'BROWSE' || state == 'MINGLE') {
+    // drawing someone else's pattern
+    if (state == 'BROWSE' || state == 'MINGLE'|| state =='VIEWALL') {
       for (var i = 0; i < patternElse.length; i++) {
         drawCircle(ctx,patternElse[i].x * w, patternElse[i].y * h, noteSize-2, '#ff969d');
         if (i < patternElse.length-1) {
-          drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h, 
+          drawLine(ctx,patternElse[i].x * w, patternElse[i].y * h,
                    patternElse[i+1].x * w, patternElse[i+1].y * h, '#d16970');
         }
         drawCircle(ctx, patternElse[i].x * w, patternElse[i].y * h, noteSize/3, '#d16970');
       }
-      
+
       if (playBarNoteElse >= 0) {
-        var playBarCircleX = patternElse[playBarNoteElse].x * 
+        var playBarCircleX = patternElse[playBarNoteElse].x *
             (1-progressElse) + patternElse[playBarNoteElse+1].x * (progressElse);
-        var playBarCircleY = patternElse[playBarNoteElse].y * 
+        var playBarCircleY = patternElse[playBarNoteElse].y *
             (1-progressElse) + patternElse[playBarNoteElse+1].y * (progressElse);
 
         drawCircle(ctx,playBarCircleX * w, playBarCircleY * h, noteSize/2, '#fdff85');
@@ -1363,10 +1419,11 @@ $(document).ready(function () {
       return;
     var currentTime = Date.now();
     var intervalInSec = interval/1000;
-    var oscType = ['sine','sine','triangle','triangle','sawtooth','square','triangle','sawtooth','square' ];
+    var oscType = ['sine','sine','triangle','sawtooth','square'];
     var detune = 20;
     var maxNumOsc = oscType.length;
 
+    // play my own pattern
     if (state == 'EDIT' || state == 'MINGLE' || state == 'WAIT') {
       progress = (currentTime - lastPingTime ) / interval;
       if (playBarNote < 0 && lastPingTime + interval < currentTime) {
@@ -1381,11 +1438,11 @@ $(document).ready(function () {
           var numDetune = Math.floor(pattern[playBarNote].x * detune );
           var pitchIndex = getPitchIndex(1 - pattern[playBarNote].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1,intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1,intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
@@ -1407,18 +1464,19 @@ $(document).ready(function () {
         }
         intervalInSec = interval/1000;
         if (soundEnabled) {
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
     } // end of if (state == 'EDIT' || state == 'MINGLE') {
 
-    if (state == 'BROWSE' || state == 'MINGLE') {
-      
+  // play someone else's pattern
+    if (state == 'BROWSE' || state == 'MINGLE'|| state =='VIEWALL') {
+
       progressElse = (currentTime - lastPingTimeElse ) / intervalElse;
       if (playBarNoteElse < 0 && lastPingTimeElse + intervalElse < currentTime) {
         playBarNoteElse++;
@@ -1431,11 +1489,11 @@ $(document).ready(function () {
           var numDetune = Math.floor(patternElse[playBarNoteElse].x * detune);
           var pitchIndex = getPitchIndex(1 - patternElse[playBarNoteElse].y);
           var octave = Math.floor(pitchIndex / selectedScale.length);
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] +
                                          octave * 12,numOsc,oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
-          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4, 
+          voice.output.play(0, intervalInSec*0.1, intervalInSec*0.1, intervalInSec*0.4,
                             intervalInSec*0.1, voice.maxGain*2.0, voice.maxGain);
         }
       }
@@ -1458,7 +1516,7 @@ $(document).ready(function () {
         }
         intervalInSec = interval/1000;
         if (soundEnabled) {
-          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12, 
+          var voice = new ScissorVoice(baseNote + selectedScale[pitchIndex] + octave * 12,
                                        numOsc, oscType, detune);
           voice.stop(context.currentTime + intervalInSec * 0.7);
           voice.connect(reverb);
@@ -1471,9 +1529,9 @@ $(document).ready(function () {
   };
 
   animate();
-  
+
   var selectedNote = -1;
-  
+
   $(document).bind('touchstart', function(event) {
     if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
@@ -1493,7 +1551,7 @@ $(document).ready(function () {
       selectedNote = tempNoteID;
     }
   });
-  
+
   function touchHandler() {
     //Assume only one touch/only process one touch even if there's more
     var e = event.targetTouches[0];
@@ -1549,7 +1607,7 @@ $(document).ready(function () {
       }
     }
   });
-  
+
   $(document).mousedown(function(e) {
     if (state == 'WAIT') return;
     // Left mouse button was pressed, set flag
@@ -1568,7 +1626,7 @@ $(document).ready(function () {
       selectedNote = tempNoteID;
     }
   });
-  
+
   function mouseHandler(e) {
     if (selectedNote < 0)
       return;
@@ -1614,7 +1672,7 @@ $(document).ready(function () {
       }
       if (state == 'EDIT' || state == 'MINGLE') {
         var patternStr = trimPattern();
-        
+
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,

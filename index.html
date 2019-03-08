@@ -21,12 +21,11 @@
         <thead>
           <tr id="mainTableHeader">
             <th colspan="3">
-              Press <i class="fas fa-eye"></i> to jump to a user!
+              Press <i class="btn-primary fas fa-eye"></i> to view!
             </th>
             <th>
               <button id="browseFromView" class="btn btn-secondary">
-                Back to <br/>browse
-                <i class="fas fa-sign-out-alt"></i>
+                Back <i class="fas fa-sign-out-alt"></i>
               </button>
             </th>
           </tr>
@@ -58,6 +57,8 @@
               <i class="fas fa-search fa-stack-2x"></i>
               <i id="notifyDot" class="fas fa-circle fa-stack-1x red"></i>
             </span>
+            <span class="buttonText">SEARCH</span>
+
           </span>
         </div>
         <div class="col banner center border height_100 thirdWidth">
@@ -68,6 +69,8 @@
         <div class="col banner center border height_100 thirdWidth">
           <span id="modify" class="banner_text">
             <i class="far fa-edit fa-5x"></i>
+            <span class="buttonText">EDIT</span>
+
           </span>
         </div>
       </div>
@@ -78,11 +81,15 @@
         <div class="col banner center border height_100 halfWidth">
           <span id="randomize" class="banner_text responsive_font_4">
             <i class="fas fa-dice fa-5x"></i>
+            <span class="buttonText">Random</span>
+
           </span>
         </div>
         <div class="col banner center border height_100 halfWidth">
           <span id="browse" class="banner_text responsive_font_4">
             <i class="far fa-check-square fa-5x"></i>
+            <span class="buttonText">Submit</span>
+
           </span>
         </div>
       </div>
@@ -99,37 +106,43 @@
     <div id="bottom_banner" class="bottom_banner2">
       <div class="row section group height_100">
         <div class="col banner center border height_100 quarterWidth">
-          <span id="mingle" class="banner_text">
+          <span id="mingle" class="banner_text responsive_font_4 mingle_toggle">
             <i id="mingleIcon" class="fas fa-music fa-4x"></i>
-            <span id="mingleText"></span>
+            <span class="buttonText">MINGLE</span>
           </span>
+          <span id="mingleText" class ="mingle_toggle"></span>
+
         </div>
         <div class="col banner center border height_100 quarterWidth">
           <span id="like" class="banner_text responsive_font_4">
             <i id="likeIcon" class="fas fa-heart fa-4x"></i>
+            <span class="buttonText">LOVE</span>
+
           </span>
         </div>
         <div class="col banner center border height_100 quarterWidth">
           <span id="prevPattern" class="banner_text">
             <i class="fas fa-arrow-circle-left fa-4x"></i>
+            <span class="buttonText">PREV</span>
           </span>
         </div>
         <div class="col banner center border height_100 quarterWidth">
           <span id="nextPattern" class="banner_text">
             <i class="fas fa-arrow-circle-right fa-4x"></i>
+            <span class="buttonText">NEXT</span>
           </span>
         </div>
       </div>
     </div>
     <div id="initial-message" class="dialog-message">
       <div>
-        <h1>Crowd in C[loud]</h1>
+        <h1>Crowd in C</h1>
         <div class="responsive_font_4">
-          Please enter a nickname to participate: 
+          Please enter a nickname to participate:
         </div>
         <div id="name_error_msg" class="red responsive_font_4"></div>
         <div class="buttons center">
-          <input type="text" name="screenname" id="screenname" value="" 
+          <input type="text" name="screenname" id="screenname" value=""
                  class="ui-widget-content ui-corner-all responsive_font_4"/>
           <br/>
           <br/>
@@ -139,21 +152,20 @@
     </div>
     <div id="waiting-message" class="dialog-message">
       <div>
-        <h1>Crowd in C[loud]</h1>
+        <h1>Crowd in C</h1>
         <div class="responsive_font_4">Waiting for a response...</div>
-        <div class="responsive_font_4">If it hangs more than 10 seconds, 
-          try refreshing the page. Green dots are yours, 
-          red dots belong to other users.</div>
+        <div class="responsive_font_4">If it hangs more than 10 seconds,
+          try refreshing the page. You can use the same name. </div>
       </div>
     </div>
     <div id="question-message" class="dialog-message">
       <div>
-        <h1>Crowd in C[loud]</h1>
-        <div class="responsive_font_4">I have a question.</div>
-        <div class="responsive_font_4" id="question_content"></div>
-        <div style="text-align:right;font-size:10em;">
-          <button id="answer_yes"><h1 style="font-size: xx-large;">Yes</h1></button>
-          <button id="answer_no"><h1 style="font-size: xx-large;">No</h1></button>
+        <h1>Crowd in C</h1>
+        <div class="responsive_font_4"><br></div>
+        <div class="responsive_font_4"><strong><span id="question_content"></span></strong></div>
+        <div style="text-align:right;font-size:4em;">
+          <button id="answer_yes" class="btn btn-lg btn-success"><h1>Yes</h1></button>
+          <button id="answer_no" class="btn btn-lg btn-danger"><h1>No</h1></button>
         </div>
       </div>
     </div>
@@ -175,14 +187,16 @@
       <h1 class="msg_header">Congrats, you did it!</h1>
     </div>
     <div class="mingleRequest message">
-      <h1 id="requestHeader" class="msg_header text-center">mingle request from phil beemis</h1>
-      <div class="row justify-content-center">
-        <button id="mingleYes" class="btn btn-lg btn-success">Accept</button>
-        &emsp;            
-        <button id="mingleNo" class="btn btn-lg btn-info">Ignore</button>
-        &emsp;            
-        <button class="btn btn-lg btn-secondary">Hide</button>
-      </div>
+      <br><br><br>
+      <h1 id="requestHeader" class="msg_header">Mingle request from phil beemis</h1>
+      <span class="mingle_buttons">
+        <button id="mingleYes" class="btn btn-lg btn-success mingle_button">Accept</button>
+        &emsp;
+        <button id="mingleNo" class="btn btn-lg btn-info mingle_button">Ignore</button>
+        <!-- &emsp;
+        <button class="btn btn-lg btn-secondary">Hide</button> -->
+      </span>
+      <br><br><br>
     </div>
   </body>
 </html>
