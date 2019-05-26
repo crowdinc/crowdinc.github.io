@@ -184,6 +184,10 @@ h1,h2,h3,h4 {
   vertical-align: middle;
 }
 
+#STANDBY {
+  visibility: visible;
+}
+
 table {
   width: 100%;
 }
