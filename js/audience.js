@@ -699,10 +699,10 @@ $(document).ready(function () {
           if (m.res == 's') {
             changeState(state, 'EDIT');
             setTimeout(function(){
-              showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizotanl axis)', true, 5000);
+              showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizontal axis)', true, 5000);
             },3000);
             setTimeout(function(){
-              showMessage('info', 'Once you are done with your melody, you can submit it and see what other people did! You can ak come back and EDIT your melody!', true, 4000);
+              showMessage('info', 'Once you are done with your melody, you can submit it and see what other people did! You can also come back and EDIT your melody!', true, 4000);
             },12000);
 
             $('#initial-message').bPopup().close();
