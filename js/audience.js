@@ -58,6 +58,11 @@ var currentRequestNickname = '';
 var myMessages = ['info', 'warning', 'error', 'success', 'like', 'mingleRequest'];
 
 $(document).ready(function () {
+
+  $('#STANDBY').css('visibility', 'visible');
+  $('#STANDBY').css('z-index', '2');
+  showMessage('warning', 'STANDBY, Crowd in C is about to start.');
+
   function changeState(oldState, newState, moreData) {
     if (moreData) {
       publishMessage('log', {
@@ -80,7 +85,7 @@ $(document).ready(function () {
     }
     state = newState;
   }
-  
+
   function trimPattern() {
     // for some reason this is the only deep clone by value method that works here
     var patternCopy = JSON.parse(JSON.stringify(pattern));
@@ -92,7 +97,7 @@ $(document).ready(function () {
     var patternStr = '"' + JSON.stringify(patternCopy).replace(/"/g, '""') + '"';
     return patternStr;
   }
-  
+
 
   function hideAllMessages() {
     var messagesHeights = []; // this array will store height for each
@@ -491,7 +496,7 @@ $(document).ready(function () {
   }
 
   function getNewPattern(direction) {
-    
+
     changeState(state, 'WAIT');
     NORESPONSE3++;
 
@@ -503,7 +508,7 @@ $(document).ready(function () {
       type: direction,
       index: myIndex
     });
-    
+
     $('#screenBlock').css('visibility', 'visible');
     $('#waiting-message').css('visibility', 'visible');
   }
@@ -603,7 +608,7 @@ $(document).ready(function () {
     /*to handle users entering mingle from any other state -
     could vary based on when their request is accepted*/
     var prevState = state;
-    
+
     changeState(prevState, 'MINGLE', nicknameElse);
 
     setTimeout(function(){
@@ -726,9 +731,9 @@ $(document).ready(function () {
               index: myIndex,
               pattern: pattern
             });
-            
+
             var patternStr = trimPattern();
-            
+
             publishMessage('log', {
               type: 'create',
               user: strScreenName,
