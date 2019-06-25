@@ -575,7 +575,7 @@ $(document).ready(function () {
   function randomizeNote() {
     for (var i = 0; i < patternSize; i++) {
       var note = new Note();
-      note.setPosition(Math.random(), Math.random());
+      note.setPosition(0.2+0.6*Math.random(), 0.2+0.6*Math.random());
       pattern[i] = note;
     }
 
