@@ -68,7 +68,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'stateChange',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: state,
         data2: newState,
         data3: moreData
@@ -78,7 +78,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'stateChange',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: state,
         data2: newState
       });
@@ -545,7 +545,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'leavePage2',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: state,
       data2: 'EXIT',
       data3: ""
@@ -564,7 +564,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'leavePage',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: state,
       data2: 'EXIT',
       data3: ""
@@ -685,7 +685,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'join',
         user: 'audience',
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: myID
       });
       joinMessageSent = true;
@@ -737,7 +737,7 @@ $(document).ready(function () {
             publishMessage('log', {
               type: 'create',
               user: strScreenName,
-              timestamp: Math.floor(Date.now()),
+              timestamp: Date.now(),
               data1: patternStr
             });
           }
@@ -979,7 +979,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'questionAnswer',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: $('#question_content').text(),
       data2: 'yes'
     });
@@ -991,7 +991,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'questionAnswer',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: $('#question_content').text(),
       data2: 'no'
     });
@@ -1084,7 +1084,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'randomize',
       user: strScreenName,
-      timestamp: Math.floor(Date.now())
+      timestamp: Date.now()
     });
   });
 
@@ -1167,7 +1167,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'acceptRequest',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: nicknameFrom
       });
 
@@ -1193,7 +1193,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'ignoreRequest',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: nicknameFrom
       });
     }
@@ -1220,7 +1220,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'cancelRequest',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: $('#mingleText').text().slice(19, -23)
       });
     }
@@ -1238,7 +1238,7 @@ $(document).ready(function () {
       publishMessage('log', {
         type: 'sendRequest',
         user: strScreenName,
-        timestamp: Math.floor(Date.now()),
+        timestamp: Date.now(),
         data1: nicknameElse
       });
     }
@@ -1272,7 +1272,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'acceptRequest',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: $('#requestHeader').text().slice(20)
     });
   });
@@ -1289,7 +1289,7 @@ $(document).ready(function () {
     publishMessage('log', {
       type: 'ignoreRequest',
       user: strScreenName,
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       data1: $('#requestHeader').text().slice(20)
     });
   });
@@ -1605,7 +1605,7 @@ $(document).ready(function () {
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
-          timestamp: Math.floor(Date.now()),
+          timestamp: Date.now(),
           data1: state,
           data2: patternStr
         });
@@ -1681,7 +1681,7 @@ $(document).ready(function () {
         publishMessage('log', {
           type: 'noteMove',
           user: strScreenName,
-          timestamp: Math.floor(Date.now()),
+          timestamp: Date.now(),
           data1: state,
           data2: patternStr
         });

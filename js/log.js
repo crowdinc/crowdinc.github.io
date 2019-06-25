@@ -17,32 +17,33 @@ pubnub.subscribe({
   heartbeat: 15
 });
 
-var startTime;
+var startTime = Date.now();
 
 function parseMessage(m) {
+  var currentTime = Date.now();
   if (m.type == 'total refresh') window.location.reload();
   else if (m.type == 'join' && m.user == 'performer') startTime = m.timestamp;
   else if (m.type == 'epoch') {
-    startTime = m.epoch;
+    startTime = Date.now();
     return;
   }
   if (!m.data1) m.data1 = '';
   if (!m.data2) m.data2 = '';
   if (!m.data3) m.data3 = '';
-  
+
   // add a row containing the info in the message
-  $('#actions').append(m.type + ',' + m.user + ',' + (m.timestamp - startTime) 
+  $('#actions').append(m.type + ',' + m.user + ',' + m.timestamp ',' + (currentTime - startTime) 
                        + ',' + m.data1 + ',' + m.data2 + ',' + m.data3 + '<br/>');
-  
-  
+
+
   // html table method
-  /*$('#actionsTable').append('<tr><td>' + m.type + '</td><td>' 
-                            + m.user + '</td><td>' 
-                            + (m.timestamp - startTime) + '</td><td>' 
+  /*$('#actionsTable').append('<tr><td>' + m.type + '</td><td>'
+                            + m.user + '</td><td>'
+                            + (m.timestamp - startTime) + '</td><td>'
                             + m.data1 +  '</td><td>'
                             + m.data2 +  '</td><td>'
                             + m.data3 +  '</td></tr>');*/
-  
+
   window.scrollTo(0, document.body.scrollHeight);
 }
 
@@ -57,4 +58,3 @@ $(document).ready(function() {
     }
   });
 });
-

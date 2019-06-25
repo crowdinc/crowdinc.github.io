@@ -361,11 +361,11 @@ function parseMessage(m) {
 // handler for presence events
 function performanceStatus(message) {
   if (message.action == 'join' && message.channel == 'performer') {
-    epoch = Math.floor(Date.now());
+
     publishMessage('log', {
       type: 'join',
       user: 'performer',
-      timestamp: epoch,
+      timestamp: Date.now(),
       data1: pubnub.getUUID()
     });
   };
