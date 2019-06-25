@@ -32,7 +32,7 @@ function parseMessage(m) {
   if (!m.data3) m.data3 = '';
 
   // add a row containing the info in the message
-  $('#actions').append(m.type + ',' + m.user + ',' + m.timestamp ',' + (currentTime - startTime) 
+  $('#actions').append(m.type + ',' + m.user + ',' + m.timestamp + ',' + (currentTime - startTime) 
                        + ',' + m.data1 + ',' + m.data2 + ',' + m.data3 + '<br/>');
 
 
