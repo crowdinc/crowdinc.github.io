@@ -555,7 +555,7 @@ $(document).ready(function () {
 
   window.onbeforeunload =  function(e) {
   //     return "Are you sure you want to leave this page?";
-     };
+  //   };
   // window.onunload = function() {
   //   alert("onunloadrunning");
   //   console("onunloadrunning");
