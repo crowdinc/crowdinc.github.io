@@ -537,7 +537,7 @@ $(document).ready(function () {
     }
   }
 
-  window.addEventListener('unload', function(e) {
+  window.onunload =  function(e) {
 
 
     userleft();
@@ -551,11 +551,11 @@ $(document).ready(function () {
       data3: ""
     });
     console.log("message");
-});
+};
 
-  window.addEventListener('beforeunload', function(e) {
+  window.onbeforeunload =  function(e) {
   //     return "Are you sure you want to leave this page?";
-  //   };
+     };
   // window.onunload = function() {
   //   alert("onunloadrunning");
   //   console("onunloadrunning");
@@ -570,7 +570,7 @@ $(document).ready(function () {
       data3: ""
     });
     return "Are you sure you want to leave this page?";
-  });
+  };
 
   function randomizeNote() {
     for (var i = 0; i < patternSize; i++) {
