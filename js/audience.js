@@ -702,7 +702,7 @@ $(document).ready(function () {
         case 'create-response':
           NORESPONSE1 = false;
           if (m.res == 's') {
-            changeState(state, 'EDIT');
+            changeState(state, 'EDIT',myID);
             setTimeout(function(){
               showMessage('info', 'You can compose a short melody by moving the green dots. You can control pitch (vertical axis) and timbre (horizotanl axis)', true, 5000);
             },3000);
@@ -739,7 +739,6 @@ $(document).ready(function () {
               user: strScreenName,
               timestamp: Date.now(),
               data1: patternStr,
-              data2: myID
             });
           }
           else {
