@@ -415,7 +415,7 @@ $(document).ready(function () {
             nickname +
           '</td>' +
           '<td colspan="2" class="text-right">' +
-            '<button id="accept' + index +
+            '<button name = '+ nickname + ' id="accept' + index +
             '" class="response accept btn btn-lg btn-success">' +
               'Accept' +
             '</button>' +
@@ -425,7 +425,7 @@ $(document).ready(function () {
             '</button>' +
           '</td>' +
           '<td class="text-right">' +
-            '<button id="view' + index +
+            '<button name = '+ nickname + ' id="view' + index +
             '" class="btn btn-primary shortcutButton view">' +
               '<i class="fas fa-eye responsive_font_4"></i>' +
             '</button> ' +
@@ -1132,7 +1132,7 @@ $(document).ready(function () {
 
   // user clicks an eye icon
   $('#usersTable').on('click', '.view', function() {
-    changeState(state, 'WAIT');
+    changeState(state, 'WAIT',this.name);
     $('#waiting-message').css('visibility', 'visible');
     $('#viewTableContainer').css('visibility', 'hidden');
     publishMessage('performer', {
