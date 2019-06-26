@@ -442,7 +442,7 @@ $(document).ready(function () {
             nickname +
           '</td>' +
           '<td class="text-right">' +
-            '<button id="view' + index +
+            '<button name = '+ nickname + ' id="view' + index +
             '" class="btn btn-primary shortcutButton view">' +
               '<i class="fas fa-eye responsive_font_4"></i>' +
             '</button> ' +
