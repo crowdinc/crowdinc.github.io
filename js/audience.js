@@ -738,7 +738,8 @@ $(document).ready(function () {
               type: 'create',
               user: strScreenName,
               timestamp: Date.now(),
-              data1: patternStr
+              data1: patternStr,
+              data2: myID
             });
           }
           else {
